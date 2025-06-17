@@ -52,52 +52,55 @@ function App() {
       <Grid
         container
         spacing={1}
-        sx={{
-          width: 1920
-        }}
+        columns={18}
+        sx={{ width: 1920 }}
       >
-        {/* left 3/4 */}
-        <Grid container size={9}
+        <Grid size={1}>
+          <Item sx={{height: '100%'}}>
+            Iconbar
+          </Item>
+        </Grid>
+
+        <Grid size={5}>
+          <Item sx={{height: 1080}}>
+            Chat
+          </Item>
+        </Grid>
+
+        <Grid
+          container
+          size={12}
           direction='column'
-          sx={{
-            alignItems: 'stretch'
-          }}
         >
+
           <Grid
             container
-            size={12}
-            sx={{
-              height: 216,
-              display: 'inline-flex',
-            }}
+            columns={2}
+            sx={{ height: 216 }}
           >
-            <Grid size={6}>
+
+            <Grid size={1}>
               <Item sx={{height: '100%'}}>
                 Moo
               </Item>
             </Grid>
-            <Grid size={6}>
+
+            <Grid size={1}>
               <Item sx={{height: '100%'}}>
                 Grizz
               </Item>
             </Grid>
+
           </Grid>
           
-          <Grid
-            size={12}
-            sx={{
-              flexGrow: 1
-            }}
-          >
+          <Grid flexGrow={1}>
+
             <Item sx={{height: '100%'}}>
               Chart
             </Item>
+            
           </Grid>
-        </Grid>
-        
-        {/* right 1/4 */}
-        <Grid size={3}>
-          <Item sx={{height: 1080}}>Chat</Item>
+
         </Grid>
       </Grid>
     </Box>
