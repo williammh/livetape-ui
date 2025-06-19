@@ -10,11 +10,11 @@ import {
   Grid,
   Paper,
 } from '@mui/material'
-import { SymbolsContext, getSymbols } from './Context';
+import { BarsContext, getBars } from './Context';
+import { CandlestickChart } from './components/Chart';
 import { styled } from '@mui/material/styles';
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#fff',
   ...theme.typography.body2,
   padding: theme.spacing(1),
   textAlign: 'center',
@@ -24,20 +24,16 @@ const Item = styled(Paper)(({ theme }) => ({
   }),
 }));
 
-function App() {
+
+const App = () => {
   const [assetClass, setAssetClass] = useState('Futures');
-  const { allSymbols, setAllSymbols } = useContext(SymbolsContext);
+  const { bars, setBars } = useContext(BarsContext);
   
   useEffect(() => {
     (async (): Promise<void> => {
-			setAllSymbols(await getSymbols());
+			setBars(await getBars());
 		})();
-
 	}, []);
-
-  useEffect(() => {
-     console.log(allSymbols);
-	}, [allSymbols]);
   
   const handleChangeAssetClass = (
     event: MouseEvent<HTMLElement>,
@@ -94,11 +90,9 @@ function App() {
           </Grid>
           
           <Grid flexGrow={1}>
-
             <Item sx={{height: '100%'}}>
-              Chart
+              <CandlestickChart  bardata={bars} />
             </Item>
-            
           </Grid>
 
         </Grid>

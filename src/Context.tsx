@@ -4,33 +4,32 @@ import React, {
 	type SetStateAction,
     type JSX
 } from 'react';
-// import { IPlayerSearchResult } from '../Types/types';
 
-const SymbolsContext = React.createContext({} as IAllSymbolsContext);
+const BarsContext = React.createContext({} as IBarsContext);
 
 interface ContextProviderProps {
   children: React.ReactNode
 }
 
-interface IAllSymbolsContext {
-	allSymbols: object;
-	setAllSymbols: Dispatch<SetStateAction<Array<any>>>
+interface IBarsContext {
+	bars: object;
+	setBars: Dispatch<SetStateAction<Array<any>>>
 }
 
-export const getSymbols = async () => {
-	const response = await fetch("http://localhost:8000");
+export const getBars = async () => {
+	const response = await fetch("http://localhost:8000/bars");
 	return await response.json();
 }
 
-const SymbolsContextProvider = (props: ContextProviderProps): JSX.Element => {
+const BarsContextProvider = (props: ContextProviderProps): JSX.Element => {
 
-	const [allSymbols, setAllSymbols] = useState([] as Array<any>);
+	const [bars, getBars] = useState([] as Array<any>);
 
 	return (
-		<SymbolsContext.Provider value={{allSymbols, setAllSymbols}}>
+		<BarsContext.Provider value={{bars: bars, setBars: getBars}}>
 			{props.children}
-		</SymbolsContext.Provider>
+		</BarsContext.Provider>
 	)
 }
 
-export {SymbolsContextProvider, SymbolsContext}
+export {BarsContextProvider, BarsContext}
