@@ -12,6 +12,8 @@ import {
 } from '@mui/material'
 import { BarsContext, getBars } from './Context';
 import { CandlestickChart } from './components/Chart';
+import { Chat } from './components/Chat';
+
 import { styled } from '@mui/material/styles';
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -23,7 +25,6 @@ const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: '#1A2027',
   }),
 }));
-
 
 const App = () => {
   const [assetClass, setAssetClass] = useState('Futures');
@@ -59,7 +60,7 @@ const App = () => {
 
         <Grid size={5}>
           <Item sx={{height: 1080}}>
-            Chat
+            <Chat />
           </Item>
         </Grid>
 

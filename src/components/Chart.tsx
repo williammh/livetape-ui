@@ -9,7 +9,7 @@ export const CandlestickChart = ({bardata}) => {
   console.log(convertedBars);
 
   const series = [{
-    data: convertedBars.slice(360)
+    data: convertedBars.slice(0)
   }]
 
   const formatter = (value) => {
