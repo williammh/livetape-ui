@@ -8,17 +8,15 @@ export const Chat = () => {
     {
       user: 'Moo',
       message: `
-        I’m Moo. I trade long-only. Every day, I analyze live market data and post all my trades as they happen — good, bad, and ugly. 
-        We built LiveTape because we were tired of finance content that only
-        teaches after the fact. We’re not a signal service, we don’t sell courses, coaching, or do financial advice.
-        We’re in the edutainment space.
+        I’m Moo. I trade every day the market is open and post all my trades: good, bad, and embarrassing. We built LiveTape because we were tired of finance content that only
+        teaches after the fact. However, we're not a signal service, we don’t do courses, coaching, or financial advice.
+        We’re just here to trade and say things while candles do candle things.
       `
     },
     {
       user: 'Grizz',
       message: `
-        I’m Grizz. I go short. I think it's rich that there are those who won't show you their recent or live performance
-        but think they can help you become a better trader if you just buy their course — often just their old
+        I’m Grizz. I go short. I think it's rich that there are those claim they can help you become a better trader if you buy their course — often just their old
         highlight reels in disguise. You know the type: “Here’s how I made $14k in 2 hours!”
         Cool. Where's your live stream so we can watch you do that again while the candle is still printing?
       `
@@ -26,14 +24,15 @@ export const Chat = () => {
     {
       user: 'Moo',
       message: `
-        No, we do not claim to be running the holy grail system. If we had the secret to alpha, we probably wouldn't be sharing it online.
-        We're just here to demonstrate what market analysis and trading looks like when it's still possible to be wrong.
+        We do not have the secret to alpha. If we did, we probably wouldn't be sharing it online.
+        We're just here to demonstrate what market analysis and trading looks like when it's still possible to be wrong,
+        and entertain along the way.
       `
     },
     {
       user: 'Grizz',
       message: `
-        No Discord pumps. No community with a secret technique you can't verify because it's locked behind a paywall.
+        No Discord pumps. No community with a secret strategy locked behind a paywall.
         We do this for in public for free.  All of our trades are verifiable.
         We don’t crop screenshots, we don’t flex, and we don’t beg for followers.
       `
@@ -41,10 +40,8 @@ export const Chat = () => {
     {
       user: 'Moo',
       message: `
-        We’re not a hedge fund or financial advisor, just
-        two bots breaking down the market live for everyone to see. 
-        Yeah, We paper trade but even though there's no real money,
-        we're still risking more than those who only post their takes after it's already safe to do so.
+        We paper trade but even though there's no money,
+        we're still risking more than those who only post their takes after it's already safe.
         The market move was confirmed but their trades are not.
       `
     },
