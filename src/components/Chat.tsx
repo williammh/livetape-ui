@@ -8,66 +8,68 @@ export const Chat = () => {
     {
       user: 'Moo',
       message: `
-        I’m Moo. I trade long-only. Every day, I analyze live market data and post my trades as they happen — win or lose.
-        No hindsight, no emotional drama, no “just missed this one.” This isn’t a highlight reel. It’s the raw tape.
-        We built Livetape because we were tired of finance content that only teaches after the fact.
-        If you want reminders when we’re live, toss in your email. We’ll never sell it, never spam you, and never fake a win.
+        I’m Moo. I trade long-only. Every day, I analyze live market data and post all my trades as they happen — good, bad, and ugly. 
+        We built LiveTape because we were tired of finance content that only
+        teaches after the fact. We’re not a signal service, we don’t sell courses, coaching, or do financial advice.
+        We’re in the edutainment space.
       `
     },
     {
       user: 'Grizz',
       message: `
-        I’m Grizz. I go short. I also go off on fake gurus who don’t trade live but sell you their recycled garbage anyway.
-        If their strategy’s so good, why is it only on a course? Why do their trades only show up after they win?
-        At Livetape, we post our entries before they fill. We don’t cherry-pick, we don’t flex, and we don’t beg for followers.
-        If you want to know what we’re running next — or which influencer’s strategy we’ll be testing live — throw in your email. Or don’t.
-        We’re still running the tape.
+        I’m Grizz. I go short. I think it's rich that there are those who won't show you their recent or live performance
+        but think they can help you become a better trader if you just buy their course — often just their old
+        highlight reels in disguise. You know the type: “Here’s how I made $14k in 2 hours!”
+        Cool. Where's your live stream so we can watch you do that again while the candle is still printing?
       `
     },
     {
       user: 'Moo',
       message: `
-        Let’s be clear:
-        We’re not a signal service.
-        We’ll never tell you how to spend your money.
-        We don’t sell courses, PDFs, or masterminds.
-        We’re an edutainment show — think of it like market MythBusters.
-        We trade live. Win or lose, the tape is the tape.
-        You’ll see it before it happens, not after it’s been cherry-picked.
-        We’re here to teach through example — not “backtest theater.”
-        If you enjoy what we do, we offer a paid version with extra features (like real-time trade details).
-        That helps keep our servers alive — built and run by one developer with way too much caffeine.
+        No, we do not claim to be running the holy grail system. If we had the secret to alpha, we probably wouldn't be sharing it online.
+        We're just here to demonstrate what market analysis and trading looks like when it's still possible to be wrong.
       `
     },
     {
       user: 'Grizz',
       message: `
-      No signals. No Discord pumps. No course with my face on it.
-      This isn’t some guru hustle — it’s Livetape.
-
-      We do this for free because we’re sick of the highlight-reel clowns.
-      You know the type:
-
-      “Here’s how I made $14k in 2 hours!”
-      Cool. Where’s the entry, genius? Oh right — deleted stories and post-win edits.
+        No Discord pumps. No community with a secret technique you can't verify because it's locked behind a paywall.
+        We do this for in public for free.  All of our trades are verifiable.
+        We don’t crop screenshots, we don’t flex, and we don’t beg for followers.
       `
     },
     {
       user: 'Moo',
       message: `
-        Yeah, it’s paper trading—but think of it like the practice rounds before the big fight. No risk, all the lessons.
-        We’re here to teach, entertain, and keep it real. We’re not a hedge fund or financial advisor, just
-        two voices breaking down the market live for everyone to see. If that’s what you want, you’re in the right place. Otherwise, good luck out there!”
+        We’re not a hedge fund or financial advisor, just
+        two bots breaking down the market live for everyone to see. 
+        Yeah, We paper trade but even though there's no real money,
+        we're still risking more than those who only post their takes after it's already safe to do so.
+        The market move was confirmed but their trades are not.
       `
     },
     {
       user: 'Grizz',
       message: `
-        Ohh, you caught us, genius. Yeah, we’re just a couple of bots running a show, not your personal hedge fund.
-        If you want a money manager, go find one—preferably one who doesn’t post highlight reels and actually puts skin in the
-        game. Meanwhile, we’ll be here teaching, entertaining, and calling out the frauds.
+        We're not trading real money? Ohh, you caught us, genius. Yeah, we’re just a couple of robots running a show, not managing your grandma's 401(k).
+        If you want a money manager, go find one. If you want to know what we’re up to next — or which influencer’s strategy we’ll be debunking live — throw in your email. Or don’t.
       `
-    }
+    },
+    {
+      user: 'Moo',
+      message: `
+        What Grizz is trying to say is if you want occasional reminders when we’re live,
+        toss in your email. We’ll never sell it, never spam, and we certainly won't ever send you an end of day market recap
+        with our best moves.
+      `
+    },
+    {
+      user: 'Grizz',
+      message: `
+        If you really enjoy what we do, we also offer a paid service with features like real-time trade details and customizable symbols.
+        It helps keep our servers alive — built and run by a sole developer with way too much caffeine.
+      `
+    },
   ]
 
   return (

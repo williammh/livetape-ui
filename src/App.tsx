@@ -29,12 +29,50 @@ const Item = styled(Paper)(({ theme }) => ({
 const App = () => {
   const [assetClass, setAssetClass] = useState('Futures');
   const { bars, setBars } = useContext(BarsContext);
+  const [isUpdatingBars, setIsUpdatingBars] = useState(false);
   
-  useEffect(() => {
+  const updateBars = () => {
     (async (): Promise<void> => {
 			setBars(await getBars());
 		})();
+  }
+
+  useEffect(() => {
+    updateBars();
 	}, []);
+
+  useEffect(() => {
+		const seconds = 1;
+		const milliseconds = seconds * 1000
+		const minuteTimer = setInterval(() => {
+      const now = new Date();
+      const nowStr = now.toISOString().slice(0, 19) + 'Z';
+      now.setSeconds(0);
+      const nowStrTopMinute = now.toISOString();
+      const nowRfc3339 = nowStrTopMinute.slice(0, nowStrTopMinute.indexOf('.')) + 'Z';
+      const lastBarDatetime = bars[bars.length - 1].TimeStamp;
+      
+      console.log(nowStr, lastBarDatetime, isUpdatingBars);
+      // console.log(lastBarDatetime); 
+      // console.log(isUpdatingBars);
+
+      if (nowRfc3339 >= lastBarDatetime && !isUpdatingBars) {
+        console.log(`updating bars at ${nowRfc3339}`);
+        setIsUpdatingBars(true);
+        updateBars();
+      } else if (nowStr < lastBarDatetime && isUpdatingBars) {
+        console.log("Done updating bars!");
+        setIsUpdatingBars(false);
+      }
+
+		}, milliseconds);
+	
+		return () => {
+		  clearInterval(minuteTimer);
+		}
+
+  }, [bars, isUpdatingBars]);
+	
   
   const handleChangeAssetClass = (
     event: MouseEvent<HTMLElement>,
@@ -50,7 +88,7 @@ const App = () => {
         container
         spacing={1}
         columns={18}
-        sx={{ width: 1920 }}
+        sx={{ width: 1920, height: 1080 }}
       >
         <Grid size={1}>
           <Item sx={{height: '100%'}}>
@@ -78,13 +116,13 @@ const App = () => {
 
             <Grid size={1}>
               <Item sx={{height: '100%'}}>
-                Moo
+                Moo Open Orders and Positions
               </Item>
             </Grid>
 
             <Grid size={1}>
               <Item sx={{height: '100%'}}>
-                Grizz
+                Grizz Open Orders and Positions
               </Item>
             </Grid>
 
