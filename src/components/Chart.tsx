@@ -2,21 +2,45 @@ import Chart from 'react-apexcharts';
 import {
   useState,
   useEffect,
+  use,
 } from 'react';
 import { 
   Box,
   Autocomplete,
-  TextField
-} from '@mui/material'
+  TextField,
+  Typography,
+  Grid
+} from '@mui/material';
+
 export const CandlestickChart = ({bardata}) => {
   const convertedBars = bardata.map((bar) => ({
     x: new Date(bar['TimeStamp']),
     y: [bar['Open'], bar['High'], bar['Low'], bar['Close']]
   }));
 
-  // console.log(convertedBars);
   const defaultSymbol = 'MNQU25'
   const [symbol, setSymbol] = useState(defaultSymbol);
+
+  const options: Intl.DateTimeFormatOptions = {
+      timeZone: 'America/Los_Angeles',
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+  }
+  
+  const lastDateTime: Date = convertedBars[convertedBars.length - 1]?.['x'];
+  const lastDateTimeISOString = lastDateTime?.toISOString().slice(0, 19) + 'Z';
+  const lastDateTimeLocaleString = lastDateTime?.toLocaleString('en-US', options);
+  const dateTimeString = `${lastDateTimeLocaleString} | ${lastDateTimeISOString}`;
+
+  useEffect(() => {
+    if (lastDateTime) {
+      console.log(dateTimeString);
+    }
+  }, [lastDateTime]);
 
 
   const formatter = (value: string) => {
@@ -25,23 +49,32 @@ export const CandlestickChart = ({bardata}) => {
 
   return (
     <Box>
-      <Autocomplete 
-        options={['MESU25', 'MNQU25']}
-        defaultValue={defaultSymbol}
-        onChange={(_event, value) => setSymbol(value!)}
-        renderInput={(params) => (
-          <TextField
-          {...params}
-          label="Symbol"
-          size="small"
-          />
-        )}
-        sx={{
-          width: 160,
-        }}
-        disableClearable={true}
-        // disabled={true}
-      />
+      <Grid
+        container
+        spacing={1}
+        columns={18}
+        direction="row"
+        alignItems="center"
+      >
+        <Autocomplete 
+          options={['MESU25', 'MNQU25']}
+          defaultValue={defaultSymbol}
+          onChange={(_event, value) => setSymbol(value!)}
+          renderInput={(params) => (
+            <TextField
+            {...params}
+            label="Symbol"
+            size="small"
+            />
+          )}
+          sx={{
+            width: 160,
+          }}
+          disableClearable={true}
+          // disabled={true}
+        />
+        <Typography>{dateTimeString}</Typography>
+      </Grid>
       <Box>
         <Chart
           series={[{

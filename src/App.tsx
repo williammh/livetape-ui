@@ -40,29 +40,52 @@ const App = () => {
   useEffect(() => {
     updateBars();
 	}, []);
-
+  
   useEffect(() => {
 		const seconds = 1;
 		const milliseconds = seconds * 1000
 		const minuteTimer = setInterval(() => {
       const now = new Date();
       const nowStr = now.toISOString().slice(0, 19) + 'Z';
-      now.setSeconds(0);
-      const nowStrTopMinute = now.toISOString();
-      const nowRfc3339 = nowStrTopMinute.slice(0, nowStrTopMinute.indexOf('.')) + 'Z';
-      const lastBarDatetime = bars[bars.length - 1].TimeStamp;
+      const lastBarDatetimeStr = bars[bars.length - 1]?.TimeStamp;
       
-      console.log(nowStr, lastBarDatetime, isUpdatingBars);
-      // console.log(lastBarDatetime); 
-      // console.log(isUpdatingBars);
+      const lastBarCloseDatetime = new Date(lastBarDatetimeStr);
+      const lastBarCloseUTC = new Date(
+        Date.UTC(
+          lastBarCloseDatetime.getFullYear(),
+          lastBarCloseDatetime.getMonth(),
+          lastBarCloseDatetime.getDate(),
+          lastBarCloseDatetime.getUTCHours(),
+          lastBarCloseDatetime.getMinutes(),
+          lastBarCloseDatetime.getSeconds(),
+        )
+      )
 
-      if (nowRfc3339 >= lastBarDatetime && !isUpdatingBars) {
-        console.log(`updating bars at ${nowRfc3339}`);
+      const currBarCloseUTC = new Date(
+        Date.UTC(
+          lastBarCloseUTC.getFullYear(),
+          lastBarCloseUTC.getMonth(),
+          lastBarCloseUTC.getDate(),
+          lastBarCloseUTC.getUTCHours(),
+          lastBarCloseUTC.getMinutes() + 1,
+          lastBarCloseUTC.getSeconds(),
+        )
+      )
+
+      console.log(lastBarCloseDatetime.toUTCString());
+      console.log(now.toUTCString());
+      console.log(currBarCloseUTC.toUTCString());
+      console.log("      ");
+
+      if (currBarCloseUTC <= now && !isUpdatingBars) {
+        console.log(`Start updating bars at ${nowStr}`);
         setIsUpdatingBars(true);
         updateBars();
-      } else if (nowStr < lastBarDatetime && isUpdatingBars) {
-        console.log("Done updating bars!");
+      } else if (currBarCloseUTC > now && isUpdatingBars) {
+        console.log(`Done updating bars at ${nowStr}`);
         setIsUpdatingBars(false);
+      } else if (isUpdatingBars) {
+        console.log(`Still updating bars at ${nowStr}`);
       }
 
 		}, milliseconds);

@@ -17,7 +17,7 @@ interface IBar {
 	low: number;
 	close: number;
 	totalVolume: number;
-	timestamp: string;
+	TimeStamp: string;
 }
 
 interface IBarsContext {
