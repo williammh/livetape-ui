@@ -2,6 +2,7 @@ import {
   useState,
   useEffect,
   useContext,
+  useRef,
   type SetStateAction,
   type MouseEvent
 } from 'react'
@@ -13,6 +14,7 @@ import {
 import { BarsContext, getBars } from './Context';
 import { CandlestickChart } from './components/Chart';
 import { Chat } from './components/Chat';
+import { useWebSocket } from './useWebsocket';
 
 import { styled } from '@mui/material/styles';
 
@@ -29,74 +31,13 @@ const Item = styled(Paper)(({ theme }) => ({
 const App = () => {
   const [assetClass, setAssetClass] = useState('Futures');
   const { bars, setBars } = useContext(BarsContext);
-  const [isUpdatingBars, setIsUpdatingBars] = useState(false);
-  
-  const updateBars = () => {
-    (async (): Promise<void> => {
-			setBars(await getBars());
-		})();
-  }
+
+  const barsRef = useRef(bars);
 
   useEffect(() => {
-    updateBars();
-	}, []);
-  
-  useEffect(() => {
-		const seconds = 1;
-		const milliseconds = seconds * 1000
-		const minuteTimer = setInterval(() => {
-      const now = new Date();
-      const nowStr = now.toISOString().slice(0, 19) + 'Z';
-      const lastBarDatetimeStr = bars[bars.length - 1]?.TimeStamp;
-      
-      const lastBarCloseDatetime = new Date(lastBarDatetimeStr);
-      const lastBarCloseUTC = new Date(
-        Date.UTC(
-          lastBarCloseDatetime.getFullYear(),
-          lastBarCloseDatetime.getMonth(),
-          lastBarCloseDatetime.getDate(),
-          lastBarCloseDatetime.getUTCHours(),
-          lastBarCloseDatetime.getMinutes(),
-          lastBarCloseDatetime.getSeconds(),
-        )
-      )
+    barsRef.current = bars;
+  }, [bars]);
 
-      const currBarCloseUTC = new Date(
-        Date.UTC(
-          lastBarCloseUTC.getFullYear(),
-          lastBarCloseUTC.getMonth(),
-          lastBarCloseUTC.getDate(),
-          lastBarCloseUTC.getUTCHours(),
-          lastBarCloseUTC.getMinutes() + 1,
-          lastBarCloseUTC.getSeconds(),
-        )
-      )
-
-      console.log(lastBarCloseDatetime.toUTCString());
-      console.log(now.toUTCString());
-      console.log(currBarCloseUTC.toUTCString());
-      console.log("      ");
-
-      if (currBarCloseUTC <= now && !isUpdatingBars) {
-        console.log(`Start updating bars at ${nowStr}`);
-        setIsUpdatingBars(true);
-        updateBars();
-      } else if (currBarCloseUTC > now && isUpdatingBars) {
-        console.log(`Done updating bars at ${nowStr}`);
-        setIsUpdatingBars(false);
-      } else if (isUpdatingBars) {
-        console.log(`Still updating bars at ${nowStr}`);
-      }
-
-		}, milliseconds);
-	
-		return () => {
-		  clearInterval(minuteTimer);
-		}
-
-  }, [bars, isUpdatingBars]);
-	
-  
   const handleChangeAssetClass = (
     event: MouseEvent<HTMLElement>,
     assetClass: SetStateAction<string>,
@@ -105,6 +46,17 @@ const App = () => {
     setAssetClass(assetClass);
   };
 
+  useWebSocket((data) => {
+    if (data['type'] == 'latest_bar') {
+      const copy = [...barsRef.current];
+      copy.shift();
+      copy.push(data['data']);
+      setBars(copy);
+    } else if (data['type'] == 'all_bars') {
+      setBars(data['data']);
+    }
+  });
+  
   return (
     <Box>
       <Grid
