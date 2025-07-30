@@ -11,10 +11,8 @@ import {
   Grid,
   Paper,
 } from '@mui/material'
-import { BarsContext, getBars } from './Context';
 import { CandlestickChart } from './components/Chart';
 import { Chat } from './components/Chat';
-import { useWebSocket } from './useWebsocket';
 
 import { styled } from '@mui/material/styles';
 
@@ -28,35 +26,7 @@ const Item = styled(Paper)(({ theme }) => ({
   }),
 }));
 
-const App = () => {
-  const [assetClass, setAssetClass] = useState('Futures');
-  const { bars, setBars } = useContext(BarsContext);
-
-  const barsRef = useRef(bars);
-
-  useEffect(() => {
-    barsRef.current = bars;
-  }, [bars]);
-
-  const handleChangeAssetClass = (
-    event: MouseEvent<HTMLElement>,
-    assetClass: SetStateAction<string>,
-  ) => {
-    console.log(event);
-    setAssetClass(assetClass);
-  };
-
-  useWebSocket((data) => {
-    if (data['type'] == 'latest_bar') {
-      const copy = [...barsRef.current];
-      copy.shift();
-      copy.push(data['data']);
-      setBars(copy);
-    } else if (data['type'] == 'all_bars') {
-      setBars(data['data']);
-    }
-  });
-  
+const App = () => { 
   return (
     <Box>
       <Grid
@@ -105,7 +75,7 @@ const App = () => {
           
           <Grid flexGrow={1}>
             <Item sx={{height: '100%'}}>
-              <CandlestickChart  bardata={bars} />
+              <CandlestickChart />
             </Item>
           </Grid>
 

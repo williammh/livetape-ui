@@ -76,8 +76,8 @@ export const Chat = () => {
         height: '100%'
       }}
     >
-      {messages.map(m => (
-        m.user == 'Moo' ? <MooMessage message={m.message} /> : <GrizzMessage message={m.message} />
+      {messages.map((m, i) => (
+        m.user == 'Moo' ? <MooMessage message={m.message} key={i} /> : <GrizzMessage message={m.message} key={i} />
       ))}
     </Box>  
   );
