@@ -14,13 +14,12 @@ import {
 import { useWebSocket } from '../useWebsocket';
 
 export const CandlestickChart = () => {
-  const [chartData, setChartData] = useState([]);
-  const [chartInstance, setChartInstance] = useState(null);
+  const [chartData, setChartData] = useState<Array<any>>([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const fullBarsRef = useRef([]); // Keep track of raw bar data
-  const chartInstanceRef = useRef(null); // Use ref for chart instance to avoid closure issues
+  const barDataRef = useRef([]); // Keep track of raw bar data
+  const chartRef = useRef(null);
   const zoomStateRef = useRef(null); // Store zoom state
-
+  
 
   const defaultSymbol = 'MNQU25';
   const [symbol, setSymbol] = useState(defaultSymbol);
@@ -46,7 +45,7 @@ export const CandlestickChart = () => {
   // Function to safely update chart without re-rendering
   const updateChartSeries = (newConvertedBars) => {
   
-    if (!chartInstanceRef.current) {
+    if (!chartRef.current) {
       console.log('Chart not ready for updates');
       return;
     }
@@ -57,30 +56,21 @@ export const CandlestickChart = () => {
     }
 
     try {
-      const chart = chartInstanceRef.current;
+      const chart = chartRef.current;
       const currentXAxisRange = chart.w.globals.minX && chart.w.globals.maxX ? {
         min: chart.w.globals.minX,
         max: chart.w.globals.maxX
       } : null;
       
-      
-      const date = new Date(1753916160000);
-      console.log(date);
-
-      const currentYAxisRange = chart.w.globals.minY && chart.w.globals.maxY ? {
-        min: chart.w.globals.minY,
-        max: chart.w.globals.maxY
-      } : null;
-      
-      chartInstanceRef.current.updateSeries([{
+      chartRef.current.updateSeries([{
         data: newConvertedBars
-      }], false); // false preserves zoom
+      }], false);
 
-         // Force restore zoom state immediately and with multiple attempts
+      // Force restore zoom state immediately and with multiple attempts
       const restoreZoom = () => {
         if (currentXAxisRange) {
           try {
-            // + 60000 epoch time moves X axis range 1 minute forward
+            // +60000 epoch time moves X axis range 1 minute forward
             chart.zoomX(currentXAxisRange.min + 60000, currentXAxisRange.max + 60000);
 
           } catch (error) {
@@ -98,33 +88,25 @@ export const CandlestickChart = () => {
     }
   };
 
-  useEffect(() => {
-    console.log('Chart instance changed:', chartInstance);
-  }, [chartInstance]);
-
   useWebSocket((data) => {
     console.log('Websocket data received:', data);
     switch(data['type']) {
       case 'all_bars':
         const convertedBars = convertBars(data['data']);
-        fullBarsRef.current = data['data'];
         setChartData(convertedBars);
         setIsDataLoaded(true);
+        barDataRef.current = data['data'];
         break;
       case 'latest_bar':
-        const currentBars = [...fullBarsRef.current];
-        if (currentBars.length > 0) {
+        if (barDataRef.current.length > 0) {
+          const currentBars = [...barDataRef.current];
           currentBars.shift();
           currentBars.push(data['data']);
-          fullBarsRef.current = currentBars;
-          
           const newConvertedBars = convertBars(currentBars);
-          console.log('Updating with latest bar:', newConvertedBars.length, 'total bars');
-          
-          // Use updateSeries to preserve zoom
           updateChartSeries(newConvertedBars);
+          barDataRef.current = currentBars;          
+          break;
         }
-        break;
     }
     
   });
@@ -184,13 +166,10 @@ export const CandlestickChart = () => {
                   mounted: (chart) => {
                     console.log('Chart mounted successfully');
                     console.log(chart);
-                    setChartInstance(chart);
-                    chartInstanceRef.current = chart;
+                    chartRef.current = chart;
                   },
                   zoomed: (chartContext, { xaxis, yaxis }) => {
-                    // Store zoom state when user zooms
                     zoomStateRef.current = { xaxis, yaxis };
-                    console.log('Zoom state stored:', zoomStateRef.current);
                   }
                 }
               },
