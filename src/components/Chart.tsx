@@ -66,22 +66,17 @@ export const CandlestickChart = () => {
         data: newConvertedBars
       }], false);
 
-      // Force restore zoom state immediately and with multiple attempts
-      const restoreZoom = () => {
-        if (currentXAxisRange) {
-          try {
-            // +60000 epoch time moves X axis range 1 minute forward
-            chart.zoomX(currentXAxisRange.min + 60000, currentXAxisRange.max + 60000);
+      // Force restore zoom state immediately
+      if (currentXAxisRange) {
+        try {
+          // +60000 epoch time moves X axis range 1 minute forward
+          chart.zoomX(currentXAxisRange.min + 60000, currentXAxisRange.max + 60000);
 
-          } catch (error) {
-            console.warn('Failed to restore X-axis zoom:', error);
-          }
+        } catch (error) {
+          console.warn('Failed to restore X-axis zoom:', error);
         }
-      };
-
-      restoreZoom();
-
-
+      }
+    
       console.log('Chart updated via updateSeries');
     } catch (error) {
       console.warn('Chart update failed:', error);
@@ -89,7 +84,8 @@ export const CandlestickChart = () => {
   };
 
   useWebSocket((data) => {
-    console.log('Websocket data received:', data);
+    console.log('Websocket data received:');
+    console.log(data);
     switch(data['type']) {
       case 'all_bars':
         const convertedBars = convertBars(data['data']);
@@ -105,8 +101,11 @@ export const CandlestickChart = () => {
           const newConvertedBars = convertBars(currentBars);
           updateChartSeries(newConvertedBars);
           barDataRef.current = currentBars;          
-          break;
         }
+        break;
+      case 'open_bar':
+        console.log(data['data']['current_datetime'])
+        break;
     }
     
   });
