@@ -1,6 +1,6 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import { BarsContextProvider } from './Context';
+import { ContextProvider } from './Context';
 
 export const Providers = (props) => {
 
@@ -17,12 +17,12 @@ export const Providers = (props) => {
   });
   
   return (
-    <BarsContextProvider>
+    <ContextProvider>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {props.children}
       </ThemeProvider>
-    </BarsContextProvider>
+    </ContextProvider>
   )
 }
 

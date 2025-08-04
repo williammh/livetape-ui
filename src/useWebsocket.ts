@@ -1,38 +1,11 @@
 import { useRef, useEffect } from 'react';
 
-// export function useWebSocket(onMessage: (msg: string) => void) {
-//   const wsRef = useRef<WebSocket | null>(null);
-
-//   useEffect(() => {
-//     const ws = new WebSocket("ws://localhost:8000/ws");
-//     wsRef.current = ws;
-
-//     ws.onopen = () => {
-//       console.log("WebSocket connected");
-//       ws.send("Hello server!");
-//     };
-
-//     ws.onmessage = (event) => {
-//       onMessage(JSON.parse(event.data));
-//     };
-
-//     ws.onclose = () => {
-//       console.log("WebSocket disconnected");
-//     };
-
-//     return () => {
-//       ws.close();
-//     };
-
-//   }, [onMessage]);
-// }
-
 export const useWebSocket = (onMessage: (data: any) => void) => {
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     // Only initialize once
-    ws.current = new WebSocket('ws://localhost:8000/ws');
+    ws.current = new WebSocket('ws://localhost:8000/ws/chart');
 
     ws.current.onopen = () => {
       console.log('WebSocket connected');

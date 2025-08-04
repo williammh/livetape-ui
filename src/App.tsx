@@ -15,6 +15,7 @@ import { CandlestickChart } from './components/Chart';
 import { Chat } from './components/Chat';
 
 import { styled } from '@mui/material/styles';
+import { StatusBar } from './components/StatusBar';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -75,6 +76,7 @@ const App = () => {
           
           <Grid flexGrow={1}>
             <Item sx={{height: '100%'}}>
+              {/* <StatusBar /> */}
               <CandlestickChart />
             </Item>
           </Grid>

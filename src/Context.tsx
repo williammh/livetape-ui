@@ -2,10 +2,11 @@ import React, {
 	useState,
 	type Dispatch,
 	type SetStateAction,
-    type JSX
+    type JSX,
+	useEffect
 } from 'react';
 
-const BarsContext = React.createContext({} as IBarsContext);
+const AppContext = React.createContext({} as IAppContext);
 
 interface ContextProviderProps {
   children: React.ReactNode
@@ -20,25 +21,21 @@ interface IBar {
 	TimeStamp: string;
 }
 
-interface IBarsContext {
-	bars: IBar[];
-	setBars: Dispatch<SetStateAction<IBar[]>>
+interface IAppContext {
+	dateTime: any;
+	setDateTime: Dispatch<SetStateAction<any>>
 }
 
-export const getBars = async () => {
-	const response = await fetch("http://localhost:8000/bars");
-	return await response.json();
-}
+const ContextProvider = (props: ContextProviderProps): JSX.Element => {
+	const [dateTime, setDateTime] = useState(null);
 
-const BarsContextProvider = (props: ContextProviderProps): JSX.Element => {
-
-	const [bars, getBars] = useState([] as IBar[]);
+	// console.log(dateTime);
 
 	return (
-		<BarsContext.Provider value={{bars: bars, setBars: getBars}}>
+		<AppContext.Provider value={{dateTime, setDateTime}}>
 			{props.children}
-		</BarsContext.Provider>
+		</AppContext.Provider>
 	)
 }
 
-export {BarsContextProvider, BarsContext}
+export {ContextProvider, AppContext}

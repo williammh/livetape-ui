@@ -2,7 +2,8 @@ import Chart from 'react-apexcharts';
 import {
   useState,
   useRef,
-  useEffect
+  useEffect,
+  useContext
 } from 'react';
 import { 
   Box,
@@ -12,15 +13,14 @@ import {
   Grid
 } from '@mui/material';
 import { useWebSocket } from '../useWebsocket';
+// import { AppContext } from '../Context';
 
 export const CandlestickChart = () => {
   const [chartData, setChartData] = useState<Array<any>>([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const barDataRef = useRef([]); // Keep track of raw bar data
   const chartRef = useRef(null);
-  const zoomStateRef = useRef(null); // Store zoom state
-  
-
+ 
   const defaultSymbol = 'MNQU25';
   const [symbol, setSymbol] = useState(defaultSymbol);
 
@@ -43,7 +43,7 @@ export const CandlestickChart = () => {
   };
 
   // Function to safely update chart without re-rendering
-  const updateChartSeries = (newConvertedBars) => {
+  const updateChartSeries = (newConvertedBars, panRight=false) => {
   
     if (!chartRef.current) {
       console.log('Chart not ready for updates');
@@ -69,8 +69,12 @@ export const CandlestickChart = () => {
       // Force restore zoom state immediately
       if (currentXAxisRange) {
         try {
-          // +60000 epoch time moves X axis range 1 minute forward
-          chart.zoomX(currentXAxisRange.min + 60000, currentXAxisRange.max + 60000);
+          if (panRight) {
+            // +60000 epoch time moves X axis range 1 minute forward
+            chart.zoomX(currentXAxisRange.min + 60000, currentXAxisRange.max + 60000);
+          } else {
+            chart.zoomX(currentXAxisRange.min, currentXAxisRange.max);
+          }
 
         } catch (error) {
           console.warn('Failed to restore X-axis zoom:', error);
@@ -84,8 +88,8 @@ export const CandlestickChart = () => {
   };
 
   useWebSocket((data) => {
-    console.log('Websocket data received:');
-    console.log(data);
+    console.log(`Websocket data received: ${data['type']}`);
+    console.log(data['data']);
     switch(data['type']) {
       case 'all_bars':
         const convertedBars = convertBars(data['data']);
@@ -93,18 +97,43 @@ export const CandlestickChart = () => {
         setIsDataLoaded(true);
         barDataRef.current = data['data'];
         break;
-      case 'latest_bar':
+      case 'closed_bar':
         if (barDataRef.current.length > 0) {
           const currentBars = [...barDataRef.current];
-          currentBars.shift();
-          currentBars.push(data['data']);
+          const closedBarTimeStamp = data['data']['TimeStamp'];
+          const index = currentBars.findLastIndex((bar) => bar['TimeStamp'] === closedBarTimeStamp);
+          currentBars[index] = data['data'];
+          console.log(currentBars);
           const newConvertedBars = convertBars(currentBars);
-          updateChartSeries(newConvertedBars);
+          updateChartSeries(newConvertedBars, false);
           barDataRef.current = currentBars;          
         }
         break;
       case 'open_bar':
-        console.log(data['data']['current_datetime'])
+        const currentBars = [...barDataRef.current];
+        const lastBarTimeStamp = currentBars[currentBars.length - 1]['TimeStamp'];
+        const openBarTimeStamp = data['data']['close_datetime'];
+        const openBar = {
+          'Open': data['data']['open'],
+          'High': data['data']['high'],
+          'Low': data['data']['low'],
+          'Close': data['data']['close'],
+          'TimeStamp': openBarTimeStamp,
+          'BarStatus': 'Open'
+        }
+
+        if (lastBarTimeStamp === openBarTimeStamp) {
+          currentBars[currentBars.length - 1] = openBar;
+          const newConvertedBars = convertBars(currentBars);
+          updateChartSeries(newConvertedBars, false);
+        } else {
+          currentBars.shift();
+          currentBars.push(openBar);
+          const newConvertedBars = convertBars(currentBars);
+          updateChartSeries(newConvertedBars, true);
+        }
+
+        barDataRef.current = currentBars;          
         break;
     }
     
@@ -167,9 +196,6 @@ export const CandlestickChart = () => {
                     console.log(chart);
                     chartRef.current = chart;
                   },
-                  zoomed: (chartContext, { xaxis, yaxis }) => {
-                    zoomStateRef.current = { xaxis, yaxis };
-                  }
                 }
               },
               tooltip: {
