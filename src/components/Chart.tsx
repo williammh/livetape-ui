@@ -87,16 +87,24 @@ export const CandlestickChart = () => {
     }
   };
 
+  useEffect(() => {
+    const getClosedBars = (async () => {
+      const res = await fetch('http://localhost:8000/closed_bars');
+      const closedBars = await res.json();
+      console.log('closed:');
+      console.log(closedBars);
+      const convertedBars = convertBars(closedBars);
+      setChartData(convertedBars);
+      setIsDataLoaded(true);
+      barDataRef.current = closedBars;
+    })();
+
+  }, []);
+
   useWebSocket((data) => {
     console.log(`Websocket data received: ${data['type']}`);
     console.log(data['data']);
     switch(data['type']) {
-      case 'all_bars':
-        const convertedBars = convertBars(data['data']);
-        setChartData(convertedBars);
-        setIsDataLoaded(true);
-        barDataRef.current = data['data'];
-        break;
       case 'closed_bar':
         if (barDataRef.current.length > 0) {
           const currentBars = [...barDataRef.current];
