@@ -25,7 +25,10 @@ export const StatusBar = () => {
 
   return (
     <Box>
-        <Typography>
+        <Typography
+          variant='h5'
+          align='right'
+        >
           Timestamp: {timestamp}, Price: {price}
         </Typography>
     </Box>
