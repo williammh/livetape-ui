@@ -354,10 +354,7 @@ export const CandlestickChart = () => {
               tooltip: {
                 theme: 'dark',
                 custom: ({ seriesIndex, dataPointIndex, w }) => {
-                  const o = w.globals.initialSeries[seriesIndex].data[dataPointIndex].y[0];
-                  const h = w.globals.initialSeries[seriesIndex].data[dataPointIndex].y[1];
-                  const l = w.globals.initialSeries[seriesIndex].data[dataPointIndex].y[2];
-                  const c = w.globals.initialSeries[seriesIndex].data[dataPointIndex].y[3];
+                  const [o, h, l, c] = w.globals.initialSeries[seriesIndex].data[dataPointIndex].y;
       
                   return `
                     <div style="padding:5px; text-align: right;">
