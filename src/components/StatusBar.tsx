@@ -1,32 +1,32 @@
-import Chart from 'react-apexcharts';
 import {
   useState,
-  useRef,
   useEffect,
-  useContext
 } from 'react';
 import { 
   Box,
-  Autocomplete,
-  TextField,
   Typography,
-  Grid
 } from '@mui/material';
-import { AppContext } from '../Context';
+import { useSharedWebSocket } from '../WebSocketContext';
 
-
-export const StatusBar = ({dateTime}) => {
- 
-  // console.log(dateTime);
+export const StatusBar = () => {
+  const { message } = useSharedWebSocket();
+  const [timestamp, setTimeStamp] = useState();
+  const [price, setPrice] = useState();
 
   useEffect(() => {
-    console.log(dateTime);
-  }, [dateTime]);
+    switch(message.type) {
+      case 'open_bar':
+        setTimeStamp(message.data['current_datetime']);
+        setPrice(message.data['close'])
+        break;
+    }
+
+  }, [message]);
 
   return (
     <Box>
         <Typography>
-          {dateTime}
+          Timestamp: {timestamp}, Price: {price}
         </Typography>
     </Box>
   );

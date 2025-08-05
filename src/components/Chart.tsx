@@ -3,7 +3,6 @@ import {
   useState,
   useRef,
   useEffect,
-  useContext
 } from 'react';
 import { 
   Box,
@@ -12,144 +11,154 @@ import {
   Typography,
   Grid
 } from '@mui/material';
-import { useWebSocket } from '../useWebsocket';
-// import { AppContext } from '../Context';
+import { useSharedWebSocket } from '../WebSocketContext';
 
-export const CandlestickChart = () => {
-  const [chartData, setChartData] = useState<Array<any>>([]);
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const barDataRef = useRef([]); // Keep track of raw bar data
-  const chartRef = useRef(null);
- 
-  const defaultSymbol = 'MNQU25';
-  const [symbol, setSymbol] = useState(defaultSymbol);
+interface IBar {
+  Open: number;
+  High: number;
+  Low: number;
+  Close: number;
+  TimeStamp: string;
+  BarStatus: string;
+  TotalVolume?: number;
+}
 
-  const convertBars = (barData) => {
-    if (!barData || !Array.isArray(barData) || barData.length === 0) {
-      return [];
-    }
-    
-    return barData
-      .filter(bar => bar && bar.TimeStamp && bar.Open !== undefined && bar.High !== undefined && bar.Low !== undefined && bar.Close !== undefined)
-      .map((bar) => ({
-        x: new Date(bar['TimeStamp']),
-        y: [
-          parseFloat(bar['Open']) || 0,
-          parseFloat(bar['High']) || 0,
-          parseFloat(bar['Low']) || 0,
-          parseFloat(bar['Close']) || 0
-        ]
-      }));
-  };
-
-  // Function to safely update chart without re-rendering
-  const updateChartSeries = (newConvertedBars, panRight=false) => {
+const convertBars = (barData) => {
+  if (!barData || !Array.isArray(barData) || barData.length === 0) {
+    return [];
+  }
   
-    if (!chartRef.current) {
-      console.log('Chart not ready for updates');
-      return;
-    }
-    
-    if (!newConvertedBars || newConvertedBars.length === 0) {
-      console.warn('No data to update');
-      return;
-    }
+  return barData
+    .filter(bar => bar && bar.TimeStamp && bar.Open !== undefined && bar.High !== undefined && bar.Low !== undefined && bar.Close !== undefined)
+    .map((bar) => ({
+      x: new Date(bar['TimeStamp']),
+      y: [
+        parseFloat(bar['Open']) || 0,
+        parseFloat(bar['High']) || 0,
+        parseFloat(bar['Low']) || 0,
+        parseFloat(bar['Close']) || 0
+      ]
+    }));
+};
 
+const WebSocketDataHandler = ({ onMessage }) => {
+  const { message } = useSharedWebSocket();
+  useEffect(() => {
+    if (message) {
+      onMessage(message);
+    }
+  }, [message]);
+
+  return null; // Does not render anything
+}
+
+const restoreZoom = (chart, currentXAxisRange, panRight=false) => {
+  // Force restore zoom state immediately
+  if (currentXAxisRange) {
     try {
-      const chart = chartRef.current;
-      const currentXAxisRange = chart.w.globals.minX && chart.w.globals.maxX ? {
-        min: chart.w.globals.minX,
-        max: chart.w.globals.maxX
-      } : null;
-      
-      chartRef.current.updateSeries([{
+      if (panRight) {
+        // +60000 epoch time moves X axis range 1 minute forward
+        chart.zoomX(currentXAxisRange.min + 60000, currentXAxisRange.max + 60000);
+      } else {
+        chart.zoomX(currentXAxisRange.min, currentXAxisRange.max);
+      }
+
+    } catch (error) {
+      console.warn('Failed to restore X-axis zoom:', error);
+    }
+  }
+}
+
+const handleWebSocketMessage = (message, chartRef, rawBarDataRef) => {
+  if (rawBarDataRef.current.length === 0) {
+    return;
+  }
+
+  console.log(`Received ${message.type} message: `);
+  console.log(message.data);
+  
+  const chart = chartRef.current;
+  const currentXAxisRange = chart?.w.globals.minX && chart?.w.globals.maxX ? {
+    min: chart.w.globals.minX,
+    max: chart.w.globals.maxX
+  } : null;
+
+  const currentBars = [...rawBarDataRef.current];
+
+  switch(message.type) {
+    case 'closed_bar':
+      const closedBarTimeStamp = message.data['TimeStamp'];
+      const index = currentBars.findLastIndex((bar) => bar['TimeStamp'] === closedBarTimeStamp);
+      currentBars[index] = message.data;
+      const newConvertedBars = convertBars(currentBars);
+      chart?.updateSeries([{
         data: newConvertedBars
       }], false);
-
-      // Force restore zoom state immediately
-      if (currentXAxisRange) {
-        try {
-          if (panRight) {
-            // +60000 epoch time moves X axis range 1 minute forward
-            chart.zoomX(currentXAxisRange.min + 60000, currentXAxisRange.max + 60000);
-          } else {
-            chart.zoomX(currentXAxisRange.min, currentXAxisRange.max);
-          }
-
-        } catch (error) {
-          console.warn('Failed to restore X-axis zoom:', error);
-        }
+      restoreZoom(chart, currentXAxisRange);
+      rawBarDataRef.current = currentBars;          
+      break;
+    case 'open_bar':
+      const lastBar = currentBars[currentBars.length - 1];
+      const lastBarTimeStamp = lastBar['TimeStamp'];
+      const openBarTimeStamp = message.data['close_datetime'];
+      const openBar = {
+        'Open': message.data['open'],
+        'High': message.data['high'],
+        'Low': message.data['low'],
+        'Close': message.data['close'],
+        'TimeStamp': openBarTimeStamp,
+        'BarStatus': 'Open',
       }
-    
-      console.log('Chart updated via updateSeries');
-    } catch (error) {
-      console.warn('Chart update failed:', error);
-    }
-  };
+      
+      if (lastBarTimeStamp === openBarTimeStamp) {
+        currentBars[currentBars.length - 1] = openBar;
+        const newConvertedBars = convertBars(currentBars);
+        chart?.updateSeries([{
+          data: newConvertedBars
+        }], false)
+        restoreZoom(chart, currentXAxisRange, false);
+      } else {
+        currentBars.shift();
+        currentBars.push(openBar);
+        const newConvertedBars = convertBars(currentBars);
+        chart?.updateSeries([{
+          data: newConvertedBars
+        }], false)
+        restoreZoom(chart, currentXAxisRange, true);
+      }
+
+      rawBarDataRef.current = currentBars;          
+      break;
+  }
+};
+
+export const CandlestickChart = () => {
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const rawBarDataRef = useRef<Array<IBar>>([]);
+  const chartRef = useRef(null);
+ 
+  const [symbol, setSymbol] = useState<string>('MNQU25');
+
+  const formatter = (value: string) => {
+    return (new Date(Number(value)).toLocaleTimeString('en-US', {timeZone: "UTC", timeStyle: 'short'}))
+  }
 
   useEffect(() => {
     const getClosedBars = (async () => {
       const res = await fetch('http://localhost:8000/closed_bars');
       const closedBars = await res.json();
-      console.log('closed:');
       console.log(closedBars);
+      console.log('closed:');
       const convertedBars = convertBars(closedBars);
-      setChartData(convertedBars);
       setIsDataLoaded(true);
-      barDataRef.current = closedBars;
+      chartRef.current?.updateSeries([{ data: convertedBars }], false);
+      rawBarDataRef.current = closedBars;
     })();
-
   }, []);
 
-  useWebSocket((data) => {
-    console.log(`Websocket data received: ${data['type']}`);
-    console.log(data['data']);
-    switch(data['type']) {
-      case 'closed_bar':
-        if (barDataRef.current.length > 0) {
-          const currentBars = [...barDataRef.current];
-          const closedBarTimeStamp = data['data']['TimeStamp'];
-          const index = currentBars.findLastIndex((bar) => bar['TimeStamp'] === closedBarTimeStamp);
-          currentBars[index] = data['data'];
-          console.log(currentBars);
-          const newConvertedBars = convertBars(currentBars);
-          updateChartSeries(newConvertedBars, false);
-          barDataRef.current = currentBars;          
-        }
-        break;
-      case 'open_bar':
-        const currentBars = [...barDataRef.current];
-        const lastBarTimeStamp = currentBars[currentBars.length - 1]['TimeStamp'];
-        const openBarTimeStamp = data['data']['close_datetime'];
-        const openBar = {
-          'Open': data['data']['open'],
-          'High': data['data']['high'],
-          'Low': data['data']['low'],
-          'Close': data['data']['close'],
-          'TimeStamp': openBarTimeStamp,
-          'BarStatus': 'Open'
-        }
+  console.log("RENDER Chart!");
 
-        if (lastBarTimeStamp === openBarTimeStamp) {
-          currentBars[currentBars.length - 1] = openBar;
-          const newConvertedBars = convertBars(currentBars);
-          updateChartSeries(newConvertedBars, false);
-        } else {
-          currentBars.shift();
-          currentBars.push(openBar);
-          const newConvertedBars = convertBars(currentBars);
-          updateChartSeries(newConvertedBars, true);
-        }
-
-        barDataRef.current = currentBars;          
-        break;
-    }
-    
-  });
-
-  const formatter = (value: string) => {
-    return (new Date(Number(value)).toLocaleTimeString('en-US', {timeZone: "UTC", timeStyle: 'short'}))
-  }
+  const convertedBars = convertBars([...rawBarDataRef.current]);
 
   return (
     <Box>
@@ -162,13 +171,13 @@ export const CandlestickChart = () => {
       >
         <Autocomplete 
           options={['MESU25', 'MNQU25']}
-          defaultValue={defaultSymbol}
+          defaultValue={symbol}
           onChange={(_event, value) => setSymbol(value!)}
           renderInput={(params) => (
             <TextField
-            {...params}
-            label="Symbol"
-            size="small"
+              {...params}
+              label="Symbol"
+              size="small"
             />
           )}
           sx={{
@@ -176,15 +185,15 @@ export const CandlestickChart = () => {
           }}
           disableClearable={true}
         />
-        <Typography>
-          {isDataLoaded ? `Chart Ready (${chartData.length} bars)` : 'Loading...'}
-        </Typography>
       </Grid>
       <Box>
+        <WebSocketDataHandler
+          onMessage={(msg) => handleWebSocketMessage(msg, chartRef, rawBarDataRef)} 
+        />
         {isDataLoaded ? (
           <Chart
             series={[{
-              data: chartData
+              data: convertedBars
             }]}
             type='candlestick'
             height={780}
@@ -200,10 +209,8 @@ export const CandlestickChart = () => {
                 },
                 events: {
                   mounted: (chart) => {
-                    console.log('Chart mounted successfully');
-                    console.log(chart);
                     chartRef.current = chart;
-                  },
+                  }
                 }
               },
               tooltip: {

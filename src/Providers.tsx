@@ -1,6 +1,6 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import { ContextProvider } from './Context';
+import { WebSocketProvider } from './WebSocketContext';
 
 export const Providers = (props) => {
 
@@ -17,12 +17,12 @@ export const Providers = (props) => {
   });
   
   return (
-    <ContextProvider>
+    <WebSocketProvider>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {props.children}
       </ThemeProvider>
-    </ContextProvider>
+    </WebSocketProvider>
   )
 }
 

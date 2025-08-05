@@ -76,7 +76,7 @@ const App = () => {
           
           <Grid flexGrow={1}>
             <Item sx={{height: '100%'}}>
-              {/* <StatusBar /> */}
+              <StatusBar />
               <CandlestickChart />
             </Item>
           </Grid>
