@@ -51,6 +51,34 @@ const WebSocketDataHandler = ({ onMessage }) => {
   return null; // Does not render anything
 }
 
+// Function to determine appropriate tick interval based on price range
+const getTickInterval = (min, max) => {
+  const range = max - min;
+  
+  if (range <= 100) return 10;      // For small ranges, use 10-point intervals
+  if (range <= 500) return 25;      // For medium ranges, use 25-point intervals
+  if (range <= 1000) return 50;     // For larger ranges, use 50-point intervals
+  if (range <= 5000) return 100;    // For very large ranges, use 100-point intervals
+  return 250;                       // For extremely large ranges, use 250-point intervals
+};
+
+// Function to calculate clean Y-axis min/max and tick interval
+const calculateCleanYAxisRange = (min, max) => {
+  const tickInterval = getTickInterval(min, max);
+  
+  // Round min down to nearest tick interval
+  const cleanMin = Math.floor(min / tickInterval) * tickInterval;
+  
+  // Round max up to nearest tick interval
+  const cleanMax = Math.ceil(max / tickInterval) * tickInterval;
+  
+  return {
+    min: cleanMin,
+    max: cleanMax,
+    tickAmount: Math.floor((cleanMax - cleanMin) / tickInterval)
+  };
+};
+
 const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, panRight=false) => {
   // Force restore zoom state immediately
   if (currentXAxisRange) {
@@ -69,14 +97,17 @@ const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, panRight=false
   // Restore Y-axis range if it was manually set
   if (currentYAxisRange && currentYAxisRange.min !== undefined && currentYAxisRange.max !== undefined) {
     try {
+      const cleanRange = calculateCleanYAxisRange(currentYAxisRange.min, currentYAxisRange.max);
       chart.updateOptions({
         yaxis: {
-          min: currentYAxisRange.min,
-          max: currentYAxisRange.max,
+          min: cleanRange.min,
+          max: cleanRange.max,
+          tickAmount: cleanRange.tickAmount,
           labels: {
             style: {
               colors: '#fff'
             },
+            formatter: (val) => Math.round(val).toFixed(2)
           },
           tooltip: { enabled: true },
         }
@@ -293,14 +324,17 @@ export const CandlestickChart = () => {
                           const convertedData = convertBars(rawBarDataRef.current);
                           const yRange = calculateYAxisRange(chart, convertedData);
                           if (yRange.min !== undefined && yRange.max !== undefined) {
+                            const cleanRange = calculateCleanYAxisRange(yRange.min, yRange.max);
                             chart.updateOptions({
                               yaxis: {
-                                min: yRange.min,
-                                max: yRange.max,
+                                min: cleanRange.min,
+                                max: cleanRange.max,
+                                tickAmount: cleanRange.tickAmount,
                                 labels: {
                                   style: {
                                     colors: '#fff'
                                   },
+                                  formatter: (val) => Math.round(val).toFixed(2)
                                 },
                                 tooltip: { enabled: true },
                               }
@@ -349,11 +383,11 @@ export const CandlestickChart = () => {
                 }
               },
               yaxis: {
-                // Initial Y-axis will be auto-scaled, then updated dynamically
                 labels: {
                   style: {
                     colors: '#fff'
                   },
+                  formatter: (val) => Math.round(val).toFixed(2)
                 },
                 tooltip: { enabled: true },
               }

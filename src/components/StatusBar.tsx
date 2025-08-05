@@ -17,7 +17,7 @@ export const StatusBar = () => {
     switch(message.type) {
       case 'open_bar':
         setTimeStamp(message.data['current_datetime']);
-        setPrice(message.data['close'])
+        setPrice(message.data['close'].toFixed(2))
         break;
     }
 
