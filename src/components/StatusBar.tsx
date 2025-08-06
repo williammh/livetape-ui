@@ -28,13 +28,10 @@ export const StatusBar = () => {
       case 'open_bar':
         setTimeStamp(message.data['current_datetime']);
         setPrice(message.data['close'].toFixed(2));
-        console.log(message.data['current_datetime']);
         break;
     }
 
   }, [message]);
-
-  console.log(timestamp);
 
   const timeZone = 'America/Los_Angeles';
   const options = {
@@ -50,16 +47,23 @@ export const StatusBar = () => {
   const tzLabel = timeZone.split('/')[1].replace('_', ' ');
   const localTimeStamp = new Date(timestamp).toLocaleString('en-US', options);
 
+  const gridStyles = {
+    padding: 1
+  }
 
   return (
     <Box>
       <Grid
         container
-        columns={8}
+        columns={2}
         direction='row'
       >
         <Grid
+          container
           size={1}
+          direction='row'
+          justifyContent='flex-start'
+          alignItems='center'
         >
           <Autocomplete 
             options={['Stocks', 'Futures']}
@@ -74,14 +78,10 @@ export const StatusBar = () => {
             )}
             sx={{
               width: 160,
-              padding: 1
+              ...gridStyles
             }}
             disableClearable={true}
           />
-        </Grid>
-        <Grid
-          size={1}
-        >
           <Autocomplete 
             options={['MESU25', 'MNQU25']}
             defaultValue={symbol}
@@ -95,15 +95,11 @@ export const StatusBar = () => {
             )}
             sx={{
               width: 160,
-              padding: 1
+              ...gridStyles
 
             }}
             disableClearable={true}
           />
-        </Grid>
-        <Grid
-          size={1}
-        >
           <Autocomplete 
             options={['1 Minute', '5 Minute']}
             defaultValue={interval}
@@ -117,45 +113,47 @@ export const StatusBar = () => {
             )}
             sx={{
               width: 160,
-              padding: 1
-
+              ...gridStyles
             }}
             disableClearable={true}
           />
         </Grid>
-        <Grid size={1}>
+        <Grid
+          container
+          size={1}
+          direction='row'
+          justifyContent='flex-end'
+          alignItems='center'
+        >
           <Chip
             label={serverStatus}
             icon={<PlayArrow />}
             color="success"
+            sx={{
+              color: '#fff',
+              fontWeight: 600,
+            }}
           />
-        </Grid>
-        <Grid
-          size={3}
-        >
           <Typography
             variant='h6'
             align='right'
             sx={{
-              fontWeight: '600'
+              ...gridStyles
             }}
           >
-           {localTimeStamp} {tzLabel}
+            {localTimeStamp} {tzLabel}
           </Typography>
-        </Grid>
-        <Grid
-          size={1}
-        >
           <Typography
             variant='h6'
             align='right'
             sx={{
-              fontWeight: '600'
+              ...gridStyles
             }}
           >
-           {price}
+            {price}
           </Typography>
         </Grid>
+      
       </Grid>
 
     </Box>
