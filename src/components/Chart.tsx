@@ -11,13 +11,13 @@ import {
 import { useSharedWebSocket } from '../WebSocketContext';
 
 interface IBar {
-  Open: number;
-  High: number;
-  Low: number;
-  Close: number;
-  TimeStamp: string;
-  BarStatus: string;
-  TotalVolume?: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  timestamp: string;
+  barstatus: string;
+  totalvolume?: number;
 }
 
 const convertBars = (barData) => {
@@ -26,14 +26,14 @@ const convertBars = (barData) => {
   }
   
   return barData
-    .filter(bar => bar && bar.TimeStamp && bar.Open !== undefined && bar.High !== undefined && bar.Low !== undefined && bar.Close !== undefined)
+    .filter(bar => bar && bar.timestamp && bar.open !== undefined && bar.high !== undefined && bar.low !== undefined && bar.close !== undefined)
     .map((bar) => ({
-      x: new Date(bar['TimeStamp']),
+      x: new Date(bar['timestamp']),
       y: [
-        parseFloat(bar['Open']) || 0,
-        parseFloat(bar['High']) || 0,
-        parseFloat(bar['Low']) || 0,
-        parseFloat(bar['Close']) || 0
+        parseFloat(bar['open']) || 0,
+        parseFloat(bar['high']) || 0,
+        parseFloat(bar['low']) || 0,
+        parseFloat(bar['close']) || 0
       ]
     }));
 };
@@ -118,10 +118,10 @@ const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef,
     }
 
     try {
-      console.log(userZoomedXAxis.current);
       if (!userZoomedXAxis.current) {
-        const firstBarTime = new Date(rawBarDataRef.current[0].TimeStamp).getTime();
-        const lastBarTime = new Date(rawBarDataRef.current[rawBarDataRef.current.length - 1].TimeStamp).getTime();
+        const firstBarTime = new Date(rawBarDataRef.current[0].timestamp).getTime();
+        const lastBarTime = new Date(rawBarDataRef.current[rawBarDataRef.current.length - 1].timestamp).getTime();
+
 
         const cleanXRange = calculateCleanXAxisRange(currentXAxisRange.min, currentXAxisRange.max, firstBarTime, lastBarTime);
 
@@ -248,8 +248,8 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
   
   switch(message.type) {
     case 'closed_bar':
-      const closedBarTimeStamp = message.data['TimeStamp'];
-      const index = currentBars.findLastIndex((bar) => bar['TimeStamp'] === closedBarTimeStamp);
+      const closedBarTimeStamp = message.data['timestamp'];
+      const index = currentBars.findLastIndex((bar) => bar['timestamp'] === closedBarTimeStamp);
       currentBars[index] = message.data;
       const newConvertedBars = convertBars(currentBars);
       
@@ -263,15 +263,15 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
       
     case 'open_bar':
       const lastBar = currentBars[currentBars.length - 1];
-      const lastBarTimeStamp = lastBar['TimeStamp'];
-      const openBarTimeStamp = message.data['close_datetime'];
+      const lastBarTimeStamp = lastBar['timestamp'];
+      const openBarTimeStamp = message.data['timestamp'];
       const openBar = {
-        'Open': message.data['open'],
-        'High': message.data['high'],
-        'Low': message.data['low'],
-        'Close': message.data['close'],
-        'TimeStamp': openBarTimeStamp,
-        'BarStatus': 'Open',
+        'open': message.data['open'],
+        'high': message.data['high'],
+        'low': message.data['low'],
+        'close': message.data['close'],
+        'timestamp': openBarTimeStamp,
+        'barstatus': 'open',
       }
       
       if (lastBarTimeStamp === openBarTimeStamp) {
@@ -284,7 +284,6 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
         
         restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, false);
       } else {
-        currentBars.shift();
         currentBars.push(openBar);
         const newConvertedBars = convertBars(currentBars);
         
@@ -314,7 +313,7 @@ export const CandlestickChart = () => {
   const userZoomedXAxis = useRef(false);
 
   useEffect(() => {
-    const getClosedBars = (async () => {
+    const getclosedBars = (async () => {
       const res = await fetch('http://localhost:8000/closed_bars');
       const closedBars = await res.json();
       console.log(closedBars);
@@ -395,11 +394,11 @@ export const CandlestickChart = () => {
                     const newMin = new Date(xaxis.min).getTime();
     
                     if (newMin == firstTime) {
-                      console.log("UNZOOMED");
+                      // console.log("UNZOOMED");
                       userZoomedYAxis.current = false;
                       userZoomedXAxis.current = false; 
                     } else {
-                      console.log(firstTime, newMin, "ZOOMED");
+                      // console.log(firstTime, newMin, "ZOOMED");
                       userZoomedYAxis.current = true;
                       userZoomedXAxis.current = true; 
                     }
@@ -416,10 +415,10 @@ export const CandlestickChart = () => {
                 
                   return `
                     <div style="padding:5px; text-align: right;">
-                      Open: ${o.toFixed(2)}<br/>
-                      High: ${h.toFixed(2)}<br/>
-                      Low: ${l.toFixed(2)}<br/>
-                      Close: ${c.toFixed(2)}
+                      open: ${o.toFixed(2)}<br/>
+                      high: ${h.toFixed(2)}<br/>
+                      low: ${l.toFixed(2)}<br/>
+                      close: ${c.toFixed(2)}
                     </div>
                   `;
                 }

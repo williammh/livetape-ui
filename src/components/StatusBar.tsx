@@ -26,8 +26,8 @@ export const StatusBar = () => {
   useEffect(() => {
     switch(message.type) {
       case 'open_bar':
-        setTimeStamp(message.data['current_datetime']);
-        setPrice(message.data['close'].toFixed(2));
+        setTimeStamp(message.system_time);
+        setPrice(message.data['close']?.toFixed(2));
         break;
     }
 
