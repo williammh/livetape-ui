@@ -8,7 +8,7 @@ import {
   Box,
   Typography,
 } from '@mui/material';
-import { useSharedWebSocket } from '../WebSocketContext';
+import { useBarWebSocket } from '../contexts/WebSocketContext';
 
 interface IBar {
   open: number;
@@ -39,7 +39,7 @@ const convertBars = (barData) => {
 };
 
 const WebSocketDataHandler = ({ onMessage }) => {
-  const { message } = useSharedWebSocket();
+  const { message } = useBarWebSocket();
   useEffect(() => {
     if (message) {
       onMessage(message);
