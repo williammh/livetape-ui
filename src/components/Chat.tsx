@@ -1,7 +1,11 @@
+import {
+  useEffect,
+  useState
+} from 'react';
 import { Box, Card } from '@mui/material';
 import { GrizzMessage } from './GrizzMessage';
 import { MooMessage } from './MooMessage';
-
+import { useCommentContext } from '../contexts/CommentContext';
 
 export const Chat = () => {
   const messages = [
@@ -68,6 +72,20 @@ export const Chat = () => {
       `
     },
   ]
+
+  const [ messageLog, setMessageLog ] = useState([]);
+
+  const { message } = useCommentContext();
+
+  useEffect(() => {
+    // if (message.persona) {
+    //   console.log("Chat.tsx received!");
+    //   console.log(message);
+    // }
+
+  }, [message]);
+
+
 
   return (
     <Box

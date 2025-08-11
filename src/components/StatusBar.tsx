@@ -10,11 +10,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useBarWebSocket } from '../contexts/WebSocketContext';
+import { useBarContext } from '../contexts/BarContext';
 import { PlayArrow } from '@mui/icons-material';
 
 export const StatusBar = () => {
-  const { message } = useBarWebSocket();
+  const { message } = useBarContext();
   const [timestamp, setTimeStamp] = useState<string>('');
   const [price, setPrice] = useState();
   const [symbol, setSymbol] = useState<string>('MNQU25');

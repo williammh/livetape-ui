@@ -25,39 +25,39 @@ interface IBarWebSocketContext {
     setMessage?: Dispatch<SetStateAction<any>>;
 }
 
-const BarWebSocketContext = createContext({} as IBarWebSocketContext);
+const BarContext = createContext({} as IBarWebSocketContext);
 
-export const BarWebSocketProvider = ({children}: ContextProviderProps) => {
+export const BarProvider = ({children}: ContextProviderProps) => {
     const [message, setMessage] = useState({} as IBarWebSocketContext['message']);
-    const wsRef = useRef<WebSocket | null>(null);
+    const barWsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
-        const ws = new WebSocket('ws://localhost:8000/ws/bar');
-        wsRef.current = ws;
+        const barWs = new WebSocket('ws://localhost:8000/ws/bar');
+        barWsRef.current = barWs;
 
-        ws.onopen = () => {
-            console.log('WebSocket connected');
+        barWs.onopen = () => {
+            console.log('📊 Bar WebSocket connected');
         };
 
-        ws.onmessage = (event) => {
+        barWs.onmessage = (event) => {
             const data = JSON.parse(event.data);
             setMessage(data);
         };
 
-        ws.onclose = () => {
-            console.log('WebSocket disconnected');
+        barWs.onclose = () => {
+            console.log('📊 Bar WebSocket disconnected');
         };
 
         return () => {
-            ws.close();
+            barWs.close();
         };
     }, []);
 
     return (
-        <BarWebSocketContext.Provider value={{ message }}>
+        <BarContext.Provider value={{ message }}>
             {children}
-        </BarWebSocketContext.Provider>
+        </BarContext.Provider>
     );
 };
 
-export const useBarWebSocket = () => useContext(BarWebSocketContext);
+export const useBarContext = () => useContext(BarContext);

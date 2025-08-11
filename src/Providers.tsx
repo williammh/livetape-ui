@@ -1,6 +1,7 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import { BarWebSocketProvider } from './contexts/WebSocketContext';
+import { BarProvider } from './contexts/BarContext';
+import { CommentProvider } from './contexts/CommentContext';
 
 export const Providers = (props) => {
 
@@ -17,12 +18,14 @@ export const Providers = (props) => {
   });
   
   return (
-    <BarWebSocketProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {props.children}
-      </ThemeProvider>
-    </BarWebSocketProvider>
+    <BarProvider>
+      <CommentProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {props.children}
+        </ThemeProvider>
+      </CommentProvider>
+    </BarProvider>
   )
 }
 
