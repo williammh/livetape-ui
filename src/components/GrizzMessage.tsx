@@ -1,7 +1,16 @@
 import { Grid, Card, Avatar, Typography, colors } from '@mui/material'
 import grizz from '../assets/grizz.png';
-export const GrizzMessage = ({message}) => {
+import { toLocalTime } from '../util/misc';
+
+interface IGrizzMessageProps {
+  message: string;
+  timestamp: string;
+}
+
+export const GrizzMessage = ({message, timestamp}: IGrizzMessageProps) => {
   
+  const localTimestamp = toLocalTime(timestamp, 'America/Los_Angeles')
+
   return (
     <Grid
       container
@@ -20,7 +29,21 @@ export const GrizzMessage = ({message}) => {
             padding: 2
           }}
         >
-          {message}
+          <Typography
+            sx={{
+              marginBottom: 1
+            }}
+          >
+            {message}
+          </Typography>
+          <Typography
+            sx={{
+              textAlign: 'right',
+              color: 'gray'
+            }}
+          >
+            {localTimestamp}
+          </Typography>
         </Card>
       </Grid>
       <Grid size={1}>

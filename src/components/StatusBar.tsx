@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { useBarContext } from '../contexts/BarContext';
 import { PlayArrow } from '@mui/icons-material';
+import { toLocalTime } from '../util/misc';
 
 export const StatusBar = () => {
   const { message } = useBarContext();
@@ -34,18 +35,8 @@ export const StatusBar = () => {
   }, [message]);
 
   const timeZone = 'America/Los_Angeles';
-  const options = {
-    timeZone: timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: true,
-  };
   const tzLabel = timeZone.split('/')[1].replace('_', ' ');
-  const localTimeStamp = new Date(timestamp).toLocaleString('en-US', options);
+  const localTimestamp = toLocalTime(timestamp, timeZone);
 
   const gridStyles = {
     padding: 1
@@ -141,7 +132,7 @@ export const StatusBar = () => {
               ...gridStyles
             }}
           >
-            {localTimeStamp} {tzLabel}
+            {localTimestamp} {tzLabel}
           </Typography>
           <Typography
             variant='h6'

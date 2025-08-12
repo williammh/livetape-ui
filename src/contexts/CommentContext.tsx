@@ -13,22 +13,17 @@ interface ContextProviderProps {
 }
 
 interface ICommentWebSocket {
-    message: {
-        persona: string;
-        text: string;
-        timestamp: string;
-    };
-    setMessage?: Dispatch<SetStateAction<any>>;
+    commentList: Array<{persona: string, text: string, timestamp: string}>
 }
 
 const CommentContext = createContext({} as ICommentWebSocket);
 
 export const CommentProvider = ({children}: ContextProviderProps) => {
-    const [message, setMessage] = useState({} as ICommentWebSocket['message']);
+    const [commentList, setCommentList] = useState<Array<ICommentWebSocket['message']>>([]);
     const commentWsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
-        const commentWs = new WebSocket('ws://localhost:8000/ws/comment');
+        const commentWs = new WebSocket('ws://localhost:8000/ws/comments');
         commentWsRef.current = commentWs;
 
         commentWs.onopen = () => {
@@ -38,8 +33,19 @@ export const CommentProvider = ({children}: ContextProviderProps) => {
         commentWs.onmessage = (event) => {
             const data: ICommentWebSocket['message'] = JSON.parse(event.data);
             console.log(`💬 Comment Websocket received`);
-            console.log(data);
-            setMessage(data);
+
+            if (data.data instanceof Array) {
+                const parsedComments = data.data.map(comment => JSON.parse(comment))
+                console.log(parsedComments);
+                setCommentList(parsedComments);
+            } else if (data.data) {
+                const parsedComment = JSON.parse(data.data);
+                if ('timestamp' in parsedComment) {
+                    console.log(parsedComment);
+                    setCommentList((prev) => [...prev, parsedComment]);
+                }
+            }
+
         };
 
         commentWs.onclose = () => {
@@ -52,7 +58,7 @@ export const CommentProvider = ({children}: ContextProviderProps) => {
     }, []);
 
     return (
-        <CommentContext.Provider value={{ message }}>
+        <CommentContext.Provider value={{ commentList }}>
             {children}
         </CommentContext.Provider>
     );

@@ -32,7 +32,7 @@ export const BarProvider = ({children}: ContextProviderProps) => {
     const barWsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
-        const barWs = new WebSocket('ws://localhost:8000/ws/bar');
+        const barWs = new WebSocket('ws://localhost:8000/ws/bars');
         barWsRef.current = barWs;
 
         barWs.onopen = () => {
