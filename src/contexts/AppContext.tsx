@@ -13,10 +13,10 @@ interface ContextProviderProps {
 }
 
 interface IAppContext {
-    selectedAssetClass: string;
-    setSelectedAssetClass: Dispatch<SetStateAction<string>>;
-    selectedSymbol: string;
-    setSelectedSymbol: Dispatch<SetStateAction<string>>;
+    assetClass: string;
+    setAssetClass: Dispatch<SetStateAction<string>>;
+    symbol: string;
+    setSymbol: Dispatch<SetStateAction<string>>;
     timezone: string;
     setTimezone: Dispatch<SetStateAction<string>>;
 }
@@ -25,17 +25,17 @@ const AppContext = createContext({} as IAppContext);
 
 export const AppProvider = ({children}: ContextProviderProps) => {
    
-    const [ selectedAssetClass, setSelectedAssetClass ] = useState<string>('Stocks');
-    const [ selectedSymbol, setSelectedSymbol ] = useState<string>('NVDA');
+    const [ assetClass, setAssetClass ] = useState<string>('Stocks');
+    const [ symbol, setSymbol ] = useState<string>('NVDA');
     const [ timezone, setTimezone ] = useState<string>('America/Los_Angeles');
 
     return (
         <AppContext.Provider
             value={{
-                selectedAssetClass,
-                setSelectedAssetClass,
-                selectedSymbol,
-                setSelectedSymbol,
+                assetClass,
+                setAssetClass,
+                symbol,
+                setSymbol,
                 timezone,
                 setTimezone
             }}

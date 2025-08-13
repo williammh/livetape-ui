@@ -19,15 +19,26 @@ export const StatusBar = () => {
   const { message } = useBarContext();
   const [timestamp, setTimeStamp] = useState<string>('');
   const [price, setPrice] = useState();
-  const [symbol, setSymbol] = useState<string>('MNQU25');
-  const [assetClass, setAssetClass] = useState<string>('Futures');
   const [interval, setInterval] = useState<string>('1 Minute');
 
-  const { selectedAssetClass, setSelectedAssetClass } = useAppContext();
-  const { selectedSymbol, setSelectedSymbol } = useAppContext();
+  const { assetClass, setAssetClass } = useAppContext();
+  const { symbol, setSymbol } = useAppContext();
   const { timezone } = useAppContext();
 
-  console.log(selectedAssetClass, selectedSymbol);
+  console.log(assetClass, symbol);
+
+  const symbols = {
+    'Stocks': ['NVDA', 'TLSA'],
+    'Crypto': ['BTC', 'ETH'],
+    'Futures': ['MESU25', 'MNQU25']
+  };
+
+  useEffect(() => {
+    setSymbol(symbols[assetClass][0]);
+
+  }, [assetClass]);
+
+
 
   const serverStatus = "Live Data";
 
@@ -63,12 +74,13 @@ export const StatusBar = () => {
           alignItems='center'
         >
           <Autocomplete 
-            options={['Stocks', 'Futures']}
+            options={Object.keys(symbols)}
             defaultValue={assetClass}
             onChange={(_event, value) => setAssetClass(value!)}
             renderInput={(params) => (
               <TextField
                 {...params}
+                // value={assetClass}
                 label="Asset Class"
                 size="small"
               />
@@ -80,12 +92,13 @@ export const StatusBar = () => {
             disableClearable={true}
           />
           <Autocomplete 
-            options={['MESU25', 'MNQU25']}
+            options={symbols[assetClass]}
             defaultValue={symbol}
             onChange={(_event, value) => setSymbol(value!)}
             renderInput={(params) => (
               <TextField
                 {...params}
+                // value={symbol}
                 label="Symbol"
                 size="small"
               />
