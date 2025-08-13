@@ -23,6 +23,7 @@ interface IPosition {
   direction: string;
   quantity: number;
   symbol: string;
+  average: number | string;
   pnl: number | string;
   datetime: string;
 }
@@ -33,14 +34,9 @@ export const Positions = ({persona}) => {
 
   const columns = [
     {
-      field: 'datetime',
-      headerName: 'Opened',
-      width: 180
-    },
-    {
       field: 'direction',
       headerName: 'Direction',
-      width: 80
+      width: 120
     },
     {
       field: 'quantity',
@@ -51,6 +47,11 @@ export const Positions = ({persona}) => {
       field: 'symbol',
       headerName: 'Symbol',
       width: 80
+    },
+    {
+      field: 'datetime',
+      headerName: 'Opened',
+      width: 180
     },
     {
       field: 'average',
@@ -84,58 +85,23 @@ export const Positions = ({persona}) => {
 
   return (
     <Box>
-      {/* <Typography>{personaStr}</Typography> */}
-      <Typography
-        variant="h6"
-        textAlign="left"
+      <Grid
+        textAlign={'left'}
       >
-        {personaStr} Positions
-      </Typography>
+        <Typography
+          // variant="h6"
+          component="span"
+        >
+          Positions
+        </Typography>
+      </Grid>
       <DataGrid
         rows={positions}
         columns={columns}
         showColumnVerticalBorder={false}
         hideFooter={true}
       />
-      {/* {positions.map((p) => (
-        <Grid
-          container
-          columns={8}
-        >
-          <Grid size={1}>
-            {p.direction}
-          </Grid>
-          <Grid size={1}>
-            {p.quantity}
-          </Grid>
-          <Grid size={1}>
-            {p.symbol}
-          </Grid>
-          <Grid size={2}>
-            {p.pnl > 0 ? '+' : '-'}{p.pnl.toFixed(2)}
-          </Grid>
-          <Grid size={3}>
-            {p.datetime}
-          </Grid>
-        </Grid>
-      ))} */}
-      {/* <Grid
-        container columns={5}
-        // spacing={2}
-      >
-        <Grid size={1}>
-          a
-        </Grid>
-        <Grid size={1}>
-          b
-        </Grid>
-        <Grid size={1}>
-          c
-        </Grid>
-        <Grid size={1}>
-          d
-        </Grid>
-      </Grid> */}
+      
       {/* <List
         sx={{ width: '100%', bgcolor: 'background.paper' }}
         component="nav"

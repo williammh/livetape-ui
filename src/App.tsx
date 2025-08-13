@@ -8,6 +8,7 @@ import {
 } from 'react'
 import { 
   Box,
+  colors,
   Grid,
   Paper,
   Typography,
@@ -61,8 +62,6 @@ const App = () => {
           size={12}
           direction='column'
         >
-
-          
           <Grid flexGrow={1}>
             <Item sx={{height: '100%'}}>
               <StatusBar />
@@ -76,7 +75,14 @@ const App = () => {
           >
             <Grid size={1}>
               <Item sx={{height: '100%'}}>
-                {/* <Typography variant="h6">Moo</Typography> */}
+                {/* <Typography
+                  variant="h6"
+                  sx={{
+                    color: colors.green[400]
+                  }}
+                >
+                  Moo
+                </Typography> */}
                 <ProfitLoss persona='moo' />
                 <Positions persona='moo' />
                 <Orders persona='moo' />
@@ -85,7 +91,14 @@ const App = () => {
 
             <Grid size={1}>
               <Item sx={{height: '100%'}}>
-                {/* <Typography variant="h6">Grizz</Typography> */}
+                {/* <Typography
+                  variant="h6"
+                  sx={{
+                    color: colors.red[400]
+                  }}
+                >
+                  Grizz
+                </Typography> */}
                 <ProfitLoss persona='grizz' />
                 <Positions persona='grizz' />
                 <Orders persona='grizz' />

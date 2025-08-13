@@ -24,11 +24,6 @@ export const Orders = ({persona}) => {
 
   const columns = [
     {
-      field: 'datetime',
-      headerName: 'Opened',
-      width: 180
-    },
-    {
       field: 'action',
       headerName: 'Action',
       width: 60
@@ -49,14 +44,19 @@ export const Orders = ({persona}) => {
       width: 80
     },
     {
+      field: 'datetime',
+      headerName: 'Opened',
+      width: 180
+    },
+    {
       field: 'status',
       headerName: 'Status',
-      width: 60
+      width: 80
     },
     {
       field: 'price',
       headerName: 'Price',
-      width: 100,
+      width: 80,
     },
   ];
 
@@ -85,12 +85,16 @@ export const Orders = ({persona}) => {
 
   return (
     <Box>
-      <Typography
-        variant="h6"
-        textAlign="left"
+      <Grid
+        textAlign={'left'}
       >
-        {personaStr} Orders
-      </Typography>
+        <Typography
+          // variant="h6"
+          component="span"
+        >
+          Orders
+        </Typography>
+      </Grid>
       <DataGrid
         rows={orders}
         columns={columns}

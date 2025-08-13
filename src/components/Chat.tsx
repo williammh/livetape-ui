@@ -9,42 +9,8 @@ import { GrizzMessage } from './GrizzMessage';
 import { MooMessage } from './MooMessage';
 import { useCommentContext } from '../contexts/CommentContext';
 
-export const getScrollBarStyles = (selector: string, scrollBarWidth?: number, height?: number | string) => {
-  return {
-    [`& ${selector}`]: {
-      overflowY: 'scroll',
-      height: height ?? 'auto'
-    },
-    [`& ${selector}::-webkit-scrollbar`]: {
-      width: scrollBarWidth ?? 4
-    },
-    [`& ${selector}::-webkit-scrollbar-track`]: {
-      backgroundColor: '#0004',
-      borderRadius: scrollBarWidth ?? 4 / 2
-    },
-    [`& ${selector}::-webkit-scrollbar-thumb`]: {
-      backgroundColor: '#FFFA',
-      borderRadius: scrollBarWidth ?? 4 / 2
-    }
-  }
-}
-
-export const useChatStyles = makeStyles({
-	root: {
-		cursor: 'default',
-		backgroundColor: 'lightgray',
-		...getScrollBarStyles('.sidebar-scrollbar', 8),
-		...getScrollBarStyles('.visualizations-container', 8),
-		'& .top-bar' : {
-			height: '10vh',
-			padding: 6
-		},
-	}
-})
-
 export const Chat = () => {
-  const appGridClasses = useChatStyles();
-
+ 
   const messages = [
     {
       persona: 'moo',

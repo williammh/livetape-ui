@@ -1,6 +1,7 @@
 import { 
   Box,
   colors,
+  Grid,
   Typography,
 } from '@mui/material';
 
@@ -15,14 +16,41 @@ export const ProfitLoss = ({persona}) => {
 
   return (
     <Box>
-      {/* <Typography>{personaStr}</Typography> */}
-      <Typography
-        sx={{
-          color: pnl > 0 ? colors.green[400] : colors.red[400] 
-        }}
+      <Grid
+        container
+        columns={2}
       >
-        Profit/Loss: {pnlStr}
-      </Typography>
+        <Grid
+          size={1}
+          sx={{
+            textAlign: 'left'
+          }}
+        >
+          <Typography
+            variant='h6'
+            // component='span'
+          >
+            {`${personaStr} `}
+          </Typography>
+        </Grid>
+
+        <Grid
+          size={1}  
+          sx={{
+            textAlign: 'right'
+          }}
+        >
+          <Typography
+            variant='h6'
+            // component='span'
+            sx={{
+              color: pnl > 0 ? colors.green[400] : colors.red[400] 
+            }}
+          >
+            {pnlStr}
+          </Typography>
+        </Grid>
+      </Grid>
     </Box>
   );
 }
