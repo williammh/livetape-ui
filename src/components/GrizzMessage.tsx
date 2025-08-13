@@ -21,8 +21,24 @@ export const GrizzMessage = ({message, timestamp}: IGrizzMessageProps) => {
       }}
     >
       <Grid
+        size={1}
+        sx={{
+          textAlign: 'center'
+        }}
+      >
+        <Avatar
+          src={grizz}
+          sx={{
+            height: 48,
+            width: 48,
+            bgcolor: colors.red[900],
+            margin: 'auto'
+          }}
+        />
+        <Typography>Grizz</Typography>
+      </Grid>
+      <Grid
         size={5}
-        
       >
         <Card
           sx={{
@@ -45,23 +61,6 @@ export const GrizzMessage = ({message, timestamp}: IGrizzMessageProps) => {
             {localTimestamp}
           </Typography>
         </Card>
-      </Grid>
-      <Grid
-        size={1}
-        sx={{
-          textAlign: 'center'
-        }}
-      >
-        <Avatar
-          src={grizz}
-          sx={{
-            height: 48,
-            width: 48,
-            bgcolor: colors.red[900],
-            margin: 'auto'
-          }}
-        />
-        <Typography>Grizz</Typography>
       </Grid>
     </Grid>  
   );

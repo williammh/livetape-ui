@@ -328,6 +328,9 @@ export const CandlestickChart = () => {
   console.log("RENDER Chart!");
   const convertedBars = convertBars([...rawBarDataRef.current]);
   
+  // const height = 728
+  const height = 564
+
   return (
     <Box>
       <Box>
@@ -340,7 +343,9 @@ export const CandlestickChart = () => {
               data: convertedBars
             }]}
             type='candlestick'
-            height={728}
+            // height={728}
+            height={height}
+
             width={1160}
             options={{
               chart: {
@@ -456,7 +461,7 @@ export const CandlestickChart = () => {
         ) : (
           <Box 
             sx={{ 
-              height: 728, 
+              height: height, 
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',

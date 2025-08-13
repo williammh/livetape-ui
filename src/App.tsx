@@ -62,11 +62,11 @@ const App = () => {
           <Grid
             container
             columns={2}
-            sx={{ height: 216 }}
+            sx={{ height: 380 }}
           >
             <Grid size={1}>
               <Item sx={{height: '100%'}}>
-                <Typography>Moo</Typography>
+                {/* <Typography variant="h6">Moo</Typography> */}
                 <ProfitLoss persona='moo' />
                 <Positions persona='moo' />
                 <Orders persona='moo' />
@@ -75,7 +75,7 @@ const App = () => {
 
             <Grid size={1}>
               <Item sx={{height: '100%'}}>
-                <Typography>Grizz</Typography>
+                {/* <Typography variant="h6">Grizz</Typography> */}
                 <ProfitLoss persona='grizz' />
                 <Positions persona='grizz' />
                 <Orders persona='grizz' />
