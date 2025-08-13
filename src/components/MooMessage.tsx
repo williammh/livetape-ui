@@ -1,7 +1,16 @@
 import { Grid, Card, Avatar, Typography, colors } from '@mui/material'
 import moo from '../assets/moo.png';
-export const MooMessage = ({message}) => {
+import { toLocalTime } from '../util/misc';
+
+interface IMooMessageProps {
+  message: string;
+  timestamp: string;
+}
+
+export const MooMessage = ({message, timestamp}: IMooMessageProps) => {
   
+  const localTimestamp = toLocalTime(timestamp, 'America/Los_Angeles')
+
   return (
     <Grid
       container
@@ -11,7 +20,12 @@ export const MooMessage = ({message}) => {
         marginBottom: 2
       }}
     >
-      <Grid size={1}>
+      <Grid
+        size={1}
+        sx={{
+          textAlign: 'center'
+        }}
+      >
         <Avatar
           src={moo}
           sx={{
@@ -21,18 +35,34 @@ export const MooMessage = ({message}) => {
             margin: 'auto'
           }}
         />
+        <Typography>Moo</Typography>
       </Grid>
       <Grid
-        size={5}
+        size={5} 
       >
         <Card
           sx={{
             padding: 2
           }}
         >
-          {message}
+          <Typography
+            sx={{
+              marginBottom: 1
+            }}
+          >
+            {message}
+          </Typography>
+          <Typography
+            sx={{
+              textAlign: 'right',
+              color: 'gray'
+            }}
+          >
+            {localTimestamp}
+          </Typography>
         </Card>
       </Grid>
+      
     </Grid>  
   );
 }

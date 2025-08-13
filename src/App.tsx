@@ -10,12 +10,17 @@ import {
   Box,
   Grid,
   Paper,
+  Typography,
 } from '@mui/material'
 import { CandlestickChart } from './components/Chart';
 import { Chat } from './components/Chat';
-
 import { styled } from '@mui/material/styles';
 import { StatusBar } from './components/StatusBar';
+import { Positions } from './components/Positions';
+import { Orders } from './components/Orders';
+import { ProfitLoss } from './components/ProfitLoss';
+
+
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -59,19 +64,23 @@ const App = () => {
             columns={2}
             sx={{ height: 216 }}
           >
-
             <Grid size={1}>
               <Item sx={{height: '100%'}}>
-                Moo Open Orders and Positions
+                <Typography>Moo</Typography>
+                <ProfitLoss persona='moo' />
+                <Positions persona='moo' />
+                <Orders persona='moo' />
               </Item>
             </Grid>
 
             <Grid size={1}>
               <Item sx={{height: '100%'}}>
-                Grizz Open Orders and Positions
+                <Typography>Grizz</Typography>
+                <ProfitLoss persona='grizz' />
+                <Positions persona='grizz' />
+                <Orders persona='grizz' />
               </Item>
             </Grid>
-
           </Grid>
           
           <Grid flexGrow={1}>

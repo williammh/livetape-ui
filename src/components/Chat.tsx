@@ -96,7 +96,7 @@ export const Chat = () => {
       ref={chatRef}
     >
       {commentList.map((m, i) => (
-        m.persona== 'moo' ? <MooMessage message={m.text} key={i} /> : <GrizzMessage message={m.text} timestamp={m.timestamp} key={i} />
+        m.persona== 'moo' ? <MooMessage message={m.text} timestamp={m.timestamp} key={i} /> : <GrizzMessage message={m.text} timestamp={m.timestamp} key={i} />
       ))}
     </Box>  
   );

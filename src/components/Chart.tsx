@@ -228,7 +228,7 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
     return;
   }
 
-  console.log(`Received ${message.type} message: `);
+  console.log(message.type);
   console.log(message.data);
   
   const chart = chartRef.current;
@@ -389,7 +389,7 @@ export const CandlestickChart = () => {
                     }
                   },
                   beforeZoom: (chart, { xaxis }) => {
-                    console.log(`before ZOOM? ${xaxis}`);
+                    // console.log(`before ZOOM? ${xaxis}`);
                     const firstTime = convertBars([rawBarDataRef.current[0]])[0].x.getTime();     
                     const newMin = new Date(xaxis.min).getTime();
     
