@@ -328,151 +328,153 @@ export const CandlestickChart = () => {
   console.log("RENDER Chart!");
   const convertedBars = convertBars([...rawBarDataRef.current]);
   
-  // const height = 728
-  const height = 564 - 96
+  const height = 520
 
   return (
-    <Box>
-      <Box>
-        <WebSocketDataHandler
-          onMessage={(msg) => handleWebSocketMessage(msg, chartRef, rawBarDataRef, userZoomedXAxis)} 
-        />
-        {isDataLoaded ? (
-          <Chart
-            series={[{
-              data: convertedBars
-            }]}
-            type='candlestick'
-            // height={728}
-            height={height}
+    <Box
+      sx={{
+        height: height
+      }}
+    >
+      <WebSocketDataHandler
+        onMessage={(msg) => handleWebSocketMessage(msg, chartRef, rawBarDataRef, userZoomedXAxis)} 
+      />
+      {isDataLoaded ? (
+        <Chart
+          series={[{
+            data: convertedBars
+          }]}
+          type='candlestick'
+          // height={728}
+          height={height}
 
-            width={1160}
-            options={{
-              chart: {
-                type: 'candlestick',
-                toolbar: { show: false },
-                animations: {
-                  enabled: false, // Disable animations to prevent zoom reset
-                  dynamicAnimation: {
-                    enabled: false
-                  }
+          width={1160}
+          options={{
+            chart: {
+              type: 'candlestick',
+              toolbar: { show: false },
+              animations: {
+                enabled: false, // Disable animations to prevent zoom reset
+                dynamicAnimation: {
+                  enabled: false
+                }
+              },
+              events: {
+                mounted: (chart) => {
+                  chartRef.current = chart;
                 },
-                events: {
-                  mounted: (chart) => {
-                    chartRef.current = chart;
-                  },
-                  zoomed: (chartContext, { xaxis, yaxis }) => {
-                    // Mark that user has manually scaled the Y-axis if yaxis is defined
-                    if (yaxis && (yaxis.min !== undefined || yaxis.max !== undefined)) {
-                      userZoomedYAxis.current = true;
-                    }
-                    
-                    if (xaxis) {
-                      const chart = chartRef.current;
-                      if (chart && rawBarDataRef.current.length > 0) {
-                        const convertedData = convertBars(rawBarDataRef.current);
-                        const yRange = calculateYAxisRange(chart, convertedData);
-                        if (yRange.min !== undefined && yRange.max !== undefined) {
-                          const cleanRange = calculateCleanYAxisRange(yRange.min, yRange.max);
-                          chart.updateOptions({
-                            yaxis: {
-                              min: cleanRange.min,
-                              max: cleanRange.max,
-                              tickAmount: cleanRange.tickAmount,
-                              labels: {
-                                style: {
-                                  colors: '#fff',
-                                  fontSize: '18',
-                                },
-                                formatter: (val) => Math.round(val).toFixed(2)
+                zoomed: (chartContext, { xaxis, yaxis }) => {
+                  // Mark that user has manually scaled the Y-axis if yaxis is defined
+                  if (yaxis && (yaxis.min !== undefined || yaxis.max !== undefined)) {
+                    userZoomedYAxis.current = true;
+                  }
+                  
+                  if (xaxis) {
+                    const chart = chartRef.current;
+                    if (chart && rawBarDataRef.current.length > 0) {
+                      const convertedData = convertBars(rawBarDataRef.current);
+                      const yRange = calculateYAxisRange(chart, convertedData);
+                      if (yRange.min !== undefined && yRange.max !== undefined) {
+                        const cleanRange = calculateCleanYAxisRange(yRange.min, yRange.max);
+                        chart.updateOptions({
+                          yaxis: {
+                            min: cleanRange.min,
+                            max: cleanRange.max,
+                            tickAmount: cleanRange.tickAmount,
+                            labels: {
+                              style: {
+                                colors: '#fff',
+                                fontSize: '18',
                               },
-                              tooltip: { enabled: true },
-                            }
-                          }, false, false);
-                        }
+                              formatter: (val) => Math.round(val).toFixed(2)
+                            },
+                            tooltip: { enabled: true },
+                          }
+                        }, false, false);
                       }
                     }
-                  },
-                  beforeZoom: (chart, { xaxis }) => {
-                    // console.log(`before ZOOM? ${xaxis}`);
-                    const firstTime = convertBars([rawBarDataRef.current[0]])[0].x.getTime();     
-                    const newMin = new Date(xaxis.min).getTime();
-    
-                    if (newMin == firstTime) {
-                      // console.log("UNZOOMED");
-                      userZoomedYAxis.current = false;
-                      userZoomedXAxis.current = false; 
-                    } else {
-                      // console.log(firstTime, newMin, "ZOOMED");
-                      userZoomedYAxis.current = true;
-                      userZoomedXAxis.current = true; 
-                    }
-
-                    // return ;
                   }
+                },
+                beforeZoom: (chart, { xaxis }) => {
+                  // console.log(`before ZOOM? ${xaxis}`);
+                  const firstTime = convertBars([rawBarDataRef.current[0]])[0].x.getTime();     
+                  const newMin = new Date(xaxis.min).getTime();
+  
+                  if (newMin == firstTime) {
+                    // console.log("UNZOOMED");
+                    userZoomedYAxis.current = false;
+                    userZoomedXAxis.current = false; 
+                  } else {
+                    // console.log(firstTime, newMin, "ZOOMED");
+                    userZoomedYAxis.current = true;
+                    userZoomedXAxis.current = true; 
+                  }
+
+                  // return ;
                 }
+              }
+            },
+            tooltip: {
+              theme: 'dark',
+              custom: ({ seriesIndex, dataPointIndex, w }) => {
+                const [o, h, l, c] = w.globals.initialSeries[seriesIndex].data[dataPointIndex].y;
+                
+              
+                return `
+                  <div style="padding:5px; text-align: right;">
+                    open: ${o.toFixed(2)}<br/>
+                    high: ${h.toFixed(2)}<br/>
+                    low: ${l.toFixed(2)}<br/>
+                    close: ${c.toFixed(2)}
+                  </div>
+                `;
+              }
+            },
+            xaxis: {
+              type: 'datetime',
+              labels: {
+                formatter: dateFormatter,
+                style: {
+                  colors: '#fff',
+                  fontSize: '18',
+                },
+              },
+              axisBorder: {
+                show: true,
+                color: '#fff'
               },
               tooltip: {
-                theme: 'dark',
-                custom: ({ seriesIndex, dataPointIndex, w }) => {
-                  const [o, h, l, c] = w.globals.initialSeries[seriesIndex].data[dataPointIndex].y;
-                  
-                
-                  return `
-                    <div style="padding:5px; text-align: right;">
-                      open: ${o.toFixed(2)}<br/>
-                      high: ${h.toFixed(2)}<br/>
-                      low: ${l.toFixed(2)}<br/>
-                      close: ${c.toFixed(2)}
-                    </div>
-                  `;
-                }
-              },
-              xaxis: {
-                type: 'datetime',
-                labels: {
-                  formatter: dateFormatter,
-                  style: {
-                    colors: '#fff',
-                    fontSize: '18',
-                  },
-                },
-                axisBorder: {
-                  show: true,
-                  color: '#fff'
-                },
-                tooltip: {
-                  enabled: true,
-                  formatter: dateFormatter,
-                }
-              },
-              yaxis: {
-                labels: {
-                  style: {
-                    colors: '#fff',
-                    fontSize: '18',
-                  },
-                  formatter: (val) => Math.round(val).toFixed(2)
-                },
-                tooltip: { enabled: true },
+                enabled: true,
+                formatter: dateFormatter,
               }
-            }}
-          />
-        ) : (
-          <Box 
-            sx={{ 
-              height: height, 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              backgroundColor: '#1a1a1a',
-              color: 'white'
-            }}
-          >
-            <Typography>Waiting for chart data...</Typography>
-          </Box>
-        )}
-      </Box>
+            },
+            yaxis: {
+              labels: {
+                style: {
+                  colors: '#fff',
+                  fontSize: '18',
+                },
+                formatter: (val) => Math.round(val).toFixed(2)
+              },
+              tooltip: { enabled: true },
+            }
+          }}
+        />
+      ) : (
+        <Box 
+          sx={{ 
+            height: height, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            backgroundColor: '#1a1a1a',
+            color: 'white'
+          }}
+        >
+          <Typography>Waiting for chart data...</Typography>
+        </Box>
+      )}
+
     </Box>
   );
 }

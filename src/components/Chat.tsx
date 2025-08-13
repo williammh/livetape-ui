@@ -5,8 +5,7 @@ import {
 import {
   Box,
  } from '@mui/material';
-import { GrizzMessage } from './GrizzMessage';
-import { MooMessage } from './MooMessage';
+import { Message } from './Message';
 import { useCommentContext } from '../contexts/CommentContext';
 
 export const Chat = () => {
@@ -120,7 +119,14 @@ export const Chat = () => {
       ref={chatRef}
     >
       {commentList.map((m, i) => (
-        m.persona== 'moo' ? <MooMessage message={m.text} timestamp={m.timestamp} key={i} /> : <GrizzMessage message={m.text} timestamp={m.timestamp} key={i} />
+        <Message
+          persona={m.persona}
+          message={m.text}
+          timestamp={m.timestamp}
+        />
+
+
+        // m.persona== 'moo' ? <MooMessage message={m.text} timestamp={m.timestamp} key={i} /> : <GrizzMessage message={m.text} timestamp={m.timestamp} key={i} />
       ))}
     </Box>  
   );

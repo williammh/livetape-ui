@@ -1,23 +1,30 @@
 import { Grid, Card, Avatar, Typography, colors } from '@mui/material'
 import moo from '../assets/moo.png';
+import grizz from '../assets/grizz.png';
+
 import { toLocalTime } from '../util/misc';
 
-interface IMooMessageProps {
+interface IMessageProps {
+  persona?: string;
   message: string;
   timestamp: string;
 }
 
-export const MooMessage = ({message, timestamp}: IMooMessageProps) => {
+export const Message = ({persona, message, timestamp}: IMessageProps) => {
   
   const localTimestamp = toLocalTime(timestamp, 'America/Los_Angeles')
+
+  const bgColor = persona === 'moo' ? colors.green[900] : colors.red[900]
+  const displayName = `${persona?.[0].toUpperCase()}${persona?.slice(1)}`;
 
   return (
     <Grid
       container
-      columns={6}
+      columns={8}
       sx={{
         textAlign: 'left',
-        marginBottom: 2
+        marginBottom: 2,
+        marginRight: 1,
       }}
     >
       <Grid
@@ -27,18 +34,18 @@ export const MooMessage = ({message, timestamp}: IMooMessageProps) => {
         }}
       >
         <Avatar
-          src={moo}
+          src={persona === 'moo' ? moo : grizz}
           sx={{
-            height: 48,
-            width: 48,
-            bgcolor: colors.green[900],
+            height: 56,
+            width: 56,
+            bgcolor: bgColor,
             margin: 'auto'
           }}
         />
-        <Typography>Moo</Typography>
+        <Typography>{displayName}</Typography>
       </Grid>
       <Grid
-        size={5} 
+        size={7}
       >
         <Card
           sx={{
@@ -62,7 +69,6 @@ export const MooMessage = ({message, timestamp}: IMooMessageProps) => {
           </Typography>
         </Card>
       </Grid>
-      
     </Grid>  
   );
 }
