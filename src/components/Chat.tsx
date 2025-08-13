@@ -124,9 +124,6 @@ export const Chat = () => {
           message={m.text}
           timestamp={m.timestamp}
         />
-
-
-        // m.persona== 'moo' ? <MooMessage message={m.text} timestamp={m.timestamp} key={i} /> : <GrizzMessage message={m.text} timestamp={m.timestamp} key={i} />
       ))}
     </Box>  
   );

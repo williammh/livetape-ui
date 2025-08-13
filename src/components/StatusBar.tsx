@@ -13,6 +13,7 @@ import {
 import { useBarContext } from '../contexts/BarContext';
 import { PlayArrow } from '@mui/icons-material';
 import { toLocalTime } from '../util/misc';
+import { useAppContext } from '../contexts/AppContext';
 
 export const StatusBar = () => {
   const { message } = useBarContext();
@@ -21,6 +22,12 @@ export const StatusBar = () => {
   const [symbol, setSymbol] = useState<string>('MNQU25');
   const [assetClass, setAssetClass] = useState<string>('Futures');
   const [interval, setInterval] = useState<string>('1 Minute');
+
+  const { selectedAssetClass, setSelectedAssetClass } = useAppContext();
+  const { selectedSymbol, setSelectedSymbol } = useAppContext();
+  const { timezone } = useAppContext();
+
+  console.log(selectedAssetClass, selectedSymbol);
 
   const serverStatus = "Live Data";
 
@@ -34,9 +41,8 @@ export const StatusBar = () => {
 
   }, [message]);
 
-  const timeZone = 'America/Los_Angeles';
-  const tzLabel = timeZone.split('/')[1].replace('_', ' ');
-  const localTimestamp = toLocalTime(timestamp, timeZone);
+  const tzLabel = timezone.split('/')[1].replace('_', ' ');
+  const localTimestamp = toLocalTime(timestamp, timezone);
 
   const gridStyles = {
     padding: 1
