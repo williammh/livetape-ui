@@ -329,7 +329,7 @@ export const CandlestickChart = () => {
   const convertedBars = convertBars([...rawBarDataRef.current]);
   
   // const height = 728
-  const height = 564
+  const height = 564 - 96
 
   return (
     <Box>

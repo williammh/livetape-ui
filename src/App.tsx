@@ -41,14 +41,14 @@ const App = () => {
         columns={18}
         sx={{ width: 1920, height: 1080 }}
       >
-        <Grid size={1}>
-          <Item sx={{height: '100%'}}>
-            Iconbar
+        <Grid size={18}>
+          <Item sx={{height: 96}}>
+            LiveTape.ai
           </Item>
         </Grid>
 
-        <Grid size={5}>
-          <Item sx={{height: 1080}}>
+        <Grid size={6}>
+          <Item sx={{height: 1080 - 96}}>
             <Chat />
           </Item>
         </Grid>
