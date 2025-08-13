@@ -20,6 +20,7 @@ import { StatusBar } from './components/StatusBar';
 import { Positions } from './components/Positions';
 import { Orders } from './components/Orders';
 import { ProfitLoss } from './components/ProfitLoss';
+import { toLocalTime } from './util/misc';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -32,6 +33,16 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const App = () => { 
+  const now = new Date();
+  // const tomorrow = new Date(
+
+  // );
+  // console.log(tomorrow);
+
+  const startTimeStr = toLocalTime(now, 'America/Los_Angeles');
+  console.log(startTimeStr);
+
+
   return (
     <Box>
       <Grid
@@ -42,12 +53,39 @@ const App = () => {
       >
         <Grid size={18}>
           <Item sx={{height: 96}}>
-            <Typography
-              variant='h2'
-              textAlign='left'
+            <Grid
+              container
+              columns={2}
+              alignItems='center'
+              sx={{
+                  height: '100%'
+              }}
             >
-              LiveTape.ai
-            </Typography>
+              <Grid
+                size={1}
+                sx={{
+                  textAlign: 'left',
+                }}
+              >
+                <Typography
+                  variant='h3'
+                  component='span'
+                >
+                  LiveTape.ai
+                </Typography>
+              </Grid>
+              <Grid
+                size={1}
+              >
+                <Typography
+                  variant='h5'
+                  component='span'
+                >
+                  BTC - Bitcoin starting at {startTimeStr}
+                </Typography>
+              </Grid>
+             
+            </Grid>
           </Item>
         </Grid>
 
