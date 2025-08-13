@@ -20,8 +20,6 @@ import { Positions } from './components/Positions';
 import { Orders } from './components/Orders';
 import { ProfitLoss } from './components/ProfitLoss';
 
-
-
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   padding: theme.spacing(1),
@@ -43,7 +41,12 @@ const App = () => {
       >
         <Grid size={18}>
           <Item sx={{height: 96}}>
-            LiveTape.ai
+            <Typography
+              variant='h2'
+              textAlign='left'
+            >
+              LiveTape.ai
+            </Typography>
           </Item>
         </Grid>
 
@@ -59,6 +62,13 @@ const App = () => {
           direction='column'
         >
 
+          
+          <Grid flexGrow={1}>
+            <Item sx={{height: '100%'}}>
+              <StatusBar />
+              <CandlestickChart />
+            </Item>
+          </Grid>
           <Grid
             container
             columns={2}
@@ -81,13 +91,6 @@ const App = () => {
                 <Orders persona='grizz' />
               </Item>
             </Grid>
-          </Grid>
-          
-          <Grid flexGrow={1}>
-            <Item sx={{height: '100%'}}>
-              <StatusBar />
-              <CandlestickChart />
-            </Item>
           </Grid>
 
         </Grid>

@@ -2,12 +2,49 @@ import {
   useEffect,
   useRef,
 } from 'react';
-import { Box } from '@mui/material';
+import {
+  Box,
+ } from '@mui/material';
 import { GrizzMessage } from './GrizzMessage';
 import { MooMessage } from './MooMessage';
 import { useCommentContext } from '../contexts/CommentContext';
 
+export const getScrollBarStyles = (selector: string, scrollBarWidth?: number, height?: number | string) => {
+  return {
+    [`& ${selector}`]: {
+      overflowY: 'scroll',
+      height: height ?? 'auto'
+    },
+    [`& ${selector}::-webkit-scrollbar`]: {
+      width: scrollBarWidth ?? 4
+    },
+    [`& ${selector}::-webkit-scrollbar-track`]: {
+      backgroundColor: '#0004',
+      borderRadius: scrollBarWidth ?? 4 / 2
+    },
+    [`& ${selector}::-webkit-scrollbar-thumb`]: {
+      backgroundColor: '#FFFA',
+      borderRadius: scrollBarWidth ?? 4 / 2
+    }
+  }
+}
+
+export const useChatStyles = makeStyles({
+	root: {
+		cursor: 'default',
+		backgroundColor: 'lightgray',
+		...getScrollBarStyles('.sidebar-scrollbar', 8),
+		...getScrollBarStyles('.visualizations-container', 8),
+		'& .top-bar' : {
+			height: '10vh',
+			padding: 6
+		},
+	}
+})
+
 export const Chat = () => {
+  const appGridClasses = useChatStyles();
+
   const messages = [
     {
       persona: 'moo',
@@ -92,6 +129,27 @@ export const Chat = () => {
       sx={{
         overflowY: 'scroll',
         height: '100%'
+,
+        // Custom scrollbar styles inline
+        '&::-webkit-scrollbar': {
+          width: '8px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: '#1a1a1a',
+          borderRadius: '4px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: 'linear-gradient(135deg, #424242 0%, #616161 100%)',
+          borderRadius: '4px',
+          border: '1px solid #2a2a2a',
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            background: 'linear-gradient(135deg, #616161 0%, #757575 100%)',
+            boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1)',
+          }
+        },
+        scrollbarWidth: 'thin',
+        scrollbarColor: '#424242 #1a1a1a',
       }}
       ref={chatRef}
     >
