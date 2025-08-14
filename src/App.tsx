@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material'
 import { CandlestickChart } from './components/Chart';
-import { Chat } from './components/Chat';
+import { MessageBox } from './components/Chat';
 import { styled } from '@mui/material/styles';
 import { StatusBar } from './components/StatusBar';
 import { Positions } from './components/Positions';
@@ -107,7 +107,7 @@ const App = () => {
 
         <Grid size={6}>
           <Item sx={{height: 976}}>
-            <Chat />
+            <MessageBox />
           </Item>
         </Grid>
 

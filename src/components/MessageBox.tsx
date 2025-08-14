@@ -8,7 +8,7 @@ import {
 import { Message } from './Message';
 import { useCommentContext } from '../contexts/CommentContext';
 
-export const Chat = () => {
+export const MessageBox = () => {
  
   const messages = [
     {
