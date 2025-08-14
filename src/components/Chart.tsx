@@ -256,6 +256,7 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
       currentBars[index] = message.data;
       const newConvertedBars = convertBars(currentBars);
       
+     
       chart?.updateSeries([{
         data: newConvertedBars
       }], false);
@@ -281,6 +282,7 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
         currentBars[currentBars.length - 1] = openBar;
         const newConvertedBars = convertBars(currentBars);
         
+    
         chart?.updateSeries([{
           data: newConvertedBars
         }], false);
@@ -289,6 +291,7 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
       } else {
         currentBars.push(openBar);
         const newConvertedBars = convertBars(currentBars);
+        
         
         chart?.updateSeries([{
           data: newConvertedBars
@@ -314,12 +317,10 @@ export const CandlestickChart = () => {
 
   useEffect(() => {
     console.log(`RENDER CHART: ${symbol}`);
-
+    setIsDataLoaded(false);
     const getclosedBars = (async () => {
       const res = await fetch(`http://localhost:8000/closed_bars/${symbol}`);
       const closedBars = await res.json();
-      console.log(closedBars);
-      console.log('closed:');
       const convertedBars = convertBars(closedBars);
       setIsDataLoaded(true);
       chartRef.current?.updateSeries([{ data: convertedBars }], false);
@@ -459,7 +460,26 @@ export const CandlestickChart = () => {
               },
               tooltip: { enabled: true },
             },
-            
+            // annotations: {
+            //   yaxis: [
+            //     {
+            //       // last bar close
+            //       y: convertedBars.length > 0 
+            //         ? convertedBars[convertedBars.length - 1].y[3]
+            //         : null,            
+            //       borderWidth: 0,
+            //       label: {
+            //         text: `${convertedBars[convertedBars.length - 1]?.y[3].toFixed(2)}`,
+            //         style: {
+            //           color: '#fff',
+            //           background: '#222',
+            //           fontSize: '14px',
+            //         },
+            //         position: 'right'
+            //       }
+            //     }
+            //   ]
+            // },
           }}
         />
       ) : (

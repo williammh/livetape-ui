@@ -86,12 +86,6 @@ export const Positions = ({persona}) => {
     }
   ];
 
-   const [open, setOpen] = useState(true);
-
-  const handleClick = () => {
-    setOpen(!open);
-  };
-
   return (
     <Box>
       <Grid
@@ -110,23 +104,6 @@ export const Positions = ({persona}) => {
         showColumnVerticalBorder={false}
         hideFooter={true}
       />
-      
-      {/* <List
-        sx={{ width: '100%', bgcolor: 'background.paper' }}
-        component="nav"
-        aria-labelledby="nested-list-subheader"
-        subheader={
-          <ListSubheader component="div" id="nested-list-subheader">
-            Positions
-          </ListSubheader>
-        }
-      >
-        {positions.map(p => (
-          <ListItemButton>
-            <ListItemText primary={`${p.direction} ${p.quantity} ${p.symbol} ${p.pnl} ${p.datetime}`}  />
-          </ListItemButton>
-        ))}
-      </List> */}
     </Box>
   );
 }
