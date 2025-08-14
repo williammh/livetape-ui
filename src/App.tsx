@@ -1,21 +1,12 @@
-import {
-  useState,
-  useEffect,
-  useContext,
-  useRef,
-  type SetStateAction,
-  type MouseEvent
-} from 'react'
 import { 
   Box,
   Button,
-  colors,
   Grid,
   Paper,
   Typography,
 } from '@mui/material'
 import { CandlestickChart } from './components/Chart';
-import { MessageBox } from './components/Chat';
+import { MessageBox } from './components/MessageBox';
 import { styled } from '@mui/material/styles';
 import { StatusBar } from './components/StatusBar';
 import { Positions } from './components/Positions';
@@ -23,6 +14,7 @@ import { Orders } from './components/Orders';
 import { ProfitLoss } from './components/ProfitLoss';
 import { toLocalDateTimeStr } from './util/misc';
 import { CalendarMonth } from '@mui/icons-material';
+import { useAppContext } from './contexts/AppContext';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -37,9 +29,9 @@ const Item = styled(Paper)(({ theme }) => ({
 const App = () => { 
   const now = new Date();
 
-  const startTimeStr = toLocalDateTimeStr(now, 'America/Los_Angeles');
+  const { timezone } = useAppContext();
+  const startTimeStr = toLocalDateTimeStr(now, timezone);
   console.log(startTimeStr);
-
 
   return (
     <Box>
@@ -133,14 +125,6 @@ const App = () => {
           >
             <Grid size={1}>
               <Item>
-                {/* <Typography
-                  variant="h6"
-                  sx={{
-                    color: colors.green[400]
-                  }}
-                >
-                  Moo
-                </Typography> */}
                 <ProfitLoss persona='moo' />
                 <Positions persona='moo' />
                 <Orders persona='moo' />
@@ -149,14 +133,6 @@ const App = () => {
 
             <Grid size={1}>
               <Item>
-                {/* <Typography
-                  variant="h6"
-                  sx={{
-                    color: colors.red[400]
-                  }}
-                >
-                  Grizz
-                </Typography> */}
                 <ProfitLoss persona='grizz' />
                 <Positions persona='grizz' />
                 <Orders persona='grizz' />

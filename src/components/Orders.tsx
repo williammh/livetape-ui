@@ -6,6 +6,7 @@ import {
 import { toLocalDateTimeStr } from '../util/misc';
 import { DataGrid } from '@mui/x-data-grid';
 import { textAlignRight } from '../util/misc';
+import { useAppContext } from '../contexts/AppContext';
 
 
 interface IOrder {
@@ -20,7 +21,7 @@ interface IOrder {
 }
 
 export const Orders = ({persona}) => {
-
+  const { timezone } = useAppContext();
   const personaStr = `${persona[0].toUpperCase()}${persona.slice(1)}`;
 
   const columns = [
@@ -74,7 +75,7 @@ export const Orders = ({persona}) => {
       symbol: 'NVDA',
       price: `${(29534.5).toFixed(2)}`,
       status: 'Open',
-      datetime: toLocalDateTimeStr(new Date(), 'America/Los_Angeles'),
+      datetime: toLocalDateTimeStr(new Date(), timezone),
     },
     {
       id: 1,
@@ -84,7 +85,7 @@ export const Orders = ({persona}) => {
       symbol: 'NVDA',
       price: `${(29600.5).toFixed(2)}`,
       status: 'Open',
-      datetime: toLocalDateTimeStr(new Date(), 'America/Los_Angeles'),
+      datetime: toLocalDateTimeStr(new Date(), timezone),
     }
   ]
 

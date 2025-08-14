@@ -5,7 +5,6 @@ import {
   Typography,
 } from '@mui/material';
 
-
 export const ProfitLoss = ({persona}) => {
 
   const personaStr = `${persona[0].toUpperCase()}${persona.slice(1)}`;

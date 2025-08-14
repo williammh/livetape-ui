@@ -1,21 +1,12 @@
-import {
-  useState
-} from 'react';
-import { ExpandLess, ExpandMore, StarBorder } from '@mui/icons-material';
 import { 
   Box,
-  Collapse,
   Grid,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
   Typography,
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { toLocalDateTimeStr } from '../util/misc';
 import { textAlignRight } from '../util/misc';
+import { useAppContext } from '../contexts/AppContext';
 
 interface IPosition {
   id: number;
@@ -28,6 +19,8 @@ interface IPosition {
 }
 
 export const Positions = ({persona}) => {
+  const { timezone } = useAppContext();
+  
 
   const personaStr = `${persona[0].toUpperCase()}${persona.slice(1)}`;
 
@@ -82,7 +75,7 @@ export const Positions = ({persona}) => {
       symbol: 'NVDA',
       average: `${(29337.75).toFixed(2)}`,
       pnl: `${(29534.5).toFixed(2)}`,
-      datetime: toLocalDateTimeStr(new Date(), 'America/Los_Angeles'),
+      datetime: toLocalDateTimeStr(new Date(), timezone),
     }
   ];
 
