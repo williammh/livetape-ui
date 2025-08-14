@@ -1,8 +1,8 @@
 import { Grid, Card, Avatar, Typography, colors } from '@mui/material'
 import moo from '../assets/moo.png';
 import grizz from '../assets/grizz.png';
-
 import { toLocalDateTimeStr } from '../util/misc';
+import { useAppContext } from '../contexts/AppContext';
 
 interface IMessageProps {
   persona?: string;
@@ -11,9 +11,12 @@ interface IMessageProps {
 }
 
 export const Message = ({persona, message, timestamp}: IMessageProps) => {
-  const localTimestamp = toLocalDateTimeStr(timestamp, 'America/Los_Angeles')
-  const bgColor = persona === 'moo' ? colors.green[900] : colors.red[900]
-  const displayName = `${persona?.[0].toUpperCase()}${persona?.slice(1)}`;
+  const { timezone } = useAppContext();
+  const localTimestamp = toLocalDateTimeStr(timestamp, timezone);
+  const bgColor = persona === 'moo' ? colors.green[900] : colors.red[900];
+  const capitalized = `${persona?.[0].toUpperCase()}${persona?.slice(1)}`;
+  const displayName = capitalized.includes(":") ? capitalized.slice(0, capitalized.indexOf(":") ) : capitalized;
+  const avatar = persona?.startsWith('moo') ? moo : grizz;
 
   return (
     <Grid
@@ -32,7 +35,7 @@ export const Message = ({persona, message, timestamp}: IMessageProps) => {
         }}
       >
         <Avatar
-          src={persona === 'moo' ? moo : grizz}
+          src={avatar}
           sx={{
             height: 56,
             width: 56,

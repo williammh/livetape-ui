@@ -8,10 +8,6 @@ import {
     type SetStateAction
 } from 'react';
 
-interface ContextProviderProps {
-  children: React.ReactNode
-}
-
 interface IAppContext {
     assetClass: string;
     setAssetClass: Dispatch<SetStateAction<string>>;
@@ -23,16 +19,18 @@ interface IAppContext {
 
 const AppContext = createContext({} as IAppContext);
 
+export const serverAddress = 'localhost:8000';
+
 export const symbols = {
     'Stocks': ['NVDA', 'TLSA'],
     'Crypto': ['BTC', 'ETH'],
     'Futures': ['MESU25', 'MNQU25']
 };
 
-export const AppProvider = ({children}: ContextProviderProps) => {
+export const AppProvider = ({children}: {children: React.ReactNode}) => {
    
     const [ assetClass, setAssetClass ] = useState<string>('Stocks');
-    const [ symbol, setSymbol ] = useState<string>(symbols[assetClass][0]);
+    const [ symbol, setSymbol ] = useState<string>('NVDA');
     const [ timezone, setTimezone ] = useState<string>('America/Los_Angeles');
 
     return (

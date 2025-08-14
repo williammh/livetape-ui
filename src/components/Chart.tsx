@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useBarContext } from '../contexts/BarContext';
-import { useAppContext } from '../contexts/AppContext';
+import { serverAddress, useAppContext } from '../contexts/AppContext';
 import { toLocalTimeStr } from '../util/misc';
 
 interface IBar {
@@ -319,7 +319,7 @@ export const CandlestickChart = () => {
     console.log(`RENDER CHART: ${symbol}`);
     setIsDataLoaded(false);
     const getclosedBars = (async () => {
-      const res = await fetch(`http://localhost:8000/closed_bars/${symbol}`);
+      const res = await fetch(`http://${serverAddress}/closed_bars/${symbol}`);
       const closedBars = await res.json();
       const convertedBars = convertBars(closedBars);
       setIsDataLoaded(true);

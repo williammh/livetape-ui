@@ -7,6 +7,7 @@ import {
     type Dispatch,
     type SetStateAction
 } from 'react';
+import { serverAddress } from './AppContext';
 
 interface ContextProviderProps {
   children: React.ReactNode
@@ -23,7 +24,7 @@ export const CommentProvider = ({children}: ContextProviderProps) => {
     const commentWsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
-        const commentWs = new WebSocket('ws://localhost:8000/ws/comments');
+        const commentWs = new WebSocket(`ws://${serverAddress}/ws/comments`);
         commentWsRef.current = commentWs;
 
         commentWs.onopen = () => {
