@@ -8,6 +8,7 @@ import {
 } from 'react'
 import { 
   Box,
+  Button,
   colors,
   Grid,
   Paper,
@@ -20,7 +21,8 @@ import { StatusBar } from './components/StatusBar';
 import { Positions } from './components/Positions';
 import { Orders } from './components/Orders';
 import { ProfitLoss } from './components/ProfitLoss';
-import { toLocalTime } from './util/misc';
+import { toLocalDateTimeStr } from './util/misc';
+import { CalendarMonth } from '@mui/icons-material';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -34,12 +36,8 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const App = () => { 
   const now = new Date();
-  // const tomorrow = new Date(
 
-  // );
-  // console.log(tomorrow);
-
-  const startTimeStr = toLocalTime(now, 'America/Los_Angeles');
+  const startTimeStr = toLocalDateTimeStr(now, 'America/Los_Angeles');
   console.log(startTimeStr);
 
 
@@ -55,7 +53,7 @@ const App = () => {
           <Item sx={{height: 96}}>
             <Grid
               container
-              columns={2}
+              columns={3}
               alignItems='center'
               sx={{
                   height: '100%'
@@ -76,13 +74,31 @@ const App = () => {
               </Grid>
               <Grid
                 size={1}
+                sx={{
+                  textAlign: 'right'
+                }}
               >
                 <Typography
-                  variant='h5'
+                  variant='h6'
                   component='span'
                 >
-                  BTC - Bitcoin starting at {startTimeStr}
+                  Crypto: BTC - Bitcoin starting at {startTimeStr}
                 </Typography>
+            
+              </Grid>
+              <Grid
+                size={1}
+                sx={{
+                  textAlign: 'right'
+                }}
+              >
+                <Button
+                  variant="outlined"
+                  color="#fff"
+                  endIcon={<CalendarMonth />}
+                >
+                  Schedule
+                </Button>
               </Grid>
              
             </Grid>
@@ -90,29 +106,33 @@ const App = () => {
         </Grid>
 
         <Grid size={6}>
-          <Item sx={{height: 1080 - 96}}>
+          <Item sx={{height: 976}}>
             <Chat />
           </Item>
         </Grid>
 
         <Grid
           container
+          direction='row'
+          columns={2}
           size={12}
-          direction='column'
         >
-          <Grid flexGrow={1}>
-            <Item sx={{height: '100%'}}>
+          <Grid
+            size={1}
+            flexGrow={2}
+          >
+            <Item>
               <StatusBar />
               <CandlestickChart />
             </Item>
           </Grid>
           <Grid
             container
+            size={11}
             columns={2}
-            sx={{ height: 380 }}
           >
             <Grid size={1}>
-              <Item sx={{height: '100%'}}>
+              <Item>
                 {/* <Typography
                   variant="h6"
                   sx={{
@@ -128,7 +148,7 @@ const App = () => {
             </Grid>
 
             <Grid size={1}>
-              <Item sx={{height: '100%'}}>
+              <Item>
                 {/* <Typography
                   variant="h6"
                   sx={{

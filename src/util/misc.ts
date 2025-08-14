@@ -1,4 +1,4 @@
-export const toLocalTime = (timestamp, timeZone = 'America/Los_Angeles') => {
+export const toLocalDateTimeStr = (timestamp, timeZone = 'America/Los_Angeles') => {
     const options = {
         timeZone: timeZone,
         year: 'numeric',
@@ -13,3 +13,16 @@ export const toLocalTime = (timestamp, timeZone = 'America/Los_Angeles') => {
     const localTimeStamp = new Date(timestamp).toLocaleString('en-US', options);
     return localTimeStamp;
 }
+
+export const toLocalTimeStr = (value: string) => {
+  // const timeZone = 'UTC';
+  const timeZone = 'America/Los_Angeles';
+  return (new Date(Number(value)).toLocaleTimeString('en-US', {timeZone: timeZone, timeStyle: 'short'}));
+}
+
+export const textAlignRight = (params) => {
+    if (parseFloat(params.value)) {
+        return 'MuiDataGrid-cell--textRight'
+    }
+    return '';
+  }

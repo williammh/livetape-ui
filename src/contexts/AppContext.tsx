@@ -23,10 +23,16 @@ interface IAppContext {
 
 const AppContext = createContext({} as IAppContext);
 
+export const symbols = {
+    'Stocks': ['NVDA', 'TLSA'],
+    'Crypto': ['BTC', 'ETH'],
+    'Futures': ['MESU25', 'MNQU25']
+};
+
 export const AppProvider = ({children}: ContextProviderProps) => {
    
     const [ assetClass, setAssetClass ] = useState<string>('Stocks');
-    const [ symbol, setSymbol ] = useState<string>('NVDA');
+    const [ symbol, setSymbol ] = useState<string>(symbols[assetClass][0]);
     const [ timezone, setTimezone ] = useState<string>('America/Los_Angeles');
 
     return (

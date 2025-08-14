@@ -1,0 +1,18 @@
+.align-right {
+    text-align: right;
+}
+
+.bg-green {
+  background-color: #4caf50;
+  color: #fafafa;
+}
+
+.bg-red {
+  background-color: #f44336;
+  color: #fafafa;
+}
+
+.bg-white {
+  background-color: #ffffff;
+  color: #212121;
+}

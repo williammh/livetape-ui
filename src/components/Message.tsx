@@ -2,7 +2,7 @@ import { Grid, Card, Avatar, Typography, colors } from '@mui/material'
 import moo from '../assets/moo.png';
 import grizz from '../assets/grizz.png';
 
-import { toLocalTime } from '../util/misc';
+import { toLocalDateTimeStr } from '../util/misc';
 
 interface IMessageProps {
   persona?: string;
@@ -11,9 +11,7 @@ interface IMessageProps {
 }
 
 export const Message = ({persona, message, timestamp}: IMessageProps) => {
-  
-  const localTimestamp = toLocalTime(timestamp, 'America/Los_Angeles')
-
+  const localTimestamp = toLocalDateTimeStr(timestamp, 'America/Los_Angeles')
   const bgColor = persona === 'moo' ? colors.green[900] : colors.red[900]
   const displayName = `${persona?.[0].toUpperCase()}${persona?.slice(1)}`;
 

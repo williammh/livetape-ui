@@ -14,9 +14,8 @@ import {
   Typography,
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { toLocalTime } from '../util/misc';
-
-
+import { toLocalDateTimeStr } from '../util/misc';
+import { textAlignRight } from '../util/misc';
 
 interface IPosition {
   id: number;
@@ -36,31 +35,41 @@ export const Positions = ({persona}) => {
     {
       field: 'direction',
       headerName: 'Direction',
-      width: 120
+      headerAlign: 'left',
+      width: 120,
     },
     {
       field: 'quantity',
       headerName: 'Qty',
-      width: 60
+      headerAlign: 'right',
+      cellClassName: textAlignRight,
+      width: 40,
     },
     {
       field: 'symbol',
       headerName: 'Symbol',
+      headerAlign: 'left',
       width: 80
     },
     {
       field: 'datetime',
       headerName: 'Opened',
-      width: 180
+      headerAlign: 'left',
+      width: 200
     },
     {
       field: 'average',
       headerName: 'Avg',
+      headerAlign: 'right',
+      cellClassName: textAlignRight,
       width: 80
+
     },
     {
       field: 'pnl',
       headerName: 'P/L',
+      headerAlign: 'right',
+      cellClassName: textAlignRight,
       width: 80
     },
     
@@ -73,7 +82,7 @@ export const Positions = ({persona}) => {
       symbol: 'NVDA',
       average: `${(29337.75).toFixed(2)}`,
       pnl: `${(29534.5).toFixed(2)}`,
-      datetime: toLocalTime(new Date(), 'America/Los_Angeles'),
+      datetime: toLocalDateTimeStr(new Date(), 'America/Los_Angeles'),
     }
   ];
 

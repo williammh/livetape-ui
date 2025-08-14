@@ -3,8 +3,9 @@ import {
   Typography,
   Grid
 } from '@mui/material';
-import { toLocalTime } from '../util/misc';
+import { toLocalDateTimeStr } from '../util/misc';
 import { DataGrid } from '@mui/x-data-grid';
+import { textAlignRight } from '../util/misc';
 
 
 interface IOrder {
@@ -36,7 +37,9 @@ export const Orders = ({persona}) => {
     {
       field: 'quantity',
       headerName: 'Qty',
-      width: 60
+      headerAlign: 'right',
+      cellClassName: textAlignRight,
+      width: 40
     },
     {
       field: 'symbol',
@@ -46,7 +49,7 @@ export const Orders = ({persona}) => {
     {
       field: 'datetime',
       headerName: 'Opened',
-      width: 180
+      width: 200
     },
     {
       field: 'status',
@@ -56,6 +59,8 @@ export const Orders = ({persona}) => {
     {
       field: 'price',
       headerName: 'Price',
+      headerAlign: 'right',
+      cellClassName: textAlignRight,
       width: 80,
     },
   ];
@@ -69,7 +74,7 @@ export const Orders = ({persona}) => {
       symbol: 'NVDA',
       price: `${(29534.5).toFixed(2)}`,
       status: 'Open',
-      datetime: toLocalTime(new Date(), 'America/Los_Angeles'),
+      datetime: toLocalDateTimeStr(new Date(), 'America/Los_Angeles'),
     },
     {
       id: 1,
@@ -79,7 +84,7 @@ export const Orders = ({persona}) => {
       symbol: 'NVDA',
       price: `${(29600.5).toFixed(2)}`,
       status: 'Open',
-      datetime: toLocalTime(new Date(), 'America/Los_Angeles'),
+      datetime: toLocalDateTimeStr(new Date(), 'America/Los_Angeles'),
     }
   ]
 

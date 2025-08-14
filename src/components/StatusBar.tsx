@@ -1,6 +1,7 @@
 import {
   useState,
   useEffect,
+  useRef,
 } from 'react';
 import { 
   Autocomplete,
@@ -12,8 +13,8 @@ import {
 } from '@mui/material';
 import { useBarContext } from '../contexts/BarContext';
 import { PlayArrow } from '@mui/icons-material';
-import { toLocalTime } from '../util/misc';
-import { useAppContext } from '../contexts/AppContext';
+import { toLocalDateTimeStr } from '../util/misc';
+import { useAppContext, symbols } from '../contexts/AppContext';
 
 export const StatusBar = () => {
   const { message } = useBarContext();
@@ -25,20 +26,9 @@ export const StatusBar = () => {
   const { symbol, setSymbol } = useAppContext();
   const { timezone } = useAppContext();
 
-  console.log(assetClass, symbol);
-
-  const symbols = {
-    'Stocks': ['NVDA', 'TLSA'],
-    'Crypto': ['BTC', 'ETH'],
-    'Futures': ['MESU25', 'MNQU25']
-  };
-
   useEffect(() => {
     setSymbol(symbols[assetClass][0]);
-
   }, [assetClass]);
-
-
 
   const serverStatus = "Live Data";
 
@@ -53,7 +43,7 @@ export const StatusBar = () => {
   }, [message]);
 
   const tzLabel = timezone.split('/')[1].replace('_', ' ');
-  const localTimestamp = toLocalTime(timestamp, timezone);
+  const localTimestamp = toLocalDateTimeStr(timestamp, timezone);
 
   const gridStyles = {
     padding: 1
@@ -76,11 +66,11 @@ export const StatusBar = () => {
           <Autocomplete 
             options={Object.keys(symbols)}
             defaultValue={assetClass}
+            value={assetClass}
             onChange={(_event, value) => setAssetClass(value!)}
             renderInput={(params) => (
               <TextField
                 {...params}
-                // value={assetClass}
                 label="Asset Class"
                 size="small"
               />
@@ -94,11 +84,11 @@ export const StatusBar = () => {
           <Autocomplete 
             options={symbols[assetClass]}
             defaultValue={symbol}
+            value={symbol}
             onChange={(_event, value) => setSymbol(value!)}
             renderInput={(params) => (
               <TextField
                 {...params}
-                // value={symbol}
                 label="Symbol"
                 size="small"
               />

@@ -6,9 +6,12 @@ import {
 } from 'react';
 import { 
   Box,
+  CircularProgress,
   Typography,
 } from '@mui/material';
 import { useBarContext } from '../contexts/BarContext';
+import { useAppContext } from '../contexts/AppContext';
+import { toLocalTimeStr } from '../util/misc';
 
 interface IBar {
   open: number;
@@ -132,12 +135,12 @@ const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef,
               max: cleanXRange.max,
               tickAmount: cleanXRange.tickAmount,
               labels: {
-                formatter: dateFormatter,
+                formatter: toLocalTimeStr,
                 style: { colors: '#fff', fontSize: '18' },
               },
               tooltip: {
                 enabled: true,
-                formatter: dateFormatter,
+                formatter: toLocalTimeStr,
               },
               axisBorder: {
                 show: true,
@@ -298,13 +301,10 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
   }
 };
 
-const dateFormatter = (value: string) => {
-  // const timeZone = 'UTC';
-  const timeZone = 'America/Los_Angeles';
-  return (new Date(Number(value)).toLocaleTimeString('en-US', {timeZone: timeZone, timeStyle: 'short'}));
-}
-
 export const CandlestickChart = () => {
+  const { symbol, setSymbol } = useAppContext();
+  const { timezone } = useAppContext();
+
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const rawBarDataRef = useRef<Array<IBar>>([]);
   const chartRef = useRef(null);
@@ -313,8 +313,10 @@ export const CandlestickChart = () => {
   const userZoomedXAxis = useRef(false);
 
   useEffect(() => {
+    console.log(`RENDER CHART: ${symbol}`);
+
     const getclosedBars = (async () => {
-      const res = await fetch('http://localhost:8000/closed_bars');
+      const res = await fetch(`http://localhost:8000/closed_bars/${symbol}`);
       const closedBars = await res.json();
       console.log(closedBars);
       console.log('closed:');
@@ -323,12 +325,11 @@ export const CandlestickChart = () => {
       chartRef.current?.updateSeries([{ data: convertedBars }], false);
       rawBarDataRef.current = closedBars;
     })();
-  }, []);
+  }, [symbol]);
   
-  console.log("RENDER Chart!");
   const convertedBars = convertBars([...rawBarDataRef.current]);
   
-  const height = 520
+  const height = 526
 
   return (
     <Box
@@ -345,11 +346,10 @@ export const CandlestickChart = () => {
             data: convertedBars
           }]}
           type='candlestick'
-          // height={728}
           height={height}
-
           width={1160}
           options={{
+            
             chart: {
               type: 'candlestick',
               toolbar: { show: false },
@@ -359,6 +359,7 @@ export const CandlestickChart = () => {
                   enabled: false
                 }
               },
+             
               events: {
                 mounted: (chart) => {
                   chartRef.current = chart;
@@ -433,7 +434,7 @@ export const CandlestickChart = () => {
             xaxis: {
               type: 'datetime',
               labels: {
-                formatter: dateFormatter,
+                formatter: toLocalTimeStr,
                 style: {
                   colors: '#fff',
                   fontSize: '18',
@@ -445,7 +446,7 @@ export const CandlestickChart = () => {
               },
               tooltip: {
                 enabled: true,
-                formatter: dateFormatter,
+                formatter: toLocalTimeStr,
               }
             },
             yaxis: {
@@ -457,21 +458,29 @@ export const CandlestickChart = () => {
                 formatter: (val) => Math.round(val).toFixed(2)
               },
               tooltip: { enabled: true },
-            }
+            },
+            
           }}
         />
       ) : (
         <Box 
           sx={{ 
             height: height, 
-            display: 'flex', 
+            display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center', 
             justifyContent: 'center',
             backgroundColor: '#1a1a1a',
             color: 'white'
           }}
         >
-          <Typography>Waiting for chart data...</Typography>
+          <CircularProgress
+            color='#fff'
+            sx={{
+              margin: 4
+            }}
+          />
+          <Typography>{`Waiting for ${symbol} chart data...`}</Typography>
         </Box>
       )}
 
