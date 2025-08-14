@@ -4,8 +4,6 @@ import {
     useEffect,
     useRef,
     useState,
-    type Dispatch,
-    type SetStateAction
 } from 'react';
 import { serverAddress } from './AppContext';
 
@@ -20,7 +18,7 @@ interface ICommentWebSocket {
 const CommentContext = createContext({} as ICommentWebSocket);
 
 export const CommentProvider = ({children}: ContextProviderProps) => {
-    const [commentList, setCommentList] = useState<Array<ICommentWebSocket['message']>>([]);
+    const [commentList, setCommentList] = useState<Array<ICommentWebSocket['commentList']>>([]);
     const commentWsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
@@ -32,7 +30,7 @@ export const CommentProvider = ({children}: ContextProviderProps) => {
         };
 
         commentWs.onmessage = (event) => {
-            const data: ICommentWebSocket['message'] = JSON.parse(event.data);
+            const data: ICommentWebSocket['commentList'] = JSON.parse(event.data);
             console.log(`💬 Comment Websocket received`);
 
             if (data.data instanceof Array) {
