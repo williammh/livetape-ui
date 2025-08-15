@@ -26,3 +26,30 @@ export const textAlignRight = (params: any) => {
     }
     return '';
   }
+
+/**
+ * Increment a date by multiple units.
+ * @param date - original Date object
+ * @param increments - object with optional days, hours, minutes, seconds, milliseconds
+ * @returns new Date object
+ */
+export const addToDate = (
+  date: Date,
+  increments: {
+    days?: number;
+    hours?: number;
+    minutes?: number;
+    seconds?: number;
+    milliseconds?: number;
+  }
+): Date => {
+  const copy = new Date(date.getTime()); // copy original date
+
+  if (increments.days) copy.setDate(copy.getDate() + increments.days);
+  if (increments.hours) copy.setHours(copy.getHours() + increments.hours);
+  if (increments.minutes) copy.setMinutes(copy.getMinutes() + increments.minutes);
+  if (increments.seconds) copy.setSeconds(copy.getSeconds() + increments.seconds);
+  if (increments.milliseconds) copy.setMilliseconds(copy.getMilliseconds() + increments.milliseconds);
+
+  return copy;
+}

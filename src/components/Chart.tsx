@@ -318,6 +318,8 @@ export const CandlestickChart = () => {
   useEffect(() => {
     console.log(`RENDER CHART: ${symbol}`);
     setIsDataLoaded(false);
+    chartRef.current = null;
+    rawBarDataRef.current = [];
     const getclosedBars = (async () => {
       const res = await fetch(`http://${serverAddress}/closed_bars/${symbol}`);
       const closedBars = await res.json();
@@ -328,7 +330,7 @@ export const CandlestickChart = () => {
     })();
   }, [symbol]);
   
-  const convertedBars = convertBars([...rawBarDataRef.current]);
+  const convertedBars = convertBars([...rawBarDataRef?.current]);
   
   const height = 526
 

@@ -22,15 +22,15 @@ const AppContext = createContext({} as IAppContext);
 export const serverAddress = 'localhost:8000';
 
 export const symbols = {
-    'Stocks': ['NVDA', 'TLSA'],
+    'Stocks': ['NVDA', 'TSLA'],
     'Crypto': ['BTC', 'ETH'],
-    'Futures': ['MESU25', 'MNQU25']
+    'Futures': ['MNQU25', 'MESU25']
 };
 
 export const AppProvider = ({children}: {children: React.ReactNode}) => {
    
-    const [ assetClass, setAssetClass ] = useState<string>('Stocks');
-    const [ symbol, setSymbol ] = useState<string>('NVDA');
+    const [ assetClass, setAssetClass ] = useState<string>('Futures');
+    const [ symbol, setSymbol ] = useState<string>('MNQU25');
     const [ timezone, setTimezone ] = useState<string>('America/Los_Angeles');
 
     return (

@@ -15,6 +15,7 @@ import { ProfitLoss } from './components/ProfitLoss';
 import { toLocalDateTimeStr } from './util/misc';
 import { CalendarMonth } from '@mui/icons-material';
 import { useAppContext } from './contexts/AppContext';
+import { addToDate } from './util/misc';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -27,11 +28,14 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const App = () => { 
-  const now = new Date();
-
   const { timezone } = useAppContext();
-  const startTimeStr = toLocalDateTimeStr(now, timezone);
-  console.log(startTimeStr);
+  const now = new Date();
+  now.setHours(13);
+  now.setMinutes(30);
+  now.setSeconds(0);
+  const tomorrow = addToDate(now, {days: 1});
+  const startTimeStr = toLocalDateTimeStr(tomorrow, timezone);
+  const announcement = `Moo & Grizz switch from trading NVDA to TSLA starting tomorrow at ${startTimeStr}`;
 
   return (
     <Box>
@@ -45,7 +49,7 @@ const App = () => {
           <Item sx={{height: 96}}>
             <Grid
               container
-              columns={3}
+              columns={4}
               alignItems='center'
               sx={{
                   height: '100%'
@@ -65,16 +69,13 @@ const App = () => {
                 </Typography>
               </Grid>
               <Grid
-                size={1}
-                sx={{
-                  textAlign: 'right'
-                }}
+                size={2}
               >
                 <Typography
                   variant='h6'
                   component='span'
                 >
-                  Crypto: BTC - Bitcoin starting at {startTimeStr}
+                  {announcement}
                 </Typography>
             
               </Grid>

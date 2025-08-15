@@ -85,7 +85,6 @@ export const Positions = ({persona}) => {
         textAlign={'left'}
       >
         <Typography
-          // variant="h6"
           component="span"
         >
           Positions
