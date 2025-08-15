@@ -4,13 +4,13 @@ import grizz from '../assets/grizz.png';
 import { toLocalDateTimeStr } from '../util/misc';
 import { useAppContext } from '../contexts/AppContext';
 
-interface IMessageProps {
-  persona?: string;
-  message: string;
+export interface IMessageProps {
+  persona: string;
+  text: string;
   timestamp: string;
 }
 
-export const Message = ({persona, message, timestamp}: IMessageProps) => {
+export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
   const { timezone } = useAppContext();
   const localTimestamp = toLocalDateTimeStr(timestamp, timezone);
   const bgColor = persona === 'moo' ? colors.green[900] : colors.red[900];

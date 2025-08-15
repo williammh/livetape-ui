@@ -30,6 +30,7 @@ const Item = styled(Paper)(({ theme }) => ({
 const App = () => { 
   const { timezone } = useAppContext();
   const now = new Date();
+
   now.setHours(13);
   now.setMinutes(30);
   now.setSeconds(0);

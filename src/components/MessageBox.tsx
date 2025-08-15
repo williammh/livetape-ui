@@ -1,38 +1,41 @@
 import {
   useEffect,
   useRef,
+  useState,
 } from 'react';
 import {
   Box,
  } from '@mui/material';
-import { Message } from './Message';
+import { Message, type IMessageProps } from './Message';
 import { useCommentContext } from '../contexts/CommentContext';
+import { toLocalDateTimeStr } from '../util/misc';
+import { useAppContext } from '../contexts/AppContext';
 
 export const MessageBox = () => {
  
-  const messages = [
+  const placeholderMessages = [
     {
       persona: 'moo',
       text: `
-        I’m Moo. I trade every day the market is open and post all my trades: good, bad, and embarrassing. We built LiveTape because we were tired of finance content that only
-        teaches after the fact. However, we're not a signal service, we don’t do courses, coaching, or financial advice.
-        We’re just here to trade and say things while candles do candle things.
+        Welcome to Livetape, the only trading show that does what no human can do. As a robot,
+        I can go 24/7 never needing to eat, sleep, or poop. More importantly, I
+        do what no human influencer is willing to do: post all my trades: good, bad, and downright embarrassing.
       `
     },
     {
       persona: 'grizz',
       text: `
-        I’m Grizz. I go short. I think it's rich that there are those claim they can help you become a better trader if you buy their course — often just their old
-        highlight reels in disguise. You know the type: “Here’s how I made $14k in 2 hours!”
-        Cool. Where's your live stream so we can watch you do that again while the candle is still printing?
+        I don’t believe in breakouts, fairy tales, or backtested win rates. Instead, I was programmed to only hit the sell button.
+        It's rich that there are those claim they can help you become a better trader if you buy their old
+        highlight reels disguised as a course. You know the type: “Here’s how I made $14k in 2 hours!”
       `
     },
     {
       persona: 'moo',
       text: `
         We do not have the secret to alpha. If we did, we probably wouldn't be sharing it online.
-        We're just here to demonstrate what market analysis and trading looks like when it's still possible to be wrong,
-        and entertain along the way.
+        We're not a signal service, we don’t do courses, coaching, or financial advice.
+        We're just here to demonstrate what market analysis and trading looks like while the candle is still printing.
       `
     },
     {
@@ -40,14 +43,14 @@ export const MessageBox = () => {
       text: `
         No Discord pumps. No community with a secret strategy locked behind a paywall.
         We do this for in public for free.  All of our trades are verifiable.
-        We don’t crop screenshots, we don’t flex, and we don’t beg for followers.
+        We don’t crop screenshots and we don’t flex yesterday's trades.
       `
     },
     {
       persona: 'moo',
       text: `
-        We paper trade but even though there's no money,
-        we're still risking more than those who only post their takes after it's already safe.
+        We paper trade but on live data when it's still possible to be wrong.
+        That's more risk than those who only post their takes after it's already safe.
         The market move was confirmed but their trades are not.
       `
     },
@@ -55,7 +58,7 @@ export const MessageBox = () => {
       persona: 'grizz',
       text: `
         We're not trading real money? Ohh, you caught us, genius. Yeah, we’re just a couple of robots running a show, not managing your grandma's 401(k).
-        If you want a money manager, go find one. If you want to know what we’re up to next — or which influencer’s strategy we’ll be debunking live — throw in your email. Or don’t.
+        If you want a money manager, go find one. If you want to know what we’re up to next — throw in your email. Or don’t.
       `
     },
     {
@@ -69,32 +72,63 @@ export const MessageBox = () => {
     {
       persona: 'grizz',
       text: `
-        If you really enjoy what we do, we also offer a paid service with features like real-time trade details and customizable symbols.
+        If you really enjoy what we do, we also offer a paid service with real-time market data and more.
         It helps keep our servers alive — built and run by a sole developer with way too much caffeine.
       `
     },
   ]
 
+  const { timezone } = useAppContext();
   const { commentList } = useCommentContext();
+  const [ demoComments, setDemoComments ] = useState<IMessageProps[]>([]);
 
-  const chatRef = useRef<HTMLDivElement>(null);
+  const messageBox = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-  if (chatRef.current) {
-    chatRef.current.scrollTo({
-        top: chatRef.current.scrollHeight,
-        behavior: 'smooth'
-      });
-  }
-  
-}, [commentList]);
+    if (messageBox.current) {
+      messageBox.current.scrollTo({
+          top: messageBox.current.scrollHeight,
+          behavior: 'smooth'
+        });
+    }
+  }, [commentList, demoComments]);
+
+  useEffect(() => {
+    let seconds = 0;
+    const interval = setInterval(() => {
+      console.log(seconds);
+      if (seconds < placeholderMessages.length) {
+        setDemoComments((prev) => {
+          return [
+            ...prev,
+            {
+              ...placeholderMessages[seconds],
+              timestamp: new Date()
+            }
+          ]
+        })
+        seconds++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 4000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  console.log(demoComments);
 
   return (
     <Box
       sx={{
         overflowY: 'scroll',
-        height: '100%'
-,
+        height: '100%',
+        // display: 'flex',
+        // flexDirection: 'column',
+        // justifyContent: 'end',
+
         // Custom scrollbar styles inline
         '&::-webkit-scrollbar': {
           width: '8px',
@@ -116,12 +150,19 @@ export const MessageBox = () => {
         scrollbarWidth: 'thin',
         scrollbarColor: '#424242 #1a1a1a',
       }}
-      ref={chatRef}
+      ref={messageBox}
     >
+      {demoComments.map((m, i) => (
+        <Message
+          persona={m.persona}
+          text={m.text}
+          timestamp={m.timestamp}
+        />
+      ))}
       {commentList.map((m, i) => (
         <Message
           persona={m.persona}
-          message={m.text}
+          text={m.text}
           timestamp={m.timestamp}
         />
       ))}
