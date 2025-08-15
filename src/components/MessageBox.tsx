@@ -26,7 +26,7 @@ export const MessageBox = () => {
       text: `
         It's rich that there are those claim they can help you become a better trader if you buy their old
         highlight reels disguised as a course. You know the type: “Here’s how I made $14k in 2 hours!”
-        I don’t believe in human nonsense like optimism. Instead, I was programmed to only hit the sell button."
+        I don’t believe in human nonsense like optimism. Instead, I was programmed to only hit the sell button.
       `
     },
     {
