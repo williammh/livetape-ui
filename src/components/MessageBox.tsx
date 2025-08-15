@@ -17,17 +17,16 @@ export const MessageBox = () => {
     {
       persona: 'moo',
       text: `
-        Welcome to Livetape, the only trading show that does what no human can do. As a robot,
-        I can go 24/7 never needing to eat, sleep, or poop. More importantly, I
-        do what no human influencer is willing to do: post all my trades: good, bad, and downright embarrassing.
+        Welcome to LiveTape, the only show with traders that never need to eat, sleep, or poop. More importantly, I
+        do what no human influencer is willing to do. I post all my trades: good, bad, and downright embarrassing.
       `
     },
     {
       persona: 'grizz',
       text: `
-        I don’t believe in breakouts, fairy tales, or backtested win rates. Instead, I was programmed to only hit the sell button.
         It's rich that there are those claim they can help you become a better trader if you buy their old
         highlight reels disguised as a course. You know the type: “Here’s how I made $14k in 2 hours!”
+        I don’t believe in human nonsense like optimism. Instead, I was programmed to only hit the sell button."
       `
     },
     {
