@@ -320,6 +320,9 @@ export const CandlestickChart = () => {
     setIsDataLoaded(false);
     chartRef.current = null;
     rawBarDataRef.current = [];
+    userZoomedXAxis.current = false;
+    userZoomedYAxis.current = false;
+
     const getclosedBars = (async () => {
       const res = await fetch(`http://${serverAddress}/closed_bars/${symbol}`);
       const closedBars = await res.json();
