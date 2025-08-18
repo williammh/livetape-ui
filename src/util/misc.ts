@@ -53,3 +53,12 @@ export const addToDate = (
 
   return copy;
 }
+
+export const parseCSV = (csvText: string) => {
+  const lines = csvText.trim().split('\n');
+  const headers = lines.shift()?.split(',') ?? [];
+  return lines.map(line => {
+      const values = line.split(',');
+      return Object.fromEntries(headers.map((h, i) => [h, values[i]]));
+  });
+}

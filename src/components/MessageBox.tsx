@@ -17,8 +17,8 @@ export const MessageBox = () => {
     {
       persona: 'moo',
       text: `
-        Welcome to LiveTape, the only show with traders that never need to eat, sleep, or poop. More importantly, I
-        do what no human influencer is willing to do. I post all my trades: good, bad, and downright embarrassing.
+        Welcome to LiveTape, the only show with traders that never need to eat, sleep. More importantly, I
+        do what no human is willing to do. I post all my trades: good, bad, and downright embarrassing.
       `
     },
     {
@@ -77,11 +77,13 @@ export const MessageBox = () => {
     },
   ]
 
-  const { timezone } = useAppContext();
-  const { commentList } = useCommentContext();
+  const { symbol } = useAppContext();
+  const { commentList, setSelectedSymbol } = useCommentContext();
   const [ demoComments, setDemoComments ] = useState<IMessageProps[]>([]);
 
   const messageBox = useRef<HTMLDivElement>(null);
+
+  setSelectedSymbol(symbol);
 
   useEffect(() => {
     if (messageBox.current) {
@@ -95,6 +97,10 @@ export const MessageBox = () => {
   useEffect(() => {
     let seconds = 0;
     const interval = setInterval(() => {
+      if (commentList.length > 0) {
+        clearInterval(interval);
+        return;
+      };
       console.log(seconds);
       if (seconds < placeholderMessages.length) {
         setDemoComments((prev) => {

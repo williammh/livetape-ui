@@ -41,8 +41,11 @@ const convertBars = (barData) => {
     }));
 };
 
-const WebSocketDataHandler = ({ onMessage }) => {
-  const { message } = useBarContext();
+const WebSocketDataHandler = ({ onMessage, symbol }: {onMessage: () => void, symbol: string}) => {
+  const { message, setSelectedSymbol } = useBarContext();
+
+  setSelectedSymbol(symbol);
+
   useEffect(() => {
     if (message) {
       onMessage(message);
@@ -345,6 +348,7 @@ export const CandlestickChart = () => {
     >
       <WebSocketDataHandler
         onMessage={(msg) => handleWebSocketMessage(msg, chartRef, rawBarDataRef, userZoomedXAxis)} 
+        symbol={symbol}
       />
       {isDataLoaded ? (
         <Chart

@@ -36,7 +36,7 @@ const App = () => {
   now.setSeconds(0);
   const tomorrow = addToDate(now, {days: 1});
   const startTimeStr = toLocalDateTimeStr(tomorrow, timezone);
-  const announcement = `Tomorrow: Moo shoots for the moon while Grizz puts Elon on blast while trading TSLA at ${startTimeStr}`;
+  const announcement = `Moo shoots for the moon and Grizz puts Elon on blast trading TSLA at ${startTimeStr}`;
 
   return (
     <Box>

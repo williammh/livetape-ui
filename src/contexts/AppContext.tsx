@@ -29,8 +29,8 @@ export const symbols = {
 
 export const AppProvider = ({children}: {children: React.ReactNode}) => {
    
-    const [ assetClass, setAssetClass ] = useState<string>('Futures');
-    const [ symbol, setSymbol ] = useState<string>('MNQU25');
+    const [ assetClass, setAssetClass ] = useState<string>('Stocks');
+    const [ symbol, setSymbol ] = useState<string>('NVDA');
     const [ timezone, setTimezone ] = useState<string>('America/Los_Angeles');
 
     return (
