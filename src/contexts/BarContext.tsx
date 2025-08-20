@@ -8,8 +8,8 @@ import {
     type SetStateAction
 } from 'react';
 import { serverAddress } from './AppContext';
-import myDataCsv from '../2025-08-15.csv?raw'; // ?raw gives you the text content
-import { parseCSV  } from '../util/misc';
+import Nvda20250815 from '../2025-08-15-updates.csv?raw'; // ?raw gives you the text content
+import { parseCSV, toLocalDateTimeStr  } from '../util/misc';
 
 
 interface ContextProviderProps {
@@ -40,29 +40,60 @@ export const BarProvider = ({children}: ContextProviderProps) => {
     const [selectedSymbol, setSelectedSymbol] = useState<string>('');
 
     useEffect(() => {
-        console.log(`selected Symbol ${selectedSymbol}`);
-        const barWs = new WebSocket(`ws://${serverAddress}/ws/bars/${selectedSymbol}`);
-        barWsRef.current = barWs;
+        if (selectedSymbol.includes(":")) {
+            console.log(`REPLAYING ${selectedSymbol}`);
+            const rerunBars = parseCSV(Nvda20250815);
 
-        barWs.onopen = () => {
-            console.log(`🌐 📊 ${selectedSymbol} Bars WebSocket connected`);
-        };
+            let index = 0;
+            let lastTimeStamp = rerunBars[0].timestamp;
+            const mockBarWebSocket = setInterval(() => {
+                const timestamp = rerunBars[index].timestamp;
+                if (timestamp !== lastTimeStamp) {
+                    const message = {
+                        type: 'closed_bar',
+                        data: rerunBars[index - 1]
+                    }
+                    setMessage(message);
+                } else {
+                    const message = {
+                        type: 'open_bar',
+                        data: rerunBars[index]
+                    }
+                    setMessage(message);
+                }
+                lastTimeStamp = timestamp;
+                index++;
+            }, 1000);
 
-        barWs.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            setMessage(data);
-        };
+            return () => {
+                clearInterval(mockBarWebSocket);
+            }
 
-        barWs.onclose = () => {
-            console.log(`🔌 📊 ${selectedSymbol} Bar WebSocket disconnected`);
-        };
+        } else {
+            const barWs = new WebSocket(`ws://${serverAddress}/ws/bars/${selectedSymbol}`);
+            barWsRef.current = barWs;
+    
+            barWs.onopen = () => {
+                console.log(`🌐 📊 ${selectedSymbol} Bars WebSocket connected`);
+            };
+    
+            barWs.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                setMessage(data);
+            };
+    
+            barWs.onclose = () => {
+                console.log(`🔌 📊 ${selectedSymbol} Bar WebSocket disconnected`);
+            };
+    
+            return () => {
+                barWs.close();
+            };
+        }
 
-        return () => {
-            barWs.close();
-        };
+
 
     }, [selectedSymbol]);
-
 
     // useEffect(() => {
     //     const data = parseCSV(myDataCsv);

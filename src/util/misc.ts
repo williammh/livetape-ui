@@ -1,4 +1,4 @@
-export const toLocalDateTimeStr = (timestamp: string, timeZone = 'America/Los_Angeles') => {
+export const toLocalDateTimeStr = (timestamp: string | Date, timeZone = 'America/Los_Angeles') => {
     const options = {
         timeZone: timeZone,
         year: 'numeric',
@@ -10,8 +10,15 @@ export const toLocalDateTimeStr = (timestamp: string, timeZone = 'America/Los_An
         hour12: true,
     };
 
-    const localTimeStamp = new Date(timestamp).toLocaleString('en-US', options);
-    return localTimeStamp;
+    if (typeof timestamp === 'string') {
+      return new Date(timestamp).toLocaleString('en-US', options);
+    } else if (timestamp instanceof Date) {
+      return timestamp.toLocaleString('en-US', options);
+    }
+}
+
+export const toRfc3339Str = (Date) => {
+  return Date.toISOString().replace('.000', '');
 }
 
 export const toLocalTimeStr = (value: string) => {
@@ -59,6 +66,18 @@ export const parseCSV = (csvText: string) => {
   const headers = lines.shift()?.split(',') ?? [];
   return lines.map(line => {
       const values = line.split(',');
+
+      // open
+      values[0] = parseFloat(values[0]);
+      // high
+      values[1] = parseFloat(values[1]);
+      // low
+      values[2] = parseFloat(values[2]);
+      // close
+      values[3] = parseFloat(values[3]);
+      // totalvolume
+      values[4] = parseInt(values[4]);
+
       return Object.fromEntries(headers.map((h, i) => [h, values[i]]));
   });
 }

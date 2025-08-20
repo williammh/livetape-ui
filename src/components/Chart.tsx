@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { useBarContext } from '../contexts/BarContext';
 import { serverAddress, useAppContext } from '../contexts/AppContext';
-import { toLocalTimeStr } from '../util/misc';
+import { toLocalTimeStr, addToDate, toRfc3339Str } from '../util/misc';
 
 interface IBar {
   open: number;
@@ -67,16 +67,16 @@ const calculateCleanXAxisRange = (min: number, max: number, firstBarTime: number
   const roundedMin = roundDownTo30Min(min);
   const cleanMin = Math.max(roundedMin, firstBarTime);
 
+  
   // Only extend max if current max < lastBarTime
-  const baseMax = Math.max(max, lastBarTime);
-  const cleanMax = baseMax < lastBarTime
-    ? roundUpTo30Min(lastBarTime)
-    : roundUpTo30Min(baseMax);
+  const cleanMax = max < lastBarTime
+  ? roundUpTo30Min(lastBarTime)
+  : roundUpTo30Min(max);
+  
+  // const tickAmount = Math.floor((cleanMax - cleanMin) / THIRTY_MIN_MS);
+  const tickAmount = 8;
 
-  const tickAmount = Math.floor((cleanMax - cleanMin) / THIRTY_MIN_MS);
   // const tickAmount = THIRTY_MIN_MS;
-
-  console.log(tickAmount);
 
   return { min: cleanMin, max: cleanMax, tickAmount };
 };
@@ -85,6 +85,9 @@ const calculateCleanXAxisRange = (min: number, max: number, firstBarTime: number
 const getTickInterval = (min: number, max: number) => {
   const range = max - min;
   
+  if (range <= 10) return 1;
+  if (range <= 25) return 5;
+  if (range <= 50) return 10;
   if (range <= 100) return 25;     
   if (range <= 500) return 50;    
   if (range <= 1000) return 100;  
@@ -101,15 +104,21 @@ const calculateCleanYAxisRange = (min: number, max: number) => {
   
   // Round max up to nearest tick interval
   const cleanMax = Math.ceil(max / tickInterval) * tickInterval;
+
+  // if min and max are only 1 apart, move min down by 1
+  const finalMin = cleanMax - cleanMin > 1 ? cleanMin : cleanMin - 1; 
+  
+  const tickAmount = Math.floor((cleanMax - finalMin) / tickInterval);
   
   return {
-    min: cleanMin,
+    min: finalMin,
     max: cleanMax,
-    tickAmount: Math.floor((cleanMax - cleanMin) / tickInterval)
+    tickAmount: Math.max(tickAmount, 2)
   };
 };
 
 const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, panRight=false) => {
+  
   // Force restore zoom state immediately
   if (currentXAxisRange) {
     try {
@@ -127,10 +136,8 @@ const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef,
       if (!userZoomedXAxis.current) {
         const firstBarTime = new Date(rawBarDataRef.current[0].timestamp).getTime();
         const lastBarTime = new Date(rawBarDataRef.current[rawBarDataRef.current.length - 1].timestamp).getTime();
-
-
         const cleanXRange = calculateCleanXAxisRange(currentXAxisRange.min, currentXAxisRange.max, firstBarTime, lastBarTime);
-
+        
         if (cleanXRange) {
           chart.updateOptions({
             xaxis: {
@@ -163,12 +170,12 @@ const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef,
   // Restore Y-axis range if it was manually set
   if (currentYAxisRange && currentYAxisRange.min !== undefined && currentYAxisRange.max !== undefined && userZoomedXAxis.current) {
     try {
-      const cleanRange = calculateCleanYAxisRange(currentYAxisRange.min, currentYAxisRange.max);
+      const cleanYRange = calculateCleanYAxisRange(currentYAxisRange.min, currentYAxisRange.max);
       chart.updateOptions({
         yaxis: {
-          min: cleanRange.min,
-          max: cleanRange.max,
-          tickAmount: cleanRange.tickAmount,
+          min: cleanYRange.min,
+          max: cleanYRange.max,
+          tickAmount: cleanYRange.tickAmount,
           labels: {
             style: {
               colors: '#fff',
@@ -185,12 +192,13 @@ const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef,
       console.warn('Failed to restore Y-axis range:', error);
     }
   }
-
-  
 }
 
 // Function to calculate Y-axis range for visible data
 const calculateYAxisRange = (chart, data) => {
+  // if unpopulated data because of replay bars
+  if (data[1].y[3] === 0) return { min: data[0].y[2], max: data[0].y[1] };
+
   if (!chart?.w?.globals) return { min: undefined, max: undefined };
   
   const minX = chart.w.globals.minX;
@@ -216,13 +224,16 @@ const calculateYAxisRange = (chart, data) => {
 
   visibleData.forEach(point => {
     const [open, high, low, close] = point.y;
-    minY = Math.min(minY, low);
+    // ignore 0 / NaN / null (replay bars)
+    if (low !== 0) {
+      minY = Math.min(minY, low);
+    }
     maxY = Math.max(maxY, high);
   });
 
   // Add some padding (2% on each side)
   const padding = (maxY - minY) * 0.02;
-  
+
   return {
     min: minY - padding,
     max: maxY + padding
@@ -230,12 +241,12 @@ const calculateYAxisRange = (chart, data) => {
 };
 
 const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxis) => {
+  console.log(message.type);
+  console.log(message.data);
+
   if (rawBarDataRef.current.length === 0) {
     return;
   }
-
-  console.log(message.type);
-  console.log(message.data);
   
   const chart = chartRef.current;
 
@@ -243,7 +254,7 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
     min: chart.w.globals.minX,
     max: chart.w.globals.maxX
   } : null;
-
+  
   // Capture current Y-axis range
   const currentYAxisRange = chart?.w.globals.minY !== undefined && chart?.w.globals.maxY !== undefined ? {
     min: chart.w.globals.minY,
@@ -259,18 +270,17 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
       currentBars[index] = message.data;
       const newConvertedBars = convertBars(currentBars);
       
-     
       chart?.updateSeries([{
         data: newConvertedBars
       }], false);
       
-      restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis);
       rawBarDataRef.current = currentBars;          
+      restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis);
       break;
       
     case 'open_bar':
       const lastBar = currentBars[currentBars.length - 1];
-      const lastBarTimeStamp = lastBar['timestamp'];
+      const lastBarTimeStamp = lastBar?.['timestamp'];
       const openBarTimeStamp = message.data['timestamp'];
       const openBar = {
         'open': message.data['open'],
@@ -280,27 +290,44 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
         'timestamp': openBarTimeStamp,
         'barstatus': 'open',
       }
-      
+
+      let receivedBarIndex = -1;
+      receivedBarIndex = currentBars.findIndex((bar) => bar['timestamp'] === openBarTimeStamp);
+
       if (lastBarTimeStamp === openBarTimeStamp) {
         currentBars[currentBars.length - 1] = openBar;
         const newConvertedBars = convertBars(currentBars);
         
-    
         chart?.updateSeries([{
           data: newConvertedBars
         }], false);
         
+        rawBarDataRef.current = currentBars;  
         restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, false);
       } else {
-        currentBars.push(openBar);
-        const newConvertedBars = convertBars(currentBars);
+
+        if (receivedBarIndex !== -1) {
+          currentBars[receivedBarIndex] = openBar;
         
-        
-        chart?.updateSeries([{
-          data: newConvertedBars
-        }], false);
-        
-        restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, true);
+          const newConvertedBars = convertBars(currentBars);
+          chart?.updateSeries([{
+            data: newConvertedBars
+          }], false);
+
+          rawBarDataRef.current = currentBars;
+          restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, false);
+
+        } else {
+          currentBars.push(openBar);
+          const newConvertedBars = convertBars(currentBars);
+          chart?.updateSeries([{
+            data: newConvertedBars
+          }], false);
+
+          rawBarDataRef.current = currentBars;
+          restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, true);
+        }
+          
       }
       rawBarDataRef.current = currentBars;          
       break;
@@ -308,8 +335,7 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
 };
 
 export const CandlestickChart = () => {
-  const { symbol, setSymbol } = useAppContext();
-  const { timezone } = useAppContext();
+  const { assetClass, symbol, setSymbol, timezone } = useAppContext();
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const rawBarDataRef = useRef<Array<IBar>>([]);
@@ -319,9 +345,42 @@ export const CandlestickChart = () => {
   const userZoomedXAxis = useRef(false);
 
   useEffect(() => {
+    const secondsToStartRerun = 5;
+    const offlineTimeout = setTimeout(() => {
+      if (rawBarDataRef?.current.length === 0) {
+
+        setSymbol('NVDA:2025-08-15');
+        setIsDataLoaded(true);
+   
+        const startDateTime = new Date(2025, 7, 15, 13, 31, 0);
+    
+        const emptyRawBarData = Array(390).fill().map((_, index) => {
+          const timestamp = addToDate(startDateTime, {minutes: index});
+          return {
+            timestamp: toRfc3339Str(timestamp),
+            barstatus: 'open',
+            open: NaN,
+            high: NaN,
+            low: NaN,
+            close: NaN,
+            totalvolume: 0
+          }
+        });
+
+        const emptyConvertedBars = Array(390).fill().map((_, index) => ({
+          x: addToDate(startDateTime, {minutes: index}),
+          y: [null, null, null, null]
+        }));
+        
+        rawBarDataRef.current = emptyRawBarData;
+        chartRef.current?.updateSeries([{ data: emptyConvertedBars }], false);
+
+      } 
+    }, secondsToStartRerun * 1000);
+
     console.log(`RENDER CHART: ${symbol}`);
     setIsDataLoaded(false);
-    chartRef.current = null;
+    
     rawBarDataRef.current = [];
     userZoomedXAxis.current = false;
     userZoomedYAxis.current = false;
@@ -333,12 +392,15 @@ export const CandlestickChart = () => {
       setIsDataLoaded(true);
       chartRef.current?.updateSeries([{ data: convertedBars }], false);
       rawBarDataRef.current = closedBars;
+      console.log(closedBars);
     })();
+
   }, [symbol]);
+
   
   const convertedBars = convertBars([...rawBarDataRef?.current]);
   
-  const height = 526
+  const height = 526;
 
   return (
     <Box
@@ -386,12 +448,13 @@ export const CandlestickChart = () => {
                       const convertedData = convertBars(rawBarDataRef.current);
                       const yRange = calculateYAxisRange(chart, convertedData);
                       if (yRange.min !== undefined && yRange.max !== undefined) {
-                        const cleanRange = calculateCleanYAxisRange(yRange.min, yRange.max);
+                        const cleanYRange = calculateCleanYAxisRange(yRange.min, yRange.max);
+
                         chart.updateOptions({
                           yaxis: {
-                            min: cleanRange.min,
-                            max: cleanRange.max,
-                            tickAmount: cleanRange.tickAmount,
+                            min: cleanYRange.min,
+                            max: cleanYRange.max,
+                            tickAmount: cleanYRange.tickAmount,
                             labels: {
                               style: {
                                 colors: '#fff',
@@ -423,6 +486,10 @@ export const CandlestickChart = () => {
 
                   // return ;
                 }
+              },
+              // Prevent rendering of null/empty bars for replay bars
+              sparkline: {
+                enabled: false
               }
             },
             tooltip: {

@@ -101,7 +101,6 @@ export const MessageBox = () => {
         clearInterval(interval);
         return;
       };
-      console.log(seconds);
       if (seconds < placeholderMessages.length) {
         setDemoComments((prev) => {
           return [
