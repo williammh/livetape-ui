@@ -430,26 +430,17 @@ export const CandlestickChart = () => {
     }, secondsToStartRerun * 1000);
 
     const getclosedBars = (async () => {
-      console.log("HERE? XXXXXX");
-      try {
-
-        const res = await fetch(`http://${serverAddress}/closed_bars/${symbol}`);
-        const closedBars = await res.json();
-        console.log(`CLOSED BARS: ${symbol}`);
-        console.log(closedBars);
-        rawBarDataRef.current = closedBars;
-        
-        const convertedBars = convertBars(closedBars);
-        setInitialData(convertedBars); // Set initial data instead of updating series
-        setIsDataLoaded(true);
-        console.log(`CONVERTED BARS ${convertedBars.length}`)
-        console.log(convertedBars);
-      }
-      catch (error) {
-        console.log('BGGGGG fetching closed bars:', error);
-        console.log(`raw bar data ${rawBarDataRef?.current?.length}`);
-
-      }
+      const res = await fetch(`http://${serverAddress}/closed_bars/${symbol}`);
+      const closedBars = await res.json();
+      console.log(`CLOSED BARS: ${symbol}`);
+      console.log(closedBars);
+      rawBarDataRef.current = closedBars;
+      
+      const convertedBars = convertBars(closedBars);
+      setInitialData(convertedBars); // Set initial data instead of updating series
+      setIsDataLoaded(true);
+      console.log(`CONVERTED BARS ${convertedBars.length}`)
+      console.log(convertedBars);
     })();
 
     return () => {
@@ -474,7 +465,7 @@ export const CandlestickChart = () => {
       {isDataLoaded ? (
         <Chart
           series={[{
-            data: initialData // Use initialData state instead of converting on render
+            data: initialData
           }]}
           type='candlestick'
           height={height}
@@ -485,7 +476,7 @@ export const CandlestickChart = () => {
               type: 'candlestick',
               toolbar: { show: false },
               animations: {
-                enabled: false, // Disable animations to prevent zoom reset
+                enabled: false,
                 dynamicAnimation: {
                   enabled: false
                 }

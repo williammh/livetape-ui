@@ -149,7 +149,7 @@ export const StatusBar = () => {
             icon={chipIcon}
             color={chipColor}
             sx={{
-              color: '#fff',
+              color: '#1A2027',
               fontWeight: 600,
             }}
           />
