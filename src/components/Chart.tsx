@@ -3,13 +3,13 @@ import {
   useState,
   useRef,
   useEffect,
+  useMemo,
 } from 'react';
 import { 
   Box,
   CircularProgress,
   Typography,
 } from '@mui/material';
-import { useBarContext } from '../contexts/BarContext';
 import { serverAddress, useAppContext } from '../contexts/AppContext';
 import { toLocalTimeStr, addToDate, toRfc3339Str } from '../util/misc';
 
@@ -41,18 +41,111 @@ const convertBars = (barData) => {
     }));
 };
 
-const WebSocketDataHandler = ({ onMessage, symbol }: {onMessage: () => void, symbol: string}) => {
-  const { message, setSelectedSymbol } = useBarContext();
-
-  setSelectedSymbol(symbol);
+const WebSocketDataHandler = ({ onMessage }: {onMessage: () => void }) => {
+  const { openBarCallback } = useAppContext();
 
   useEffect(() => {
-    if (message) {
-      onMessage(message);
-    }
-  }, [message]);
-  return null; // Does not render anything
+    openBarCallback(onMessage);
+    return () => openBarCallback(null);
+  }, [onMessage, openBarCallback ]);
+
+  return null;
 }
+
+const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxis) => {
+  console.log(message.type);
+  console.log(message.data);
+  console.log(rawBarDataRef.current.length);
+
+  if (rawBarDataRef.current.length === 0) {
+    return;
+  }
+  
+  const chart = chartRef.current;
+
+  const currentXAxisRange = chart?.w.globals.minX && chart?.w.globals.maxX ? {
+    min: chart.w.globals.minX,
+    max: chart.w.globals.maxX
+  } : null;
+  
+  // Capture current Y-axis range
+  const currentYAxisRange = chart?.w.globals.minY !== undefined && chart?.w.globals.maxY !== undefined ? {
+    min: chart.w.globals.minY,
+    max: chart.w.globals.maxY
+  } : null;
+
+  const currentBars = [...rawBarDataRef.current];
+  
+  switch(message.type) {
+    case 'closed_bar':
+      const closedBarTimeStamp = message.data['timestamp'];
+      const index = currentBars.findLastIndex((bar) => bar['timestamp'] === closedBarTimeStamp);
+      currentBars[index] = message.data;
+      const newConvertedBars = convertBars(currentBars);
+      
+      chart?.updateSeries([{
+        data: newConvertedBars
+      }], false);
+      
+      rawBarDataRef.current = currentBars;          
+      restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis);
+      break;
+      
+    case 'open_bar':
+      const lastBar = currentBars[currentBars.length - 1];
+      const lastBarTimeStamp = lastBar?.['timestamp'];
+      const openBarTimeStamp = message.data['timestamp'];
+      const openBar = {
+        'open': message.data['open'],
+        'high': message.data['high'],
+        'low': message.data['low'],
+        'close': message.data['close'],
+        'timestamp': openBarTimeStamp,
+        'barstatus': 'open',
+      }
+
+      let receivedBarIndex = -1;
+      receivedBarIndex = currentBars.findIndex((bar) => bar['timestamp'] === openBarTimeStamp);
+
+      if (lastBarTimeStamp === openBarTimeStamp) {
+        currentBars[currentBars.length - 1] = openBar;
+        const newConvertedBars = convertBars(currentBars);
+        
+        chart?.updateSeries([{
+          data: newConvertedBars
+        }], false);
+        
+        rawBarDataRef.current = currentBars;  
+        restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, false);
+      } else {
+
+        if (receivedBarIndex !== -1) {
+          currentBars[receivedBarIndex] = openBar;
+        
+          const newConvertedBars = convertBars(currentBars);
+          chart?.updateSeries([{
+            data: newConvertedBars
+          }], false);
+
+          rawBarDataRef.current = currentBars;
+          restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, false);
+
+        } else {
+          currentBars.push(openBar);
+          const newConvertedBars = convertBars(currentBars);
+          chart?.updateSeries([{
+            data: newConvertedBars
+          }], false);
+
+          rawBarDataRef.current = currentBars;
+          restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, true);
+        }
+          
+      }
+      rawBarDataRef.current = currentBars;          
+      break;
+  }
+};
 
 const THIRTY_MIN_MS = 30 * 60 * 1000;
 
@@ -240,102 +333,9 @@ const calculateYAxisRange = (chart, data) => {
   };
 };
 
-const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxis) => {
-  console.log(message.type);
-  console.log(message.data);
-
-  if (rawBarDataRef.current.length === 0) {
-    return;
-  }
-  
-  const chart = chartRef.current;
-
-  const currentXAxisRange = chart?.w.globals.minX && chart?.w.globals.maxX ? {
-    min: chart.w.globals.minX,
-    max: chart.w.globals.maxX
-  } : null;
-  
-  // Capture current Y-axis range
-  const currentYAxisRange = chart?.w.globals.minY !== undefined && chart?.w.globals.maxY !== undefined ? {
-    min: chart.w.globals.minY,
-    max: chart.w.globals.maxY
-  } : null;
-
-  const currentBars = [...rawBarDataRef.current];
-  
-  switch(message.type) {
-    case 'closed_bar':
-      const closedBarTimeStamp = message.data['timestamp'];
-      const index = currentBars.findLastIndex((bar) => bar['timestamp'] === closedBarTimeStamp);
-      currentBars[index] = message.data;
-      const newConvertedBars = convertBars(currentBars);
-      
-      chart?.updateSeries([{
-        data: newConvertedBars
-      }], false);
-      
-      rawBarDataRef.current = currentBars;          
-      restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis);
-      break;
-      
-    case 'open_bar':
-      const lastBar = currentBars[currentBars.length - 1];
-      const lastBarTimeStamp = lastBar?.['timestamp'];
-      const openBarTimeStamp = message.data['timestamp'];
-      const openBar = {
-        'open': message.data['open'],
-        'high': message.data['high'],
-        'low': message.data['low'],
-        'close': message.data['close'],
-        'timestamp': openBarTimeStamp,
-        'barstatus': 'open',
-      }
-
-      let receivedBarIndex = -1;
-      receivedBarIndex = currentBars.findIndex((bar) => bar['timestamp'] === openBarTimeStamp);
-
-      if (lastBarTimeStamp === openBarTimeStamp) {
-        currentBars[currentBars.length - 1] = openBar;
-        const newConvertedBars = convertBars(currentBars);
-        
-        chart?.updateSeries([{
-          data: newConvertedBars
-        }], false);
-        
-        rawBarDataRef.current = currentBars;  
-        restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, false);
-      } else {
-
-        if (receivedBarIndex !== -1) {
-          currentBars[receivedBarIndex] = openBar;
-        
-          const newConvertedBars = convertBars(currentBars);
-          chart?.updateSeries([{
-            data: newConvertedBars
-          }], false);
-
-          rawBarDataRef.current = currentBars;
-          restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, false);
-
-        } else {
-          currentBars.push(openBar);
-          const newConvertedBars = convertBars(currentBars);
-          chart?.updateSeries([{
-            data: newConvertedBars
-          }], false);
-
-          rawBarDataRef.current = currentBars;
-          restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, true);
-        }
-          
-      }
-      rawBarDataRef.current = currentBars;          
-      break;
-  }
-};
 
 export const CandlestickChart = () => {
-  const { assetClass, symbol, setSymbol, timezone } = useAppContext();
+  const { symbol, setSymbol, replayDate, setReplayDate } = useAppContext();
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const rawBarDataRef = useRef<Array<IBar>>([]);
@@ -345,11 +345,56 @@ export const CandlestickChart = () => {
   const userZoomedXAxis = useRef(false);
 
   useEffect(() => {
-    const secondsToStartRerun = 5;
+    if (replayDate) {
+      const startDateTime = new Date(2025, 7, 15, 13, 31, 0);
+    
+      const emptyRawBarData = Array(390).fill().map((_, index) => {
+        const timestamp = addToDate(startDateTime, {minutes: index});
+        return {
+          timestamp: toRfc3339Str(timestamp),
+          barstatus: 'open',
+          open: NaN,
+          high: NaN,
+          low: NaN,
+          close: NaN,
+          totalvolume: 0
+        }
+      });
+
+      const emptyConvertedBars = Array(390).fill().map((_, index) => ({
+        x: addToDate(startDateTime, {minutes: index}),
+        y: [null, null, null, null]
+      }));
+      
+      rawBarDataRef.current = emptyRawBarData;
+      console.log(rawBarDataRef.current);
+      console.log(chartRef.current);
+      setIsDataLoaded(true);
+      chartRef.current?.updateSeries([{ data: emptyConvertedBars }], false);
+
+
+    } else {
+      rawBarDataRef.current = [];
+    }
+
+  }, [replayDate]);
+
+  useEffect(() => {
+  
+    console.log(`RENDER CHART: ${symbol} ${replayDate}`);
+
+    setIsDataLoaded(false);
+    rawBarDataRef.current = [];
+    userZoomedXAxis.current = false;
+    userZoomedYAxis.current = false;
+
+    const secondsToStartRerun = 2;
     const offlineTimeout = setTimeout(() => {
       if (rawBarDataRef?.current.length === 0) {
 
-        setSymbol('NVDA:2025-08-15');
+        console.log("RESETTTING AGAIKN");
+        setSymbol('NVDA');
+        setReplayDate('2025-08-15');
         setIsDataLoaded(true);
    
         const startDateTime = new Date(2025, 7, 15, 13, 31, 0);
@@ -375,29 +420,36 @@ export const CandlestickChart = () => {
         rawBarDataRef.current = emptyRawBarData;
         chartRef.current?.updateSeries([{ data: emptyConvertedBars }], false);
 
-      } 
+      }
     }, secondsToStartRerun * 1000);
 
-    console.log(`RENDER CHART: ${symbol}`);
-    setIsDataLoaded(false);
-    
-    rawBarDataRef.current = [];
-    userZoomedXAxis.current = false;
-    userZoomedYAxis.current = false;
-
     const getclosedBars = (async () => {
-      const res = await fetch(`http://${serverAddress}/closed_bars/${symbol}`);
-      const closedBars = await res.json();
-      const convertedBars = convertBars(closedBars);
-      setIsDataLoaded(true);
-      chartRef.current?.updateSeries([{ data: convertedBars }], false);
-      rawBarDataRef.current = closedBars;
-      console.log(closedBars);
+      console.log("HERE? XXXXXX");
+      try {
+
+        const res = await fetch(`http://${serverAddress}/closed_bars/${symbol}`);
+        const closedBars = await res.json();
+        console.log(`CLOSED BARS: ${symbol}`);
+        console.log(closedBars);
+        rawBarDataRef.current = closedBars;
+        
+        const convertedBars = convertBars(closedBars);
+        setIsDataLoaded(true);
+        console.log(`CONVERTED BARS ${convertedBars.length}`)
+        console.log(convertedBars);
+        console.log(chartRef.current);
+        chartRef.current?.updateSeries([{ data: convertedBars }], false);
+      }
+      catch (error) {
+        console.log('BGGGGG fetching closed bars:', error);
+        console.log(`raw bar data ${rawBarDataRef?.current?.length}`);
+
+      }
     })();
 
   }, [symbol]);
-
   
+
   const convertedBars = convertBars([...rawBarDataRef?.current]);
   
   const height = 526;

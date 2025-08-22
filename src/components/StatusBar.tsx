@@ -11,36 +11,53 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useBarContext } from '../contexts/BarContext';
-import { PlayArrow } from '@mui/icons-material';
+import { PlayArrow, History } from '@mui/icons-material';
 import { toLocalDateTimeStr } from '../util/misc';
 import { useAppContext, symbols } from '../contexts/AppContext';
 
 export const StatusBar = () => {
-  const { message } = useBarContext();
-  const [timestamp, setTimeStamp] = useState<string>('');
-  const [price, setPrice] = useState();
-  const [interval, setInterval] = useState<string>('1 Minute');
+  const [timestamp, setTimestamp] = useState<string>('');
+  const [price, setPrice] = useState<number>();
+  const [chartInterval, setChartInterval] = useState<string>('1 Minute');
 
-  const { assetClass, setAssetClass } = useAppContext();
-  const { symbol, setSymbol } = useAppContext();
-  const { timezone } = useAppContext();
+  const {
+    assetClass,
+    setAssetClass,
+    symbol,
+    setSymbol,
+    timezone,
+    timestampRef,
+    priceRef,
+    replayDate,
+    setReplayDate
+  } = useAppContext();
 
   useEffect(() => {
+    setReplayDate('');
     setSymbol(symbols[assetClass][0]);
   }, [assetClass]);
 
-  const serverStatus = "Live Data";
+  const serverStatus = replayDate ? "Replay" : "Live Data";
+  const chipIcon = replayDate ? <History /> : <PlayArrow />;
+  const chipColor = replayDate ? "warning" : "success";
+
 
   useEffect(() => {
-    switch(message.type) {
-      case 'open_bar':
-        setTimeStamp(message.system_time);
-        setPrice(message.data['close']?.toFixed(2));
-        break;
-    }
+   
+    const updateInterval = setInterval(() => {
+      if (timestampRef.current) {
+        setTimestamp(timestampRef.current);
+      }
+      if (priceRef.current !== undefined) {
+        setPrice(priceRef.current);
+      }
+    }, 1000);
 
-  }, [message]);
+    return () => {
+      clearInterval(updateInterval);
+    };
+
+  }, []);
 
   const tzLabel = timezone.split('/')[1].replace('_', ' ');
   const localTimestamp = toLocalDateTimeStr(timestamp, timezone);
@@ -48,6 +65,8 @@ export const StatusBar = () => {
   const gridStyles = {
     padding: 1
   }
+
+  const displayPrice = (price || 0).toFixed(2);
 
   return (
     <Box>
@@ -102,8 +121,8 @@ export const StatusBar = () => {
           />
           <Autocomplete 
             options={['1 Minute', '5 Minute']}
-            defaultValue={interval}
-            onChange={(_event, value) => setInterval(value!)}
+            defaultValue={chartInterval}
+            onChange={(_event, value) => setChartInterval(value!)}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -127,8 +146,8 @@ export const StatusBar = () => {
         >
           <Chip
             label={serverStatus}
-            icon={<PlayArrow />}
-            color="success"
+            icon={chipIcon}
+            color={chipColor}
             sx={{
               color: '#fff',
               fontWeight: 600,
@@ -150,7 +169,7 @@ export const StatusBar = () => {
               ...gridStyles
             }}
           >
-            {price}
+            {displayPrice}
           </Typography>
         </Grid>
       

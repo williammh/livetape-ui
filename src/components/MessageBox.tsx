@@ -7,7 +7,6 @@ import {
   Box,
  } from '@mui/material';
 import { Message, type IMessageProps } from './Message';
-import { useCommentContext } from '../contexts/CommentContext';
 import { toLocalDateTimeStr } from '../util/misc';
 import { useAppContext } from '../contexts/AppContext';
 
@@ -77,13 +76,10 @@ export const MessageBox = () => {
     },
   ]
 
-  const { symbol } = useAppContext();
-  const { commentList, setSelectedSymbol } = useCommentContext();
+  const { commentList } = useAppContext();
   const [ demoComments, setDemoComments ] = useState<IMessageProps[]>([]);
 
   const messageBox = useRef<HTMLDivElement>(null);
-
-  setSelectedSymbol(symbol);
 
   useEffect(() => {
     if (messageBox.current) {

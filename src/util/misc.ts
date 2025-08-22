@@ -17,8 +17,8 @@ export const toLocalDateTimeStr = (timestamp: string | Date, timeZone = 'America
     }
 }
 
-export const toRfc3339Str = (Date) => {
-  return Date.toISOString().replace('.000', '');
+export const toRfc3339Str = (date: Date) => {
+  return date.toISOString().replace('.000', '');
 }
 
 export const toLocalTimeStr = (value: string) => {
