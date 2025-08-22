@@ -62,6 +62,12 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
   }
   
   const chart = chartRef.current;
+  
+  // Safety check - ensure chart is available
+  if (!chart) {
+    console.warn('Chart not available for WebSocket message');
+    return;
+  }
 
   const currentXAxisRange = chart?.w.globals.minX && chart?.w.globals.maxX ? {
     min: chart.w.globals.minX,
@@ -338,6 +344,7 @@ export const CandlestickChart = () => {
   const { symbol, setSymbol, replayDate, setReplayDate } = useAppContext();
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [initialData, setInitialData] = useState([]); // New state for initial data
   const rawBarDataRef = useRef<Array<IBar>>([]);
   const chartRef = useRef(null);
 
@@ -367,14 +374,12 @@ export const CandlestickChart = () => {
       }));
       
       rawBarDataRef.current = emptyRawBarData;
-      console.log(rawBarDataRef.current);
-      console.log(chartRef.current);
+      setInitialData(emptyConvertedBars);
       setIsDataLoaded(true);
-      chartRef.current?.updateSeries([{ data: emptyConvertedBars }], false);
-
 
     } else {
       rawBarDataRef.current = [];
+      setInitialData([]);
     }
 
   }, [replayDate]);
@@ -385,6 +390,7 @@ export const CandlestickChart = () => {
 
     setIsDataLoaded(false);
     rawBarDataRef.current = [];
+    setInitialData([]); // Clear initial data
     userZoomedXAxis.current = false;
     userZoomedYAxis.current = false;
 
@@ -395,7 +401,6 @@ export const CandlestickChart = () => {
         console.log("RESETTTING AGAIKN");
         setSymbol('NVDA');
         setReplayDate('2025-08-15');
-        setIsDataLoaded(true);
    
         const startDateTime = new Date(2025, 7, 15, 13, 31, 0);
     
@@ -418,7 +423,8 @@ export const CandlestickChart = () => {
         }));
         
         rawBarDataRef.current = emptyRawBarData;
-        chartRef.current?.updateSeries([{ data: emptyConvertedBars }], false);
+        setInitialData(emptyConvertedBars); // Set initial data
+        setIsDataLoaded(true);
 
       }
     }, secondsToStartRerun * 1000);
@@ -434,11 +440,10 @@ export const CandlestickChart = () => {
         rawBarDataRef.current = closedBars;
         
         const convertedBars = convertBars(closedBars);
+        setInitialData(convertedBars); // Set initial data instead of updating series
         setIsDataLoaded(true);
         console.log(`CONVERTED BARS ${convertedBars.length}`)
         console.log(convertedBars);
-        console.log(chartRef.current);
-        chartRef.current?.updateSeries([{ data: convertedBars }], false);
       }
       catch (error) {
         console.log('BGGGGG fetching closed bars:', error);
@@ -447,11 +452,13 @@ export const CandlestickChart = () => {
       }
     })();
 
+    return () => {
+      clearTimeout(offlineTimeout);
+    };
+
   }, [symbol]);
   
 
-  const convertedBars = convertBars([...rawBarDataRef?.current]);
-  
   const height = 526;
 
   return (
@@ -467,7 +474,7 @@ export const CandlestickChart = () => {
       {isDataLoaded ? (
         <Chart
           series={[{
-            data: convertedBars
+            data: initialData // Use initialData state instead of converting on render
           }]}
           type='candlestick'
           height={height}
@@ -487,6 +494,7 @@ export const CandlestickChart = () => {
               events: {
                 mounted: (chart) => {
                   chartRef.current = chart;
+                  console.log('Chart mounted and ref set');
                 },
                 zoomed: (chartContext, { xaxis, yaxis }) => {
                   // Mark that user has manually scaled the Y-axis if yaxis is defined

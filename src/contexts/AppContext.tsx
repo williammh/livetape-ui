@@ -9,7 +9,7 @@ import {
     type SetStateAction
 } from 'react';
 // ?raw gets the text content
-import Nvda20250815 from '../2025-08-15-updates.csv?raw';
+import Nvda20250815 from '../assets/2025-08-15-updates.csv?raw';
 
 import { parseCSV, toLocalDateTimeStr, addToDate, toRfc3339Str } from '../util/misc';
 
