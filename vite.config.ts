@@ -5,5 +5,5 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/livetape-ui/',
-  assetsInclude: ['assets/2025-08-15-updates.csv'],
+  assetsInclude: ['assets/NVDA.bars.2025-08-15.csv'],
 })

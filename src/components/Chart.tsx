@@ -398,7 +398,6 @@ export const CandlestickChart = () => {
     const offlineTimeout = setTimeout(() => {
       if (rawBarDataRef?.current.length === 0) {
 
-        console.log("RESETTTING AGAIKN");
         setSymbol('NVDA');
         setReplayDate('2025-08-15');
    

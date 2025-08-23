@@ -9,7 +9,8 @@ import {
     type SetStateAction
 } from 'react';
 // ?raw gets the text content
-import Nvda20250815 from '../assets/2025-08-15-updates.csv?raw';
+import Nvda20250815 from '../assets/NVDA.bars.2025-08-15.csv?raw';
+import comments from '../assets/NVDA.2025-08-15.comments.json';
 
 import { parseCSV, addToDate, toRfc3339Str } from '../util/misc';
 
@@ -60,6 +61,8 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
 
     useEffect(() => {
         if (replayDate) {
+
+            console.log(comments);
             const rerunBars = parseCSV(Nvda20250815);
 
             const firstTimeStamp = rerunBars[0].timestamp;
@@ -100,18 +103,12 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
             }
 
         } else {
-            console.log(`Stopping replay`);
             clearInterval(replayIntervalRef.current);
         }
 
     }, [replayDate])
 
     useEffect(() => {
-        console.log("WS BAR SOCKET")
-
-        // console.log(`Stopping replay`);
-        // clearInterval(replayIntervalRef.current);
-
         const barWs = new WebSocket(`ws://${serverAddress}/ws/bars/${symbol}`);
         barWsRef.current = barWs;
 

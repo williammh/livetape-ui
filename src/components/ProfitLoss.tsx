@@ -1,17 +1,40 @@
+import { useEffect, useState } from 'react';
 import { 
   Box,
   colors,
   Grid,
   Typography,
 } from '@mui/material';
+import { useAppContext } from '../contexts/AppContext';
+
 
 export const ProfitLoss = ({persona}) => {
 
+  const { priceRef } = useAppContext();
+  const [price, setPrice] = useState<number>();
+  
+  useEffect(() => {
+     
+      const updateInterval = setInterval(() => {
+        if (priceRef.current !== undefined) {
+          setPrice(priceRef.current);
+        }
+      }, 1000);
+  
+      return () => {
+        clearInterval(updateInterval);
+      };
+  
+    }, []);
+
+  const quantity = 500;
   const personaStr = `${persona[0].toUpperCase()}${persona.slice(1)}`;
+  const direction = persona === 'moo' ? 'long' : 'short';
+  const avgPrice = persona == 'moo' ? 181.50 : 181.70;
+  const change = direction === 'long' ? price - avgPrice: avgPrice - price;
+  const pnl = change * quantity;
 
-  const pnl = persona === 'moo' ? 3580 : -137;
-
-  const pnlStr = `${pnl > 0 ? '+' : '-'} $${Math.abs(pnl).toFixed(2)}`
+  const pnlStr = `${pnl > 0 ? '+' : '-'} $${Math.abs(pnl || 0).toFixed(2)}`
 
   return (
     <Box>

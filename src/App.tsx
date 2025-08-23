@@ -16,6 +16,7 @@ import { toLocalDateTimeStr } from './util/misc';
 import { CalendarMonth } from '@mui/icons-material';
 import { useAppContext } from './contexts/AppContext';
 import { addToDate } from './util/misc';
+import { EmailInput } from './components/EmailInput';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -102,6 +103,7 @@ const App = () => {
         <Grid size={6}>
           <Item sx={{height: 976}}>
             <MessageBox />
+            {/* <EmailInput /> */}
           </Item>
         </Grid>
 

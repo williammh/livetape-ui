@@ -9,41 +9,12 @@ import {
 import { Message, type IMessageProps } from './Message';
 import { toLocalDateTimeStr } from '../util/misc';
 import { useAppContext } from '../contexts/AppContext';
+import comments from '../assets/NVDA.2025-08-15.comments.json';
+
 
 export const MessageBox = () => {
  
   const placeholderMessages = [
-    {
-      persona: 'moo',
-      text: `
-        Welcome to LiveTape, the only show with traders that never need to eat, sleep. More importantly, I
-        do what no human is willing to do. I post all my trades: good, bad, and downright embarrassing.
-      `
-    },
-    {
-      persona: 'grizz',
-      text: `
-        It's rich that there are those claim they can help you become a better trader if you buy their old
-        highlight reels disguised as a course. You know the type: “Here’s how I made $14k in 2 hours!”
-        I don’t believe in human nonsense like optimism. Instead, I was programmed to only hit the sell button.
-      `
-    },
-    {
-      persona: 'moo',
-      text: `
-        We do not have the secret to alpha. If we did, we probably wouldn't be sharing it online.
-        We're not a signal service, we don’t do courses, coaching, or financial advice.
-        We're just here to demonstrate what market analysis and trading looks like while the candle is still printing.
-      `
-    },
-    {
-      persona: 'grizz',
-      text: `
-        No Discord pumps. No community with a secret strategy locked behind a paywall.
-        We do this for in public for free.  All of our trades are verifiable.
-        We don’t crop screenshots and we don’t flex yesterday's trades.
-      `
-    },
     {
       persona: 'moo',
       text: `
@@ -76,8 +47,8 @@ export const MessageBox = () => {
     },
   ]
 
-  const { commentList } = useAppContext();
-  const [ demoComments, setDemoComments ] = useState<IMessageProps[]>([]);
+  const { commentList, replayDate, timestampRef } = useAppContext();
+  const [ replayComments, setReplayComments ] = useState<IMessageProps[]>([]);
 
   const messageBox = useRef<HTMLDivElement>(null);
 
@@ -88,37 +59,57 @@ export const MessageBox = () => {
           behavior: 'smooth'
         });
     }
-  }, [commentList, demoComments]);
+  }, [commentList, replayComments]);
 
   useEffect(() => {
-    let seconds = 0;
+   
+
     const interval = setInterval(() => {
-      if (commentList.length > 0) {
-        clearInterval(interval);
-        return;
-      };
-      if (seconds < placeholderMessages.length) {
-        setDemoComments((prev) => {
-          return [
-            ...prev,
-            {
-              ...placeholderMessages[seconds],
-              timestamp: new Date()
-            }
-          ]
+
+      if (timestampRef.current >= comments[0]?.timestamp) {
+      
+        const comment = comments.shift();
+        setReplayComments((prev) => {
+          return [...prev, comment];
         })
-        seconds++;
-      } else {
-        clearInterval(interval);
       }
-    }, 4000);
+      
+    }, 1000);
 
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [replayDate]);
 
-  console.log(demoComments);
+  // useEffect(() => {
+  //   let seconds = 0;
+  //   const interval = setInterval(() => {
+  //     if (commentList.length > 0) {
+  //       clearInterval(interval);
+  //       return;
+  //     };
+  //     if (seconds < placeholderMessages.length) {
+  //       setDemoComments((prev) => {
+  //         return [
+  //           ...prev,
+  //           {
+  //             ...placeholderMessages[seconds],
+  //             timestamp: new Date()
+  //           }
+  //         ]
+  //       })
+  //       seconds++;
+  //     } else {
+  //       clearInterval(interval);
+  //     }
+  //   }, 4000);
+
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, []);
+
+  // console.log(replayComments);
 
   return (
     <Box
@@ -152,7 +143,7 @@ export const MessageBox = () => {
       }}
       ref={messageBox}
     >
-      {demoComments.map((m, i) => (
+      {replayComments.map((m, i) => (
         <Message
           persona={m.persona}
           text={m.text}
