@@ -10,7 +10,6 @@ import {
 } from 'react';
 // ?raw gets the text content
 import Nvda20250815 from '../assets/NVDA.bars.2025-08-15.csv?raw';
-import comments from '../assets/NVDA.2025-08-15.comments.json';
 
 import { parseCSV, addToDate, toRfc3339Str } from '../util/misc';
 
@@ -31,8 +30,7 @@ interface IAppContext {
 
 const AppContext = createContext({} as IAppContext);
 
-export const serverAddress = 'localhost:8001';
-
+export const serverAddress = 'localhost:8000';
 
 export const symbols = {
     'Stocks': ['NVDA', 'TSLA'],
@@ -46,6 +44,9 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
     const [ symbol, setSymbol ] = useState<string>('NVDA');
     const [ timezone, setTimezone ] = useState<string>('America/Los_Angeles');
 
+    const [commentList, setCommentList] = useState<IAppContext['commentList']>([]);
+    const commentWsRef = useRef<WebSocket | null>(null);
+
     const [ replayDate, setReplayDate ] = useState<string>('');
 
     const replayIntervalRef = useRef<ReturnType<typeof setInterval>>(null);
@@ -53,16 +54,12 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
     const timestampRef = useRef<string>('');
     const priceRef = useRef<number>(NaN);
 
-
     // bar data websocket connection
     const openBarcallBackRef = useRef<((msg: any) => void) | null>(null);
     const barWsRef = useRef<WebSocket | null>(null);
 
-
     useEffect(() => {
         if (replayDate) {
-
-            console.log(comments);
             const rerunBars = parseCSV(Nvda20250815);
 
             const firstTimeStamp = rerunBars[0].timestamp;
@@ -112,6 +109,8 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
         const barWs = new WebSocket(`ws://${serverAddress}/ws/bars/${symbol}`);
         barWsRef.current = barWs;
 
+     
+     
         barWs.onopen = () => {
             console.log(`🌐 📊 ${symbol} Bars WebSocket connected`);
         };
@@ -127,17 +126,6 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
             console.log(`🔌 📊 ${symbol} Bar WebSocket disconnected`);
         };
 
-        return () => {
-            barWs.close();
-        };
-    
-
-    }, [symbol]);
-
-    // comments websocket connection
-    const [commentList, setCommentList] = useState<IAppContext['commentList']>([]);
-    const commentWsRef = useRef<WebSocket | null>(null);
-    useEffect(() => {
         const commentWs = new WebSocket(`ws://${serverAddress}/ws/comments/${symbol}`);
         commentWsRef.current = commentWs;
 
@@ -168,9 +156,11 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
         };
 
         return () => {
+            barWs.close();
             commentWs.close();
         };
-    
+
+
     }, [symbol]);
 
     return (

@@ -9,7 +9,7 @@ import {
 import { Message, type IMessageProps } from './Message';
 import { toLocalDateTimeStr } from '../util/misc';
 import { useAppContext } from '../contexts/AppContext';
-import comments from '../assets/NVDA.2025-08-15.comments.json';
+import nVda20250515comments from '../assets/NVDA.2025-08-15.comments.json';
 
 
 export const MessageBox = () => {
@@ -62,54 +62,29 @@ export const MessageBox = () => {
   }, [commentList, replayComments]);
 
   useEffect(() => {
-   
+    
+    if (replayDate) {
+      const replayCommentQueue = [...nVda20250515comments];
+      const interval = setInterval(() => {
+  
+        if (timestampRef.current >= replayCommentQueue[0]?.timestamp) {
+        
+          const comment = replayCommentQueue.shift();
+          setReplayComments((prev) => {
+            return [...prev, comment];
+          })
+        }
+        
+      }, 1000);
+  
+      return () => {
+        setReplayComments([]);
+        clearInterval(interval);
+      };
+    }
 
-    const interval = setInterval(() => {
-
-      if (timestampRef.current >= comments[0]?.timestamp) {
-      
-        const comment = comments.shift();
-        setReplayComments((prev) => {
-          return [...prev, comment];
-        })
-      }
-      
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-    };
   }, [replayDate]);
 
-  // useEffect(() => {
-  //   let seconds = 0;
-  //   const interval = setInterval(() => {
-  //     if (commentList.length > 0) {
-  //       clearInterval(interval);
-  //       return;
-  //     };
-  //     if (seconds < placeholderMessages.length) {
-  //       setDemoComments((prev) => {
-  //         return [
-  //           ...prev,
-  //           {
-  //             ...placeholderMessages[seconds],
-  //             timestamp: new Date()
-  //           }
-  //         ]
-  //       })
-  //       seconds++;
-  //     } else {
-  //       clearInterval(interval);
-  //     }
-  //   }, 4000);
-
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // }, []);
-
-  // console.log(replayComments);
 
   return (
     <Box

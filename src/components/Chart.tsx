@@ -341,7 +341,7 @@ const calculateYAxisRange = (chart, data) => {
 
 
 export const CandlestickChart = () => {
-  const { symbol, setSymbol, replayDate, setReplayDate } = useAppContext();
+  const { setAssetClass, symbol, setSymbol, replayDate, setReplayDate } = useAppContext();
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [initialData, setInitialData] = useState([]); // New state for initial data
@@ -394,10 +394,12 @@ export const CandlestickChart = () => {
     userZoomedXAxis.current = false;
     userZoomedYAxis.current = false;
 
-    const secondsToStartRerun = 2;
+    const secondsToStartRerun = 5;
     const offlineTimeout = setTimeout(() => {
+    
       if (rawBarDataRef?.current.length === 0) {
 
+        setAssetClass('Stocks');
         setSymbol('NVDA');
         setReplayDate('2025-08-15');
    
