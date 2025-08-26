@@ -101,8 +101,10 @@ export const MessageBox = () => {
   return (
     <Box
       sx={{
+
         overflowY: 'scroll',
         height: '100%',
+
         // display: 'flex',
         // flexDirection: 'column',
         // justifyContent: 'end',

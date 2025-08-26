@@ -129,11 +129,18 @@ export const Positions = ({persona}) => {
     <List>
       {postionsList.map(pos => {
         const pnl = (price - pos.average) * pos.quantity;
+        let color = colors.grey[400];
+        if (pnl > 0) {
+          color = colors.green[400]
+        }
+        if (pnl < 0) {
+          color = colors.red[400]
+        }
         const pnlDisplay = (
           <Typography
             component="span"
             sx={{
-              color: pnl > 0 ? colors.green[400] : colors.red[400]
+              color: color
             }}
           >
             {pnl > 0 ? '+' : ''}{pnl.toFixed(2)}

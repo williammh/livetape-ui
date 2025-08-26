@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { PlayArrow, History } from '@mui/icons-material';
+import { PlayArrow, History, CalendarMonth } from '@mui/icons-material';
 import { toLocalDateTimeStr } from '../util/misc';
 import { useAppContext, symbols } from '../contexts/AppContext';
 
@@ -37,10 +37,25 @@ export const StatusBar = () => {
     setSymbol(symbols[assetClass][0]);
   }, [assetClass]);
 
-  const serverStatus = replayDate ? "Replay" : "Live Data";
-  const chipIcon = replayDate ? <History /> : <PlayArrow />;
-  const chipColor = replayDate ? "warning" : "success";
+  const chipProps: { label: string; icon: React.ReactNode; color: string } = {
+    label: '',
+    icon: null,
+    color: ''
+  }
 
+  if (replayDate) {
+    chipProps.label = 'Replay'
+    chipProps.icon = <CalendarMonth />
+    chipProps.color = "error" 
+  } else if (assetClass === 'Stocks') {
+    chipProps.label = '15 Min'
+    chipProps.icon = <History />
+    chipProps.color = "warning" 
+  } else {
+    chipProps.label = 'Live'
+    chipProps.icon = <PlayArrow />
+    chipProps.color = "success" 
+  }
 
   useEffect(() => {
    
@@ -92,6 +107,7 @@ export const StatusBar = () => {
                 {...params}
                 label="Asset Class"
                 size="small"
+                color="default"
               />
             )}
             sx={{
@@ -110,6 +126,7 @@ export const StatusBar = () => {
                 {...params}
                 label="Symbol"
                 size="small"
+                color="default"
               />
             )}
             sx={{
@@ -128,6 +145,7 @@ export const StatusBar = () => {
                 {...params}
                 label="Interval"
                 size="small"
+                color="default"
               />
             )}
             sx={{
@@ -145,11 +163,10 @@ export const StatusBar = () => {
           alignItems='center'
         >
           <Chip
-            label={serverStatus}
-            icon={chipIcon}
-            color={chipColor}
+            variant='outlined'
+            {...chipProps}
             sx={{
-              color: '#1A2027',
+              color: chipProps.color,
               fontWeight: 600,
             }}
           />

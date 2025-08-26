@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
 import { 
   Box,
   Button,
+  Chip,
   Grid,
   Paper,
   Typography,
@@ -13,10 +15,10 @@ import { Positions } from './components/Positions';
 import { Orders } from './components/Orders';
 import { ProfitLoss } from './components/ProfitLoss';
 import { toLocalDateTimeStr } from './util/misc';
-import { CalendarMonth } from '@mui/icons-material';
-import { useAppContext } from './contexts/AppContext';
+import { Cancel, CheckCircle } from '@mui/icons-material';
+import { useAppContext, serverAddress } from './contexts/AppContext';
 import { addToDate } from './util/misc';
-import { EmailInput } from './components/EmailInput';
+import { EmailForm } from './components/EmailForm';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -35,10 +37,57 @@ const App = () => {
   now.setHours(13);
   now.setMinutes(30);
   now.setSeconds(0);
-  const tomorrow = addToDate(now, {days: 1});
-  const startTimeStr = toLocalDateTimeStr(tomorrow, timezone);
-  const announcement = `Moo shoots for the moon and Grizz puts Elon on blast trading TSLA at ${startTimeStr}`;
+  
+  const cpiTime = addToDate(now, {hours: 2, minutes: 30});
+  const cpiTimeStr = toLocalDateTimeStr(cpiTime, timezone);
+  const announcement1 = `${cpiTimeStr}: Consumer Price Index report`;
+  
+  const tradeTslaTime = addToDate(now, {days: 1});
+  const tradeTslaTimeStr = toLocalDateTimeStr(tradeTslaTime, timezone);
+  const announcement2 = `${tradeTslaTimeStr}: Moo and Grizz trade TSLA`;
+  
+  const announcement = `Moo shoots for the moon and Grizz puts Elon on blast trading TSLA at ${tradeTslaTimeStr}`;
 
+  const scheduleItems = [
+    {
+      'timestamp': cpiTimeStr,
+      'text': ' BTCUSD - Bitcoin.'
+    },
+   {
+      'timestamp': tradeTslaTimeStr,
+      'text': ' TSLA - Tesla, Inc.'
+    },
+  ];
+
+  const [serverStatus, setServerStatus] = useState<boolean>(false);
+
+  useEffect(() => {
+    const getServerStatus = (async () => {
+      const res = await fetch(`http://${serverAddress}/`);
+      const resJson = await res.json();
+      if (resJson) {
+        setServerStatus(true);
+      }
+    })();
+  }, []);
+
+  
+  const chipProps: { label: string; icon: React.ReactNode; color: string } = {
+    label: '',
+    icon: null,
+    color: ''
+  }
+  
+  if (serverStatus) {
+    chipProps.label = 'Server Online'
+    chipProps.icon = <CheckCircle />
+    chipProps.color = "success" 
+  } else {
+    chipProps.label = 'Server Offline'
+    chipProps.icon = <Cancel />
+    chipProps.color = "error" 
+  }
+  
   return (
     <Box>
       <Grid
@@ -48,7 +97,7 @@ const App = () => {
         sx={{ width: 1920, height: 1080 }}
       >
         <Grid size={18}>
-          <Item sx={{height: 96}}>
+          <Item sx={{height: '100%'}}>
             <Grid
               container
               columns={4}
@@ -87,23 +136,84 @@ const App = () => {
                   textAlign: 'right'
                 }}
               >
-                <Button
+                <Chip
+                  {...chipProps}
                   variant="outlined"
-                  color="#fff"
-                  endIcon={<CalendarMonth />}
-                >
-                  Schedule
-                </Button>
+                />
               </Grid>
              
             </Grid>
           </Item>
         </Grid>
 
-        <Grid size={6}>
-          <Item sx={{height: 976}}>
-            <MessageBox />
-            {/* <EmailInput /> */}
+        <Grid
+          container
+          direction='column'
+          size={6}
+        >
+          <Item>
+
+            <Grid
+              container
+              direction='column'
+            >
+
+              {
+                scheduleItems.map((item) => {
+                  return (
+                    <Grid
+                      container
+                      direction='row'
+                      columns={2}
+                      sx={{
+                        height: 24
+                      }}
+                    >
+                      <Grid
+                        size={1}
+                        sx={{
+                          textAlign: 'right',
+                        }}
+                      >
+                        <Typography
+                          variant='body1'
+
+                        >
+
+                          {item.timestamp}:
+                        </Typography>
+                      </Grid>
+                      <Grid
+                        size={1}
+                        sx={{
+                          textAlign: 'left',
+                        }}
+                      >
+                        <Typography
+                          variant='body1'
+                        >
+                          {item.text}
+                        </Typography>
+                      </Grid>
+                      
+                    </Grid>
+                  )
+                })
+              }  
+            </Grid>
+            <Grid
+              flexGrow={6}
+              sx={{
+                height: 895,
+                paddingTop: 1,
+                paddingBottom: 1
+              }}
+            >
+              <MessageBox />
+            </Grid>
+            <Grid>
+              <EmailForm />
+            </Grid>
           </Item>
         </Grid>
 
