@@ -469,7 +469,7 @@ export const CandlestickChart = () => {
             data: initialData
           }]}
           type='candlestick'
-          height={height}
+          height={'100%'}
           width={1160}
           options={{
             
@@ -613,7 +613,7 @@ export const CandlestickChart = () => {
       ) : (
         <Box 
           sx={{ 
-            height: height, 
+            height: '100%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center', 

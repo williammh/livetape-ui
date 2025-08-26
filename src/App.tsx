@@ -109,23 +109,27 @@ const App = () => {
 
         <Grid
           container
-          direction='row'
+          direction='column'
           columns={2}
           size={12}
         >
           <Grid
-            size={1}
+            size={2}
             flexGrow={2}
           >
-            <Item>
+            <Item
+              sx={{
+                height: '100%'
+              }}
+            >
               <StatusBar />
               <CandlestickChart />
             </Item>
           </Grid>
           <Grid
             container
-            size={11}
-            columns={2}
+            direction='row'
+            size={2}
           >
             <Grid size={1}>
               <Item>

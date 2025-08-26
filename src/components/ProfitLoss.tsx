@@ -10,7 +10,7 @@ import { useAppContext } from '../contexts/AppContext';
 
 export const ProfitLoss = ({persona}) => {
 
-  const { priceRef } = useAppContext();
+  const { priceRef, replayDate } = useAppContext();
   const [price, setPrice] = useState<number>();
   
   useEffect(() => {
@@ -34,7 +34,7 @@ export const ProfitLoss = ({persona}) => {
   const change = direction === 'long' ? price - avgPrice: avgPrice - price;
   const pnl = change * quantity;
 
-  const pnlStr = `${pnl > 0 ? '+' : '-'} $${Math.abs(pnl || 0).toFixed(2)}`
+  const pnlStr = `${pnl > 0 ? '+' : '-'} $${Math.abs(pnl || 0).toFixed(2)}`;
 
   return (
     <Box>
@@ -50,7 +50,6 @@ export const ProfitLoss = ({persona}) => {
         >
           <Typography
             variant='h6'
-            // component='span'
           >
             {`${personaStr} `}
           </Typography>
@@ -62,7 +61,7 @@ export const ProfitLoss = ({persona}) => {
             textAlign: 'right'
           }}
         >
-          <Typography
+          {/* <Typography
             variant='h6'
             // component='span'
             sx={{
@@ -70,7 +69,7 @@ export const ProfitLoss = ({persona}) => {
             }}
           >
             {pnlStr}
-          </Typography>
+          </Typography> */}
         </Grid>
       </Grid>
     </Box>
