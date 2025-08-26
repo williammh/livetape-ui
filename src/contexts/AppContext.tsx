@@ -18,19 +18,19 @@ interface IAppContext {
     setAssetClass: Dispatch<SetStateAction<string>>;
     symbol: string;
     setSymbol: Dispatch<SetStateAction<string>>;
-    commentList: {persona: string, text: string, timestamp: string}[];
     timezone: string;
     setTimezone: Dispatch<SetStateAction<string>>;
     openBarCallback: (callback: ((msg: any) => void) | null) => void;
     replayDate: string;
     setReplayDate: Dispatch<SetStateAction<string>>;
+    messageListRef: RefObject<object[]>;
     priceRef: RefObject<number>;
     timestampRef: RefObject<string>;
 }
 
 const AppContext = createContext({} as IAppContext);
 
-export const serverAddress = 'localhost:8000';
+export const serverAddress = 'localhost:8001';
 
 export const symbols = {
     'Stocks': ['NVDA', 'TSLA'],
@@ -42,10 +42,15 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
     // app settings
     const [ assetClass, setAssetClass ] = useState<string>('Stocks');
     const [ symbol, setSymbol ] = useState<string>('NVDA');
+    // const [ assetClass, setAssetClass ] = useState<string>('Futures');
+    // const [ symbol, setSymbol ] = useState<string>('MNQU25');
     const [ timezone, setTimezone ] = useState<string>('America/Los_Angeles');
-
-    const [commentList, setCommentList] = useState<IAppContext['commentList']>([]);
+    
+    // bar data websocket connection
+    const openBarcallBackRef = useRef<((msg: any) => void) | null>(null);
+    const barWsRef = useRef<WebSocket | null>(null);
     const commentWsRef = useRef<WebSocket | null>(null);
+    const messageListRef = useRef<object[]>([]);
 
     const [ replayDate, setReplayDate ] = useState<string>('');
 
@@ -53,10 +58,6 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
 
     const timestampRef = useRef<string>('');
     const priceRef = useRef<number>(NaN);
-
-    // bar data websocket connection
-    const openBarcallBackRef = useRef<((msg: any) => void) | null>(null);
-    const barWsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
         if (replayDate) {
@@ -109,8 +110,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
         const barWs = new WebSocket(`ws://${serverAddress}/ws/bars/${symbol}`);
         barWsRef.current = barWs;
 
-     
-     
+    
         barWs.onopen = () => {
             console.log(`🌐 📊 ${symbol} Bars WebSocket connected`);
         };
@@ -126,6 +126,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
             console.log(`🔌 📊 ${symbol} Bar WebSocket disconnected`);
         };
 
+
         const commentWs = new WebSocket(`ws://${serverAddress}/ws/comments/${symbol}`);
         commentWsRef.current = commentWs;
 
@@ -140,12 +141,13 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
             if (data.data instanceof Array) {
                 const parsedComments = data.data.map(comment => JSON.parse(comment))
                 console.log(parsedComments);
-                setCommentList(parsedComments);
+                messageListRef.current = [...parsedComments];
+
             } else if (data.data) {
                 const parsedComment = JSON.parse(data.data);
                 if ('timestamp' in parsedComment) {
                     console.log(parsedComment);
-                    setCommentList((prev) => [...prev, parsedComment]);
+                    messageListRef.current = [...messageListRef.current, parsedComment];
                 }
             }
 
@@ -158,8 +160,9 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
         return () => {
             barWs.close();
             commentWs.close();
-        };
+            messageListRef.current = [];
 
+        };
 
     }, [symbol]);
 
@@ -172,10 +175,10 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
                 setSymbol,
                 replayDate,
                 setReplayDate,
-                commentList,
                 timezone,
                 setTimezone,
                 openBarCallback: (callback) => { openBarcallBackRef.current = callback; },
+                messageListRef,
                 priceRef,
                 timestampRef,
             }}

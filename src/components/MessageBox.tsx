@@ -9,7 +9,7 @@ import {
 import { Message, type IMessageProps } from './Message';
 import { toLocalDateTimeStr } from '../util/misc';
 import { useAppContext } from '../contexts/AppContext';
-import nVda20250515comments from '../assets/NVDA.2025-08-15.comments.json';
+import nVda20250815comments from '../assets/NVDA.2025-08-15.comments.json';
 
 
 export const MessageBox = () => {
@@ -47,9 +47,8 @@ export const MessageBox = () => {
     },
   ]
 
-  const { commentList, replayDate, timestampRef } = useAppContext();
-  const [ replayComments, setReplayComments ] = useState<IMessageProps[]>([]);
-
+  const { replayDate, timestampRef, messageListRef } = useAppContext();
+  const [ messageList, setMessageList] = useState<IMessageProps[]>([]);
   const messageBox = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,32 +58,45 @@ export const MessageBox = () => {
           behavior: 'smooth'
         });
     }
-  }, [commentList, replayComments]);
+  }, [messageList.length]);
 
   useEffect(() => {
-    
     if (replayDate) {
-      const replayCommentQueue = [...nVda20250515comments];
+      const replayCommentQueue = [...nVda20250815comments];
       const interval = setInterval(() => {
-  
         if (timestampRef.current >= replayCommentQueue[0]?.timestamp) {
-        
           const comment = replayCommentQueue.shift();
-          setReplayComments((prev) => {
+          console.log(comment);
+          setMessageList((prev) => {
             return [...prev, comment];
-          })
+          });
+          
         }
         
       }, 1000);
   
       return () => {
-        setReplayComments([]);
+        setMessageList([]);
         clearInterval(interval);
       };
+      
+    } else {
+      setMessageList([...messageListRef.current]);
+      const interval = setInterval(() => {
+        if (messageListRef?.current.length !== messageList.length) {
+          setMessageList(messageListRef.current);
+        }
+
+      }, 1000);
+  
+      return () => {
+        setMessageList([]);
+        clearInterval(interval);
+      };
+
     }
 
-  }, [replayDate]);
-
+  }, [replayDate, messageListRef.current.length]);
 
   return (
     <Box
@@ -118,14 +130,7 @@ export const MessageBox = () => {
       }}
       ref={messageBox}
     >
-      {replayComments.map((m, i) => (
-        <Message
-          persona={m.persona}
-          text={m.text}
-          timestamp={m.timestamp}
-        />
-      ))}
-      {commentList.map((m, i) => (
+      {messageList.map((m, i) => (
         <Message
           persona={m.persona}
           text={m.text}
