@@ -354,8 +354,8 @@ export const CandlestickChart = () => {
 
   useEffect(() => {
     if (replayDate) {
-      const startDateTime = new Date(2025, 7, 15, 13, 31, 0);
-    
+      const startDateTime = new Date("2025-08-15T13:31:00Z");
+
       const emptyRawBarData = Array(390).fill().map((_, index) => {
         const timestamp = addToDate(startDateTime, {minutes: index});
         return {
@@ -395,7 +395,7 @@ export const CandlestickChart = () => {
     userZoomedXAxis.current = false;
     userZoomedYAxis.current = false;
 
-    const secondsToStartRerun = 5;
+    const secondsToStartRerun = 2;
     const offlineTimeout = setTimeout(() => {
     
       if (rawBarDataRef?.current.length === 0) {
@@ -404,8 +404,8 @@ export const CandlestickChart = () => {
         setSymbol('NVDA');
         setReplayDate('2025-08-15');
    
-        const startDateTime = new Date(2025, 7, 15, 13, 31, 0);
-    
+        const startDateTime = new Date("2025-08-15T13:31:00Z");
+
         const emptyRawBarData = Array(390).fill().map((_, index) => {
           const timestamp = addToDate(startDateTime, {minutes: index});
           return {
