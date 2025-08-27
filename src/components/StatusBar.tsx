@@ -48,7 +48,7 @@ export const StatusBar = () => {
     chipProps.icon = <CalendarMonth />
     chipProps.color = "error" 
   } else if (assetClass === 'Stocks') {
-    chipProps.label = '15 Min'
+    chipProps.label = 'Delay'
     chipProps.icon = <History />
     chipProps.color = "warning" 
   } else {

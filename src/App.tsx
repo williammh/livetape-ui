@@ -85,7 +85,7 @@ const App = () => {
   } else {
     chipProps.label = 'Server Offline'
     chipProps.icon = <Cancel />
-    chipProps.color = "error" 
+    chipProps.color = "default" 
   }
   
   return (
