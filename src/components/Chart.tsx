@@ -44,6 +44,7 @@ const convertBars = (barData) => {
 const WebSocketDataHandler = ({ onMessage }: {onMessage: () => void }) => {
   const { openBarCallback } = useAppContext();
 
+
   useEffect(() => {
     openBarCallback(onMessage);
     return () => openBarCallback(null);
@@ -389,8 +390,8 @@ export const CandlestickChart = () => {
     console.log(`RENDER CHART: ${symbol} ${replayDate}`);
 
     setIsDataLoaded(false);
+    setInitialData([]);
     rawBarDataRef.current = [];
-    setInitialData([]); // Clear initial data
     userZoomedXAxis.current = false;
     userZoomedYAxis.current = false;
 
@@ -410,10 +411,10 @@ export const CandlestickChart = () => {
           return {
             timestamp: toRfc3339Str(timestamp),
             barstatus: 'open',
-            open: NaN,
-            high: NaN,
-            low: NaN,
-            close: NaN,
+            open: null,
+            high: null,
+            low: null,
+            close: null,
             totalvolume: 0
           }
         });
@@ -424,7 +425,7 @@ export const CandlestickChart = () => {
         }));
         
         rawBarDataRef.current = emptyRawBarData;
-        setInitialData(emptyConvertedBars); // Set initial data
+        setInitialData(emptyConvertedBars);
         setIsDataLoaded(true);
 
       }
@@ -438,7 +439,7 @@ export const CandlestickChart = () => {
       rawBarDataRef.current = closedBars;
       
       const convertedBars = convertBars(closedBars);
-      setInitialData(convertedBars); // Set initial data instead of updating series
+      setInitialData(convertedBars);
       setIsDataLoaded(true);
       console.log(`CONVERTED BARS ${convertedBars.length}`)
       console.log(convertedBars);
@@ -451,10 +452,14 @@ export const CandlestickChart = () => {
   }, [symbol]);
   
 
-  const height = 526;
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+
+  const parentHeight = chartContainerRef.current?.parentElement?.clientHeight;
+  const height = parentHeight - 96 ?? 669;
 
   return (
     <Box
+      ref={chartContainerRef}
       sx={{
         height: height
       }}
@@ -470,7 +475,6 @@ export const CandlestickChart = () => {
           }]}
           type='candlestick'
           height={'100%'}
-          width={1160}
           options={{
             
             chart: {
