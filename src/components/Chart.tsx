@@ -8,6 +8,7 @@ import {
 import { 
   Box,
   CircularProgress,
+  colors,
   Typography,
 } from '@mui/material';
 import { serverAddress, useAppContext } from '../contexts/AppContext';
@@ -479,6 +480,7 @@ export const CandlestickChart = () => {
             
             chart: {
               type: 'candlestick',
+              
               toolbar: { show: false },
               animations: {
                 enabled: false,
@@ -546,6 +548,14 @@ export const CandlestickChart = () => {
               // Prevent rendering of null/empty bars for replay bars
               sparkline: {
                 enabled: false
+              }
+            },
+            plotOptions: {
+              candlestick: {
+                colors: {
+                  upward: colors.green[400],
+                  downward: colors.red[400]
+                }
               }
             },
             tooltip: {
