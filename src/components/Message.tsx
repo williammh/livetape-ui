@@ -34,16 +34,25 @@ export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
           textAlign: 'center'
         }}
       >
-        <Avatar
-          src={avatar}
-          sx={{
-            height: 56,
-            width: 56,
-            bgcolor: bgColor,
-            margin: 'auto'
-          }}
-        />
-        <Typography>{displayName}</Typography>
+        {persona === 'moo' || persona == 'grizz' ? (
+          <>
+            <Avatar
+              src={avatar}
+              sx={{
+                height: 56,
+                width: 56,
+                bgcolor: bgColor,
+                margin: 'auto'
+              }}
+            />
+            <Typography>{displayName}</Typography>
+          </>
+        ) : (
+          <>
+            <Typography></Typography>
+            
+          </>
+        )}
       </Grid>
       <Grid
         size={7}

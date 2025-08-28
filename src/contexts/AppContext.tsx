@@ -31,6 +31,7 @@ interface IAppContext {
 
 export interface IPosition {
   id: number;
+  account: string;
   direction: string;
   quantity: number;
   symbol: string;

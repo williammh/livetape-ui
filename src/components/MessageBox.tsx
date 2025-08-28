@@ -49,6 +49,7 @@ export const MessageBox = () => {
   const { replayDate, timestampRef, messageListRef, positionsRef } = useAppContext();
   const [ messageList, setMessageList] = useState<IMessageProps[]>([]);
   const messageBox = useRef<HTMLDivElement>(null);
+  const positionsAppended = useRef(new Set());
 
   useEffect(() => {
     if (messageBox.current) {
@@ -63,18 +64,43 @@ export const MessageBox = () => {
     if (replayDate) {
 
       // load historic comments
-      const replayCommentQueue = [...nVda20250815comments];
+      const replayCommentQueue = [...nVda20250815comments];  
+    
       const interval = setInterval(() => {
-        console.log('MESSAGE BOX POSITIONS');
-        console.log(positionsRef.current);
+        
         if (timestampRef.current >= replayCommentQueue[0]?.timestamp) {
           const comment = replayCommentQueue.shift();
           console.log(comment);
+        
           setMessageList((prev) => {
-            return [...prev, comment];
+            const nextMessageList = [...prev, comment];
+            return nextMessageList;
           });
-          
         }
+
+        for (let account in positionsRef?.current) {          
+          const positions = positionsRef.current[account];
+          for (let id in positions) {
+            const pos = positions[id];
+            if(timestampRef.current >= pos.openTimestamp && !(positionsAppended.current.has(id))) {
+              const persona = `${pos.account?.[0].toUpperCase()}${pos.account?.slice(1)}`;
+              
+              const systemComment = {
+                persona: 'system',
+                text: `${persona} enters ${pos.direction} ${pos.quantity} ${pos.symbol}`,
+                timestamp: pos.openTimestamp
+              };
+              positionsAppended.current.add(id);
+              setMessageList((prev) => {
+                const nextMessageList = [...prev, systemComment];
+                return nextMessageList;
+              });
+            }
+          }
+        }
+       
+
+        // setMessageList(nextMessageList);
         
       }, 1000);
   
@@ -100,7 +126,7 @@ export const MessageBox = () => {
 
     }
 
-  }, [replayDate, messageListRef.current.length, positionsRef.current]);
+  }, [replayDate, messageListRef.current.length, positionsRef.current, positionsAppended.current]);
 
   return (
     <Box
