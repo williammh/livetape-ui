@@ -6,17 +6,18 @@ import {
   Grid,
   Paper,
   Typography,
+  colors,
 } from '@mui/material'
 import { CandlestickChart } from './components/Chart';
 import { MessageBox } from './components/MessageBox';
-import { styled } from '@mui/material/styles';
+import { styled, type SxProps } from '@mui/material/styles';
 import { StatusBar } from './components/StatusBar';
 import { Positions } from './components/Positions';
 import { Orders } from './components/Orders';
 import { ProfitLoss } from './components/ProfitLoss';
 import { toLocalDateTimeStr } from './util/misc';
 import { Cancel, CheckCircle } from '@mui/icons-material';
-import { useAppContext, serverAddress } from './contexts/AppContext';
+import { useAppContext, serverAddress, symbolMap } from './contexts/AppContext';
 import { addToDate } from './util/misc';
 import { EmailForm } from './components/EmailForm';
 
@@ -31,7 +32,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const App = () => { 
-  const { timezone } = useAppContext();
+  const { symbol, timezone } = useAppContext();
   const now = new Date();
 
   now.setHours(13);
@@ -47,7 +48,7 @@ const App = () => {
   const announcement2 = `${tradeTslaTimeStr}: Moo and Grizz trade TSLA`;
   
   const announcement = `Moo shoots for the moon and Grizz puts Elon on blast trading TSLA at ${tradeTslaTimeStr}`;
-
+  
   const scheduleItems = [
     {
       'timestamp': cpiTimeStr,
@@ -104,23 +105,44 @@ const App = () => {
   }, [isServerOnline]);
 
   
-  const chipProps: { label: string; icon: React.ReactNode; color: string } = {
+  const chipProps: {
+    variant: string,
+    label: string,
+    icon: React.ReactNode,
+    color: string,
+    sx?: SxProps,
+
+  } = {
+    variant: 'outlined',
     label: '',
     icon: null,
-    color: ''
+    color: '',
+    sx: {
+      fontWeight: 'bold'
+    },
   }
   
   if (isServerOnline) {
     chipProps.label = 'Server Online'
     chipProps.icon = <CheckCircle />
-    chipProps.color = "success" 
+    chipProps.color = "success"
+    chipProps.sx = {
+      ...chipProps.sx,
+      color: colors.green[400]
+    }
   } else {
     chipProps.label = 'Server Offline'
     chipProps.icon = <Cancel />
-    chipProps.color = "default" 
+    chipProps.color = colors.grey[600]
+    chipProps.sx = {
+      ...chipProps.sx,
+      color: colors.grey[600]
+    }
   }
 
-  console.log(`${window.outerWidth} * ${window.outerHeight}`);
+  const isPortraitMode = window.outerWidth < window.outerHeight;
+  const isFixedWidthMode = true;
+  console.log(`isPostraitMode: ${isPortraitMode}, ${window.outerWidth} * ${window.outerHeight}`);
   
   return (
     <Box>
@@ -128,7 +150,10 @@ const App = () => {
         container
         spacing={1}
         columns={18}
-        sx={{ width: 1920, height: 1080 }}
+        sx={{
+          width: isFixedWidthMode ? 1920 : null,
+          height: isFixedWidthMode ? 1080: null
+        }}
       >
         <Grid size={18}>
           <Item sx={{height: '100%'}}>
@@ -167,12 +192,11 @@ const App = () => {
               <Grid
                 size={1}
                 sx={{
-                  textAlign: 'right'
+                  textAlign: 'right',
                 }}
               >
                 <Chip
                   {...chipProps}
-                  variant="outlined"
                 />
               </Grid>
              
@@ -189,51 +213,30 @@ const App = () => {
 
             <Grid
               container
-              direction='column'
+              direction='row'
+              alignItems='center'
+              justifyContent={'center'}
+              sx={{
+                height: 56
+              }}
             >
-
-              {
-                scheduleItems.map((item) => {
-                  return (
-                    <Grid
-                      container
-                      direction='row'
-                      columns={2}
-                      sx={{
-                        height: 24
-                      }}
-                    >
-                      <Grid
-                        size={1}
-                        sx={{
-                          textAlign: 'right',
-                        }}
-                      >
-                        <Typography
-                          variant='body1'
-
-                        >
-
-                          {item.timestamp}:
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        size={1}
-                        sx={{
-                          textAlign: 'left',
-                        }}
-                      >
-                        <Typography
-                          variant='body1'
-                        >
-                          {item.text}
-                        </Typography>
-                      </Grid>
-                      
-                    </Grid>
-                  )
-                })
-              }  
+              <Typography
+                variant='h6'
+                component='span'
+                sx={{
+                  marginRight: 1
+                }}
+              >
+                {"Now:"}
+              </Typography>
+              <Typography
+                variant='h6'
+                sx={{
+                  fontWeight: 'bold'
+                }}
+              >
+                {` ${symbolMap[symbol].name} (${symbolMap[symbol].exchange}: ${symbol})`}
+              </Typography>
             </Grid>
             <Grid
               flexGrow={6}

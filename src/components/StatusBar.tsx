@@ -35,7 +35,7 @@ export const StatusBar = () => {
 
   useEffect(() => {
     setReplayDate('');
-    setSymbol(symbol);
+    setSymbol(symbols[assetClass].includes(symbol) ? symbol : symbols[assetClass][0]);
   }, [assetClass]);
 
   const chipProps: { label: string; icon: React.ReactNode; color: string } = {
@@ -45,17 +45,17 @@ export const StatusBar = () => {
   }
 
   if (replayDate) {
-    chipProps.label = 'Replay'
-    chipProps.icon = <CalendarMonth />
-    chipProps.color = "default" 
+    chipProps.label = 'Replay';
+    chipProps.icon = <CalendarMonth />;
+    chipProps.color = "default" ;
   } else if (assetClass === 'Stocks') {
-    chipProps.label = 'Delayed'
-    chipProps.icon = <History />
-    chipProps.color = "warning" 
+    chipProps.label = 'Delayed';
+    chipProps.icon = <History />;
+    chipProps.color = "warning" ;
   } else {
-    chipProps.label = 'Live'
-    chipProps.icon = <PlayArrow />
-    chipProps.color = "success" 
+    chipProps.label = 'Live';
+    chipProps.icon = <PlayArrow />;
+    chipProps.color = "success" ;
   }
 
   useEffect(() => {
