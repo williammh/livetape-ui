@@ -46,7 +46,7 @@ export const MessageBox = () => {
     },
   ]
 
-  const { replayDate, timestampRef, messageListRef } = useAppContext();
+  const { replayDate, timestampRef, messageListRef, positionsRef } = useAppContext();
   const [ messageList, setMessageList] = useState<IMessageProps[]>([]);
   const messageBox = useRef<HTMLDivElement>(null);
 
@@ -61,8 +61,12 @@ export const MessageBox = () => {
 
   useEffect(() => {
     if (replayDate) {
+
+      // load historic comments
       const replayCommentQueue = [...nVda20250815comments];
       const interval = setInterval(() => {
+        console.log('MESSAGE BOX POSITIONS');
+        console.log(positionsRef.current);
         if (timestampRef.current >= replayCommentQueue[0]?.timestamp) {
           const comment = replayCommentQueue.shift();
           console.log(comment);
@@ -78,7 +82,8 @@ export const MessageBox = () => {
         setMessageList([]);
         clearInterval(interval);
       };
-      
+    
+    // live or delayed data
     } else {
       setMessageList([...messageListRef.current]);
       const interval = setInterval(() => {
@@ -95,7 +100,7 @@ export const MessageBox = () => {
 
     }
 
-  }, [replayDate, messageListRef.current.length]);
+  }, [replayDate, messageListRef.current.length, positionsRef.current]);
 
   return (
     <Box

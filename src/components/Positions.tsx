@@ -8,24 +8,13 @@ import {
   ListItemText,
   colors,
 } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
 import { toLocalDateTimeStr } from '../util/misc';
 import { textAlignRight } from '../util/misc';
-import { useAppContext } from '../contexts/AppContext';
+import { useAppContext, type IPosition } from '../contexts/AppContext';
 import nVda20250815positions from '../assets/NVDA.2025-08-15.positions.json';
 
-interface IPosition {
-  id: number;
-  direction: string;
-  quantity: number;
-  symbol: string;
-  average: number | string;
-  pnl: number | string;
-  datetime: string;
-}
-
 export const Positions = ({persona}) => {
-  const { priceRef, timestampRef, replayDate, timezone } = useAppContext();
+  const { priceRef, timestampRef, positionsRef, replayDate, timezone } = useAppContext();
 
   const personaStr = `${persona[0].toUpperCase()}${persona.slice(1)}`;
 
@@ -73,18 +62,6 @@ export const Positions = ({persona}) => {
     
   ];
 
-  const positions: IPosition[] = [
-    {
-      id: 0,
-      direction: 'Long',
-      quantity: 1,
-      symbol: 'NVDA',
-      average: `${(29337.75).toFixed(2)}`,
-      pnl: `${(29534.5).toFixed(2)}`,
-      datetime: toLocalDateTimeStr(new Date(), timezone),
-    }
-  ];
-
   const openDateTime = new Date();
   openDateTime.setHours(13);
   openDateTime.setMinutes(30);
@@ -108,6 +85,7 @@ export const Positions = ({persona}) => {
               return key !== pos;
             });
             const nextObj = Object.fromEntries(nextArray);
+            positionsRef.current[persona] = nextObj;
             setOpenPositions(nextObj);
           }
         }
@@ -121,8 +99,9 @@ export const Positions = ({persona}) => {
           ) {
             console.log(`${persona} opening position: ${pos.id}`);
             setOpenPositions((prev) => {
-              const next = {...prev};
+              const next: {[id: string]: IPosition} = {...prev};
               next[pos.id] = pos;
+              positionsRef.current[persona] = next;
               return next;
               
             })

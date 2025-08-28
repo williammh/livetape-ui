@@ -24,8 +24,21 @@ interface IAppContext {
     replayDate: string;
     setReplayDate: Dispatch<SetStateAction<string>>;
     messageListRef: RefObject<object[]>;
+    positionsRef: RefObject<{[account: string]: {[id: string]: IPosition}}>;
     priceRef: RefObject<number>;
     timestampRef: RefObject<string>;
+}
+
+export interface IPosition {
+  id: number;
+  direction: string;
+  quantity: number;
+  symbol: string;
+  averagePrice: number | string;
+  openTimestamp: string;
+  closeTimestamp?: string;
+  pnl?: number | string;
+
 }
 
 const AppContext = createContext({} as IAppContext);
@@ -40,10 +53,10 @@ export const symbols = {
 
 export const AppProvider = ({children}: {children: React.ReactNode}) => {
     // app settings
+    // const [ assetClass, setAssetClass ] = useState<string>('Futures');
     const [ assetClass, setAssetClass ] = useState<string>('Stocks');
     const [ symbol, setSymbol ] = useState<string>('NVDA');
-    // const [ assetClass, setAssetClass ] = useState<string>('Futures');
-    // const [ symbol, setSymbol ] = useState<string>('MNQU25');
+    const [ replayDate, setReplayDate ] = useState<string>('');
     const [ timezone, setTimezone ] = useState<string>('America/Los_Angeles');
     
     // bar data websocket connection
@@ -51,11 +64,8 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
     const barWsRef = useRef<WebSocket | null>(null);
     const commentWsRef = useRef<WebSocket | null>(null);
     const messageListRef = useRef<object[]>([]);
-
-    const [ replayDate, setReplayDate ] = useState<string>('');
-
+    const positionsRef = useRef<{[account: string]: {[id: string]: IPosition}}>({});
     const replayIntervalRef = useRef<ReturnType<typeof setInterval>>(null);
-
     const timestampRef = useRef<string>('');
     const priceRef = useRef<number>(NaN);
 
@@ -179,6 +189,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
                 setTimezone,
                 openBarCallback: (callback) => { openBarcallBackRef.current = callback; },
                 messageListRef,
+                positionsRef,
                 priceRef,
                 timestampRef,
             }}
