@@ -90,14 +90,10 @@ export const Positions = ({persona}) => {
   openDateTime.setMinutes(30);
   openDateTime.setSeconds(0);
 
-  
-
   const [price, setPrice] = useState<number>();
   const [openPositions, setOpenPositions] = useState<object>({});
 
   useEffect(() => {
-
-
     const updateInterval = setInterval(() => {
       if (priceRef.current !== undefined) {
         setPrice(priceRef.current);
@@ -142,12 +138,8 @@ export const Positions = ({persona}) => {
 
   }, [replayDate, openPositions]);
 
-  
-  
   const positionsList = Object.values(openPositions);
-  // console.log(`${persona} positions:`);
-  // console.log(positionsList);
-
+  
   const positionDisplay = (
     <List>
       {positionsList.map(pos => {
@@ -160,16 +152,21 @@ export const Positions = ({persona}) => {
         if (pnl < 0) {
           color = colors.red[400]
         }
+        
+        const avgPriceStr = pos.averagePrice.toFixed(2);
+        const openTimeStamp = toLocalDateTimeStr(pos.openTimestamp);
         const pnlDisplay = (
           <Typography
             component="span"
             sx={{
-              color: color
+              color: color,
+              fontWeight: 'bold'
             }}
           >
-            {pnl > 0 ? '+' : ''}{pnl.toFixed(2)}
+            {pnl > 0 ? '+' : ''}${pnl.toFixed(2)}
           </Typography>
-        )
+        );
+
         return (
           <ListItem
             sx={{
@@ -184,7 +181,7 @@ export const Positions = ({persona}) => {
                 </>
               }
 
-              secondary={`${(pos.averagePrice).toFixed(2)} at ${pos.openTimestamp}`}
+              secondary={`${avgPriceStr} at ${openTimeStamp}`}
             />
           </ListItem>
         )
