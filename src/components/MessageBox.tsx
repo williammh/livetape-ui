@@ -87,7 +87,7 @@ export const MessageBox = () => {
               
               const systemComment = {
                 persona: 'system',
-                text: `${persona} enters ${pos.direction} ${pos.quantity} ${pos.symbol}`,
+                text: `${persona} enters ${pos.direction} ${pos.quantity} ${pos.symbol} position at average price $${pos.averagePrice.toFixed(2)}`,
                 timestamp: pos.openTimestamp
               };
               positionsAppended.current.add(id);
