@@ -12,6 +12,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { toLocalDateTimeStr } from '../util/misc';
 import { textAlignRight } from '../util/misc';
 import { useAppContext } from '../contexts/AppContext';
+import nVda20250815positions from '../assets/NVDA.2025-08-15.positions.json';
 
 interface IPosition {
   id: number;
@@ -23,8 +24,23 @@ interface IPosition {
   datetime: string;
 }
 
+
+// const mooReplayPositions = [];
+// const grizzReplayPositions = [];
+
+// nVda20250815positions.forEach(pos => {
+//   switch (pos.account) {
+//     case ("moo"):
+//       mooReplayPositions.push(pos);
+//       break;
+//     case ("grizz"):
+//       grizzReplayPositions.push(pos);
+//       break;
+//   }
+// })
+
 export const Positions = ({persona}) => {
-  const { priceRef, replayDate, timezone } = useAppContext();
+  const { priceRef, timestampRef, replayDate, timezone } = useAppContext();
 
   const personaStr = `${persona[0].toUpperCase()}${persona.slice(1)}`;
 
@@ -89,46 +105,69 @@ export const Positions = ({persona}) => {
   openDateTime.setMinutes(30);
   openDateTime.setSeconds(0);
 
-  const postionsList = replayDate ? [
-      {
-        id: 0,
-        direction: 'Long',
-        quantity: 400,
-        symbol: 'NVDA',
-        average: 181.75,
-        datetime: toLocalDateTimeStr(openDateTime, timezone),
-
-      }
-    ] : [
-      {
-        id: 0,
-        direction: '',
-        quantity: 0,
-        symbol: 'positions',
-        average: NaN,
-
-      }
-    ];
+  
 
   const [price, setPrice] = useState<number>();
-  
+  const [openPositions, setOpenPositions] = useState<object>({});
+
   useEffect(() => {
+
+
     const updateInterval = setInterval(() => {
       if (priceRef.current !== undefined) {
         setPrice(priceRef.current);
       }
+     
+      if (replayDate) {
+
+        for (let pos in openPositions) {
+          if (timestampRef.current >= openPositions[pos].closeTimestamp) {
+            console.log(`${persona} closing position: ${pos}`);
+            const nextArray = Object.entries(openPositions).filter(([key]) => {
+              return key !== pos;
+            });
+            const nextObj = Object.fromEntries(nextArray);
+            setOpenPositions(nextObj);
+          }
+        }
+
+        for (let pos of nVda20250815positions) {
+          if (
+            (timestampRef.current >= pos.openTimestamp) &&
+            (timestampRef.current < pos.closeTimestamp) &&
+            (pos.account === persona) &&
+            !(pos.id in openPositions)
+          ) {
+            console.log(`${persona} opening position: ${pos.id}`);
+            setOpenPositions((prev) => {
+              const next = {...prev};
+              next[pos.id] = pos;
+              return next;
+              
+            })
+          }
+        }
+      }
+
     }, 1000);
 
     return () => {
       clearInterval(updateInterval);
     };
 
-  }, []);
+  }, [replayDate, openPositions]);
+
+  
+  
+  const positionsList = Object.values(openPositions);
+  console.log(`${persona} positions:`);
+  console.log(positionsList);
 
   const positionDisplay = (
     <List>
-      {postionsList.map(pos => {
-        const pnl = (price - pos.average) * pos.quantity;
+      {positionsList.map(pos => {
+        const pnlPerQty = pos.direction === 'Long' ? price - pos.averagePrice : pos.averagePrice - price;
+        const pnl = pnlPerQty * pos.quantity;
         let color = colors.grey[400];
         if (pnl > 0) {
           color = colors.green[400]
@@ -147,7 +186,11 @@ export const Positions = ({persona}) => {
           </Typography>
         )
         return (
-          <ListItem>
+          <ListItem
+            sx={{
+              padding: 0
+            }}
+          >
             <ListItemText
               primary={
                 <>
@@ -156,7 +199,7 @@ export const Positions = ({persona}) => {
                 </>
               }
 
-              secondary={`${pos.average} at ${pos.datetime}`}
+              secondary={`${(pos.averagePrice).toFixed(2)} at ${pos.openTimestamp}`}
             />
           </ListItem>
         )
@@ -169,21 +212,23 @@ export const Positions = ({persona}) => {
     <Box>
       <Grid
         textAlign={'left'}
+        sx={{
+          height: 88
+        }}
       >
-        {/* <Typography
-          variant='h6'
-        >
-          Positions
-        </Typography> */}
-        {positionDisplay}
+        {
+          positionsList.length ?
+            positionDisplay :
+            <Typography
+              sx={{
+                paddingTop: 2
+              }}
+            >
+              No open positions
+            </Typography>
+        }
       
       </Grid>
-      {/* <DataGrid
-        rows={positions}
-        columns={columns}
-        showColumnVerticalBorder={false}
-        hideFooter={true}
-      /> */}
     </Box>
   );
 }

@@ -7,7 +7,6 @@ import {
   Box,
  } from '@mui/material';
 import { Message, type IMessageProps } from './Message';
-import { toLocalDateTimeStr } from '../util/misc';
 import { useAppContext } from '../contexts/AppContext';
 import nVda20250815comments from '../assets/NVDA.2025-08-15.comments.json';
 

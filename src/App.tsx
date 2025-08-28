@@ -87,6 +87,9 @@ const App = () => {
     chipProps.icon = <Cancel />
     chipProps.color = "default" 
   }
+
+  
+  console.log(`${window.outerWidth} * ${window.outerHeight}`);
   
   return (
     <Box>
