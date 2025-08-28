@@ -47,7 +47,7 @@ export const StatusBar = () => {
   if (replayDate) {
     chipProps.label = 'Replay'
     chipProps.icon = <CalendarMonth />
-    chipProps.color = colors.red[400] 
+    chipProps.color = "default" 
   } else if (assetClass === 'Stocks') {
     chipProps.label = 'Delayed'
     chipProps.icon = <History />

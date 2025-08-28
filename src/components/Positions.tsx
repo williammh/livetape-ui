@@ -16,52 +16,6 @@ import nVda20250815positions from '../assets/NVDA.2025-08-15.positions.json';
 export const Positions = ({persona}) => {
   const { priceRef, timestampRef, positionsRef, replayDate, timezone } = useAppContext();
 
-  const personaStr = `${persona[0].toUpperCase()}${persona.slice(1)}`;
-
-  const columns = [
-    {
-      field: 'direction',
-      headerName: 'Direction',
-      headerAlign: 'left',
-      width: 120,
-    },
-    {
-      field: 'quantity',
-      headerName: 'Qty',
-      headerAlign: 'right',
-      cellClassName: textAlignRight,
-      width: 40,
-    },
-    {
-      field: 'symbol',
-      headerName: 'Symbol',
-      headerAlign: 'left',
-      width: 80
-    },
-    {
-      field: 'datetime',
-      headerName: 'Opened',
-      headerAlign: 'left',
-      width: 200
-    },
-    {
-      field: 'average',
-      headerName: 'Avg',
-      headerAlign: 'right',
-      cellClassName: textAlignRight,
-      width: 80
-
-    },
-    {
-      field: 'pnl',
-      headerName: 'P/L',
-      headerAlign: 'right',
-      cellClassName: textAlignRight,
-      width: 80
-    },
-    
-  ];
-
   const openDateTime = new Date();
   openDateTime.setHours(13);
   openDateTime.setMinutes(30);
@@ -134,6 +88,7 @@ export const Positions = ({persona}) => {
         
         const avgPriceStr = pos.averagePrice.toFixed(2);
         const openTimeStamp = toLocalDateTimeStr(pos.openTimestamp);
+        const pnlStr = `${pnl >= 0 ? '+' : '-'}$${Math.abs(pnl).toFixed(2)}`;
         const pnlDisplay = (
           <Typography
             component="span"
@@ -142,7 +97,7 @@ export const Positions = ({persona}) => {
               fontWeight: 'bold'
             }}
           >
-            {pnl > 0 ? '+' : ''}${pnl.toFixed(2)}
+            {pnlStr}
           </Typography>
         );
 
