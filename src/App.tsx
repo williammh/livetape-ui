@@ -59,17 +59,49 @@ const App = () => {
     },
   ];
 
-  const [serverStatus, setServerStatus] = useState<boolean>(false);
+  const [isServerOnline, setIsServerOnline] = useState<boolean>(false);
 
   useEffect(() => {
-    const getServerStatus = (async () => {
-      const res = await fetch(`http://${serverAddress}/`);
-      const resJson = await res.json();
-      if (resJson) {
-        setServerStatus(true);
+    const pingIntervalSeconds = 5;
+
+    const fetchTimeout = async (url: string, timeout: number) => {
+      const controller = new AbortController();
+      const id = setTimeout(() => {
+        controller.abort();
+      }, timeout * 1000);
+      try {
+        const response = await fetch(url, { signal: controller.signal });
+        return response;
+      } finally {
+        clearTimeout(id);
       }
-    })();
-  }, []);
+    };
+    
+    const getServerStatus = async () => {
+      try {
+        const res = await fetchTimeout(`http://${serverAddress}/`, pingIntervalSeconds);
+        const resJson = await res.json();
+        if (resJson === true) {
+          setIsServerOnline(true);
+        } else {
+          setIsServerOnline(false);
+        }
+      } catch (error) {
+        console.log(error);
+        setIsServerOnline(false);
+      }
+    };
+    
+   
+    const pingServer = setInterval(async () => {
+      await getServerStatus();
+    }, pingIntervalSeconds * 1000);
+
+    return () => {
+      clearInterval(pingServer);
+    };
+
+  }, [isServerOnline]);
 
   
   const chipProps: { label: string; icon: React.ReactNode; color: string } = {
@@ -78,7 +110,7 @@ const App = () => {
     color: ''
   }
   
-  if (serverStatus) {
+  if (isServerOnline) {
     chipProps.label = 'Server Online'
     chipProps.icon = <CheckCircle />
     chipProps.color = "success" 
@@ -88,7 +120,6 @@ const App = () => {
     chipProps.color = "default" 
   }
 
-  
   console.log(`${window.outerWidth} * ${window.outerHeight}`);
   
   return (

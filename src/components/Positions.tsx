@@ -24,21 +24,6 @@ interface IPosition {
   datetime: string;
 }
 
-
-// const mooReplayPositions = [];
-// const grizzReplayPositions = [];
-
-// nVda20250815positions.forEach(pos => {
-//   switch (pos.account) {
-//     case ("moo"):
-//       mooReplayPositions.push(pos);
-//       break;
-//     case ("grizz"):
-//       grizzReplayPositions.push(pos);
-//       break;
-//   }
-// })
-
 export const Positions = ({persona}) => {
   const { priceRef, timestampRef, replayDate, timezone } = useAppContext();
 
@@ -160,8 +145,8 @@ export const Positions = ({persona}) => {
   
   
   const positionsList = Object.values(openPositions);
-  console.log(`${persona} positions:`);
-  console.log(positionsList);
+  // console.log(`${persona} positions:`);
+  // console.log(positionsList);
 
   const positionDisplay = (
     <List>

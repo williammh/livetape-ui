@@ -7,6 +7,7 @@ import {
   Autocomplete,
   Box,
   Chip,
+  colors,
   Grid,
   TextField,
   Typography,
@@ -34,7 +35,7 @@ export const StatusBar = () => {
 
   useEffect(() => {
     setReplayDate('');
-    setSymbol(symbols[assetClass][0]);
+    setSymbol(symbol);
   }, [assetClass]);
 
   const chipProps: { label: string; icon: React.ReactNode; color: string } = {
@@ -46,9 +47,9 @@ export const StatusBar = () => {
   if (replayDate) {
     chipProps.label = 'Replay'
     chipProps.icon = <CalendarMonth />
-    chipProps.color = "error" 
+    chipProps.color = colors.red[400] 
   } else if (assetClass === 'Stocks') {
-    chipProps.label = 'Delay'
+    chipProps.label = 'Delayed'
     chipProps.icon = <History />
     chipProps.color = "warning" 
   } else {
