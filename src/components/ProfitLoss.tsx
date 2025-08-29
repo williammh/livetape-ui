@@ -50,6 +50,9 @@ export const ProfitLoss = ({persona}) => {
         >
           <Typography
             variant='h6'
+            sx={{
+              fontWeight: 'bold'
+            }}
           >
             {`${personaStr} `}
           </Typography>

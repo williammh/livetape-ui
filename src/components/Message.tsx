@@ -31,7 +31,7 @@ export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
       <Grid
         size={1}
         sx={{
-          textAlign: 'center'
+          textAlign: 'center',
         }}
       >
         {persona === 'moo' || persona == 'grizz' ? (
@@ -42,10 +42,14 @@ export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
                 height: 56,
                 width: 56,
                 bgcolor: bgColor,
-                margin: 'auto'
+                margin: 'auto',
               }}
             />
-            <Typography>{displayName}</Typography>
+            <Typography
+              sx={{
+                fontWeight: 'bold'
+              }}
+            >{displayName}</Typography>
           </>
         ) : (
           <>

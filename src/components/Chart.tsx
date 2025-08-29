@@ -456,7 +456,7 @@ export const CandlestickChart = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
   const parentHeight = chartContainerRef.current?.parentElement?.clientHeight;
-  const height = parentHeight - 96 ?? 669;
+  const height = parentHeight - 256 ?? 669;
 
   return (
     <Box

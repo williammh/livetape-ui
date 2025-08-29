@@ -48,7 +48,7 @@ const App = () => {
   const announcement2 = `${tradeTslaTimeStr}: Moo and Grizz trade TSLA`;
   
   const announcement = `Moo shoots for the moon and Grizz puts Elon on blast trading TSLA at ${tradeTslaTimeStr}`;
-  
+
   const scheduleItems = [
     {
       'timestamp': cpiTimeStr,
@@ -145,17 +145,22 @@ const App = () => {
   console.log(`isPostraitMode: ${isPortraitMode}, ${window.outerWidth} * ${window.outerHeight}`);
   
   return (
-    <Box>
+    <Box
+      sx={{
+        width: isFixedWidthMode ? 1920 : window.innerWidth,
+        height: isFixedWidthMode ? 1080: window.innerHeight
+      }}
+    >
       <Grid
         container
+        direction={'column'}
         spacing={1}
         columns={18}
-        sx={{
-          width: isFixedWidthMode ? 1920 : null,
-          height: isFixedWidthMode ? 1080: null
-        }}
       >
-        <Grid size={18}>
+        {/* app bar */}
+        <Grid
+          size={18}
+        >
           <Item sx={{height: '100%'}}>
             <Grid
               container
@@ -204,98 +209,112 @@ const App = () => {
           </Item>
         </Grid>
 
+        {/* main content under app bar */}
         <Grid
           container
-          direction='column'
-          size={6}
+          direction='row'
+          size={18}
         >
-          <Item>
+          <Grid
+            container
+            direction='column'
+            size={6}
+          >
+            <Item>
+              <Grid
+                container
+                direction='row'
+                alignItems='center'
+                justifyContent={'center'}
+                sx={{
+                  minHeight: 56,
+                }}
+              >
+                <Typography
+                  variant='h6'
+                  component='span'
+                  sx={{
+                    marginRight: 1
+                  }}
+                >
+                  {"Now:"}
+                </Typography>
+                <Typography
+                  variant='h6'
+                  sx={{
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {` ${symbolMap[symbol].name} (${symbolMap[symbol].exchange}: ${symbol})`}
+                </Typography>
+              </Grid>
+              <Grid
+                // flexGrow={6}
+                // size={6}
+                sx={{
+                  height: isFixedWidthMode ? 895 : window.innerHeight - 72 - 56 - 40 - 24,
+                  paddingTop: 1,
+                  paddingBottom: 1
+                }}
+              >
+                <MessageBox />
+              </Grid>
+              <Grid>
+                <EmailForm />
+              </Grid>
+
+            </Item>  
+          </Grid>
+
+
+          {/* right side */}
+          <Grid
+            container
+            direction='column'
+            columns={2}
+            size={12}
+          >
+            {/* status bar and chart */}
+            <Grid
+              size={2}
+              flexGrow={2}
+            >
+              <Item
+                sx={{
+                  height: '100%'
+                }}
+              >
+                <StatusBar />
+                <CandlestickChart />
+              </Item>
+            </Grid>
+
 
             <Grid
               container
               direction='row'
-              alignItems='center'
-              justifyContent={'center'}
-              sx={{
-                height: 56
-              }}
+              size={2}
             >
-              <Typography
-                variant='h6'
-                component='span'
-                sx={{
-                  marginRight: 1
-                }}
-              >
-                {"Now:"}
-              </Typography>
-              <Typography
-                variant='h6'
-                sx={{
-                  fontWeight: 'bold'
-                }}
-              >
-                {` ${symbolMap[symbol].name} (${symbolMap[symbol].exchange}: ${symbol})`}
-              </Typography>
-            </Grid>
-            <Grid
-              flexGrow={6}
-              sx={{
-                height: 895,
-                paddingTop: 1,
-                paddingBottom: 1
-              }}
-            >
-              <MessageBox />
-            </Grid>
-            <Grid>
-              <EmailForm />
-            </Grid>
-          </Item>
-        </Grid>
+              <Grid size={1}>
+                <Item>
+                  <ProfitLoss persona='moo' />
+                  <Positions persona='moo' />
+                  <Orders persona='moo' />
+                </Item>
+              </Grid>
 
-        <Grid
-          container
-          direction='column'
-          columns={2}
-          size={12}
-        >
-          <Grid
-            size={2}
-            flexGrow={2}
-          >
-            <Item
-              sx={{
-                height: '100%'
-              }}
-            >
-              <StatusBar />
-              <CandlestickChart />
-            </Item>
-          </Grid>
-          <Grid
-            container
-            direction='row'
-            size={2}
-          >
-            <Grid size={1}>
-              <Item>
-                <ProfitLoss persona='moo' />
-                <Positions persona='moo' />
-                <Orders persona='moo' />
-              </Item>
-            </Grid>
-
-            <Grid size={1}>
-              <Item>
-                <ProfitLoss persona='grizz' />
-                <Positions persona='grizz' />
-                <Orders persona='grizz' />
-              </Item>
+              <Grid size={1}>
+                <Item>
+                  <ProfitLoss persona='grizz' />
+                  <Positions persona='grizz' />
+                  <Orders persona='grizz' />
+                </Item>
+              </Grid>
             </Grid>
           </Grid>
 
         </Grid>
+
       </Grid>
     </Box>
   )
