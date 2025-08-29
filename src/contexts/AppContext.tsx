@@ -48,7 +48,7 @@ export const serverAddress = 'localhost:8001';
 
 export const symbols = {
     'Stocks': ['NVDA', 'TSLA'],
-    'Crypto': ['BTC', 'ETH'],
+    'Crypto': ['BTCUSD', 'ETHUSD'],
     'Futures': ['NQU25', 'ESU25']
 };
 

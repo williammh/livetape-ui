@@ -396,7 +396,7 @@ export const CandlestickChart = () => {
     userZoomedXAxis.current = false;
     userZoomedYAxis.current = false;
 
-    const secondsToStartRerun = 2;
+    const secondsToStartRerun = 5;
     const offlineTimeout = setTimeout(() => {
     
       if (rawBarDataRef?.current.length === 0) {
