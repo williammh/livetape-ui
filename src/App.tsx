@@ -249,8 +249,6 @@ const App = () => {
                 </Typography>
               </Grid>
               <Grid
-                // flexGrow={6}
-                // size={6}
                 sx={{
                   height: isFixedWidthMode ? 895 : window.innerHeight - 72 - 56 - 40 - 24,
                   paddingTop: 1,
@@ -293,7 +291,9 @@ const App = () => {
             <Grid
               container
               direction='row'
-              size={2}
+
+              flexShrink={1}
+           
             >
               <Grid size={1}>
                 <Item>

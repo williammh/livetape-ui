@@ -453,16 +453,11 @@ export const CandlestickChart = () => {
   }, [symbol]);
   
 
-  const chartContainerRef = useRef<HTMLDivElement>(null);
-
-  const parentHeight = chartContainerRef.current?.parentElement?.clientHeight;
-  const height = parentHeight - 256 ?? 669;
-
+ 
   return (
     <Box
-      ref={chartContainerRef}
       sx={{
-        height: height
+        height: 'calc(100% - 56px)'
       }}
     >
       <WebSocketDataHandler
@@ -475,7 +470,7 @@ export const CandlestickChart = () => {
             data: initialData
           }]}
           type='candlestick'
-          height={'100%'}
+          height='100%'
           options={{
             
             chart: {

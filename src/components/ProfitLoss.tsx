@@ -64,15 +64,6 @@ export const ProfitLoss = ({persona}) => {
             textAlign: 'right'
           }}
         >
-          {/* <Typography
-            variant='h6'
-            // component='span'
-            sx={{
-              color: pnl > 0 ? colors.green[400] : colors.red[400] 
-            }}
-          >
-            {pnlStr}
-          </Typography> */}
         </Grid>
       </Grid>
     </Box>
