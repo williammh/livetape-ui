@@ -12,3 +12,10 @@
   background-color: #ffffff;
   color: #212121;
 }
+
+@font-face {
+  font-family: "MontserratCustom";
+  src: url("../assets/Montserrat-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}

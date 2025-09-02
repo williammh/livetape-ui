@@ -20,6 +20,7 @@ import { Cancel, CheckCircle } from '@mui/icons-material';
 import { useAppContext, serverAddress, symbolMap } from './contexts/AppContext';
 import { addToDate } from './util/misc';
 import { EmailForm } from './components/EmailForm';
+import "./components/Shared.css";
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -181,6 +182,9 @@ const App = () => {
                 <Typography
                   variant='h3'
                   component='span'
+                  sx={{
+                    fontFamily: 'MontserratCustom'
+                  }}
                 >
                   LiveTape.ai
                 </Typography>
@@ -277,7 +281,6 @@ const App = () => {
             <Grid
               columns={1}
               size={2}
-              // flexGrow={2}
             >
               <Item
                 // sx={{
