@@ -17,31 +17,49 @@ export const EmailForm = () => {
   return (
     <Box
       sx={{
-        'textAlign': 'right'
+        textAlign: 'right',
+        maxHeight: 40
       }}
     >
-      <TextField
-        size="small"
-        label="Email"
-        color="default"
-        sx={{
-          height: 40,
-          width: textFieldWidth,
-          marginRight: '8px',
-        }}
-      />
-      <Button
-        ref={buttonRef}
-        variant="outlined"
-        color="default"
-        sx={{
-          height: 40,
-          width: 'calc(20% - 8px)',
-        }}
+      <Grid
+        container
+        direction='row'
+        spacing={1}
       >
-        <Send />
-      </Button>
-   
+        <Grid
+          size={1}
+          flexGrow={3}
+        >
+          <TextField
+            size="small"
+            label="Email"
+            color="default"
+            fullWidth
+            sx={{
+              height: 40,
+            }}
+          />
+        </Grid>
+        <Grid
+          size={1}
+          flexGrow={1}
+          flexShrink={1}
+        >
+          <Button
+            ref={buttonRef}
+            variant="outlined"
+            color="default"
+            sx={{
+              height: 40,
+              width: '100%',
+            }}
+          >
+            <Send />
+          </Button>
+        </Grid>
+
+
+      </Grid>
     </Box>
   );
 }
