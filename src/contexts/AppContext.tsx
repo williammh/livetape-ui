@@ -54,7 +54,7 @@ export const symbols = {
 
 export const symbolMap = {
     'NVDA': {
-      name: 'NVIDIA Corporation',
+      name: 'Nvidia Corporation',
       exchange: 'NASDAQ'
     },
     'TSLA': {

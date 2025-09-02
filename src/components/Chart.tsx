@@ -453,11 +453,15 @@ export const CandlestickChart = () => {
   }, [symbol]);
   
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const height = window.innerHeight * .6
  
   return (
     <Box
+      ref={containerRef}
       sx={{
-        height: 'calc(100% - 56px)'
+        height: height,
       }}
     >
       <WebSocketDataHandler
@@ -465,17 +469,16 @@ export const CandlestickChart = () => {
         symbol={symbol}
       />
       {isDataLoaded ? (
+       
         <Chart
           series={[{
             data: initialData
           }]}
           type='candlestick'
-          height='100%'
+          height={height - 15}
           options={{
-            
             chart: {
-              type: 'candlestick',
-              
+              type: 'candlestick',   
               toolbar: { show: false },
               animations: {
                 enabled: false,
@@ -483,7 +486,7 @@ export const CandlestickChart = () => {
                   enabled: false
                 }
               },
-             
+            
               events: {
                 mounted: (chart) => {
                   chartRef.current = chart;
@@ -619,10 +622,11 @@ export const CandlestickChart = () => {
             // },
           }}
         />
+     
       ) : (
         <Box 
           sx={{ 
-            height: '100%',
+            height: height,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center', 

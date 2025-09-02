@@ -89,6 +89,7 @@ export const StatusBar = () => {
       <Grid
         container
         columns={2}
+        size={2}
         direction='row'
       >
         <Grid
@@ -97,6 +98,7 @@ export const StatusBar = () => {
           direction='row'
           justifyContent='flex-start'
           alignItems='center'
+          wrap='nowrap'
         >
           <Autocomplete 
             options={Object.keys(symbols)}
@@ -162,6 +164,7 @@ export const StatusBar = () => {
           direction='row'
           justifyContent='flex-end'
           alignItems='center'
+          wrap='no-wrap'
         >
           <Chip
             variant='outlined'
@@ -174,8 +177,10 @@ export const StatusBar = () => {
           <Typography
             variant='h6'
             align='right'
+            noWrap={true}
             sx={{
-              ...gridStyles
+              ...gridStyles,
+              
             }}
           >
             {localTimestamp} {tzLabel}

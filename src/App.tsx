@@ -141,14 +141,16 @@ const App = () => {
   }
 
   const isPortraitMode = window.outerWidth < window.outerHeight;
-  const isFixedWidthMode = true;
+  const isFixedWidthMode = false;
+  // const isFixedWidthMode = true;
+
   console.log(`isPostraitMode: ${isPortraitMode}, ${window.outerWidth} * ${window.outerHeight}`);
   
   return (
     <Box
       sx={{
         width: isFixedWidthMode ? 1920 : window.innerWidth,
-        height: isFixedWidthMode ? 1080: window.innerHeight
+        height: isFixedWidthMode ? 1080: window.innerHeight,
       }}
     >
       <Grid
@@ -188,7 +190,7 @@ const App = () => {
               >
                 <Typography
                   variant='h6'
-                  component='span'
+                  noWrap={true}
                 >
                   {announcement}
                 </Typography>
@@ -232,20 +234,13 @@ const App = () => {
               >
                 <Typography
                   variant='h6'
-                  component='span'
-                  sx={{
-                    marginRight: 1
-                  }}
-                >
-                  {"Now:"}
-                </Typography>
-                <Typography
-                  variant='h6'
+                  // component='span'
+                  noWrap={true}
                   sx={{
                     fontWeight: 'bold'
                   }}
                 >
-                  {` ${symbolMap[symbol].name} (${symbolMap[symbol].exchange}: ${symbol})`}
+                  {`Now: ${symbolMap[symbol].name} (${symbolMap[symbol].exchange}: ${symbol})`}
                 </Typography>
               </Grid>
               <Grid
@@ -274,13 +269,14 @@ const App = () => {
           >
             {/* status bar and chart */}
             <Grid
+              columns={1}
               size={2}
-              flexGrow={2}
+              // flexGrow={2}
             >
               <Item
-                sx={{
-                  height: '100%'
-                }}
+                // sx={{
+                //   height: '100%'
+                // }}
               >
                 <StatusBar />
                 <CandlestickChart />
@@ -291,23 +287,30 @@ const App = () => {
             <Grid
               container
               direction='row'
-
-              flexShrink={1}
-           
+              size={2}
+              flexGrow={1}
+        
             >
               <Grid size={1}>
-                <Item>
+                <Item
+                  sx={{
+                    height: '100%'
+                }}>
                   <ProfitLoss persona='moo' />
                   <Positions persona='moo' />
-                  <Orders persona='moo' />
+                  {/* <Orders persona='moo' /> */}
                 </Item>
               </Grid>
 
               <Grid size={1}>
-                <Item>
+                <Item
+                  sx={{
+                    height: '100%'
+                  }}
+                >
                   <ProfitLoss persona='grizz' />
                   <Positions persona='grizz' />
-                  <Orders persona='grizz' />
+                  {/* <Orders persona='grizz' /> */}
                 </Item>
               </Grid>
             </Grid>
