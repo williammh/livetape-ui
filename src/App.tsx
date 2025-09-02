@@ -217,12 +217,18 @@ const App = () => {
           direction='row'
           size={18}
         >
+          {/* left 1/3 */}
           <Grid
             container
             direction='column'
             size={6}
+            overflow='hidden'
           >
-            <Item>
+            <Item
+              sx={{
+                width: '100%'
+              }}
+            >
               <Grid
                 container
                 direction='row'
@@ -260,7 +266,7 @@ const App = () => {
           </Grid>
 
 
-          {/* right side */}
+          {/* right 2/3 */}
           <Grid
             container
             direction='column'
