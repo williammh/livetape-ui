@@ -98,9 +98,7 @@ export const MessageBox = () => {
             }
           }
         }
-       
 
-        // setMessageList(nextMessageList);
         
       }, 1000);
   

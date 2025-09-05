@@ -7,21 +7,11 @@ import { toLocalDateTimeStr } from '../util/misc';
 import { DataGrid } from '@mui/x-data-grid';
 import { textAlignRight } from '../util/misc';
 import { useAppContext } from '../contexts/AppContext';
+import { useEffect } from 'react';
 
-
-interface IOrder {
-  id: number;
-  action: string;
-  type: string;
-  quantity: number;
-  symbol: string;
-  price: number;
-  status: string;
-  datetime: string;
-}
 
 export const Orders = ({persona}) => {
-  const { timezone } = useAppContext();
+  const { ordersRef, replayDate, timezone } = useAppContext();
   const personaStr = `${persona[0].toUpperCase()}${persona.slice(1)}`;
 
   const columns = [
@@ -88,6 +78,23 @@ export const Orders = ({persona}) => {
       datetime: toLocalDateTimeStr(new Date(), timezone),
     }
   ]
+
+  // useEffect(() => {
+  //   const updateOrdersInterval = setInterval(() => {
+      
+      
+  //     if (replayDate) {
+
+        
+  //     }
+
+  //   }, 1000);
+
+  //   return () => {
+  //     clearInterval(updateOrdersInterval);
+  //   };
+
+  // }, [replayDate, ordersRef.current]);
 
   return (
     <Box>

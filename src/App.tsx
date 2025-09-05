@@ -307,7 +307,7 @@ const App = () => {
                 }}>
                   <ProfitLoss persona='moo' />
                   <Positions persona='moo' />
-                  {/* <Orders persona='moo' /> */}
+                  <Orders persona='moo' />
                 </Item>
               </Grid>
 
@@ -319,7 +319,7 @@ const App = () => {
                 >
                   <ProfitLoss persona='grizz' />
                   <Positions persona='grizz' />
-                  {/* <Orders persona='grizz' /> */}
+                  <Orders persona='grizz' />
                 </Item>
               </Grid>
             </Grid>

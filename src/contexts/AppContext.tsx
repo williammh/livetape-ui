@@ -11,23 +11,13 @@ import {
 // ?raw gets the text content
 import Nvda20250815 from '../assets/NVDA.bars.2025-08-15.csv?raw';
 
-import { parseCSV, addToDate, toRfc3339Str } from '../util/misc';
+// import nVda20250815positions from '../assets/NVDA.2025-08-15.positions.json';
+// import nVda20250815Orders from '../assets/NVDA.2025-08-15.orders.json';
 
-interface IAppContext {
-    assetClass: 'Stocks' | 'Crypto' | 'Futures';
-    setAssetClass: Dispatch<SetStateAction<string>>;
-    symbol: string;
-    setSymbol: Dispatch<SetStateAction<string>>;
-    timezone: string;
-    setTimezone: Dispatch<SetStateAction<string>>;
-    openBarCallback: (callback: ((msg: any) => void) | null) => void;
-    replayDate: string;
-    setReplayDate: Dispatch<SetStateAction<string>>;
-    messageListRef: RefObject<object[]>;
-    positionsRef: RefObject<{[account: string]: {[id: string]: IPosition}}>;
-    priceRef: RefObject<number>;
-    timestampRef: RefObject<string>;
-}
+
+
+
+import { parseCSV, addToDate, toRfc3339Str } from '../util/misc';
 
 export interface IPosition {
   id: number;
@@ -41,6 +31,36 @@ export interface IPosition {
   pnl?: number | string;
 
 }
+
+interface IOrder {
+  id: number;
+  action: string;
+  type: string;
+  quantity: number;
+  symbol: string;
+  price: number;
+  status: string;
+  openTimestamp: string;
+  closeTimestamp: string;
+}
+
+interface IAppContext {
+    assetClass: 'Stocks' | 'Crypto' | 'Futures';
+    setAssetClass: Dispatch<SetStateAction<string>>;
+    symbol: string;
+    setSymbol: Dispatch<SetStateAction<string>>;
+    timezone: string;
+    setTimezone: Dispatch<SetStateAction<string>>;
+    openBarCallback: (callback: ((msg: any) => void) | null) => void;
+    replayDate: string;
+    setReplayDate: Dispatch<SetStateAction<string>>;
+    messageListRef: RefObject<object[]>;
+    positionsRef: RefObject<{[account: string]: {[id: string]: IPosition}}>;
+    ordersRef: RefObject<{[account: string]: {[id: string]: IOrder}}>
+    priceRef: RefObject<number>;
+    timestampRef: RefObject<string>;
+}
+
 
 const AppContext = createContext({} as IAppContext);
 
@@ -94,6 +114,8 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
     const commentWsRef = useRef<WebSocket | null>(null);
     const messageListRef = useRef<object[]>([]);
     const positionsRef = useRef<{[account: string]: {[id: string]: IPosition}}>({});
+    const ordersRef = useRef<{[account: string]: {[id: string]: IOrder}}>({});
+
     const replayIntervalRef = useRef<ReturnType<typeof setInterval>>(null);
     const timestampRef = useRef<string>('');
     const priceRef = useRef<number>(NaN);
@@ -106,31 +128,34 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
             let firstDate = new Date(firstTimeStamp);
             firstDate = addToDate(firstDate, { minutes: -1 });
 
-            let lastTimestamp = firstTimeStamp;
             let index = 0;
+            let secondsElapsed = 0;
+
             const mockBarWebSocket = setInterval(() => {
-                const currentTimestamp = rerunBars[index].timestamp;
-                if (currentTimestamp !== lastTimestamp) {
-                    const message = {
-                        type: 'closed_bar',
-                        data: rerunBars[index - 1]
-                    }
-                    openBarcallBackRef.current?.(message);
-                    
-                } else {
+                const now = addToDate(firstDate, {seconds: secondsElapsed});
+                timestampRef.current = toRfc3339Str(now);
+
+                const rerunBarCloseTimestamp = rerunBars[index].timestamp;
+
+                
+                if (timestampRef.current < rerunBarCloseTimestamp) {
                     const message = {
                         type: 'open_bar',
                         data: rerunBars[index]
                     }
                     openBarcallBackRef.current?.(message);
-
-                    const mockSystemTime = addToDate(firstDate, { seconds: index });
-                    timestampRef.current = toRfc3339Str(mockSystemTime);
                     priceRef.current = rerunBars[index].close;
-
+                } else {
+                    const message = {
+                        type: 'closed_bar',
+                        data: rerunBars[index - 1]
+                    }
+                    openBarcallBackRef.current?.(message);
                 }
-                lastTimestamp = currentTimestamp;
+
+
                 index++;
+                secondsElapsed++;
             }, 1000);
 
             replayIntervalRef.current = mockBarWebSocket;
@@ -218,6 +243,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
                 setTimezone,
                 openBarCallback: (callback) => { openBarcallBackRef.current = callback; },
                 messageListRef,
+                ordersRef,
                 positionsRef,
                 priceRef,
                 timestampRef,
