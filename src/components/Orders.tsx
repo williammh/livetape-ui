@@ -91,7 +91,6 @@ export const Orders = ({persona}) => {
       <Box
         sx={{
           marginTop: 1,
-          position: 'relative',
           width: '100%'
         }}
       >      
@@ -114,9 +113,12 @@ export const Orders = ({persona}) => {
         >
           Orders
         </Box>
-
         {/* Actual DataGrid with top padding to not overlap group header */}
-        <Box>
+        <Box
+          sx={{
+            height: 186,
+          }}
+        >
           <DataGrid
             rows={orderList}
             columns={columns}
@@ -136,7 +138,7 @@ export const Orders = ({persona}) => {
               '& .MuiDataGrid-filler': {
                 backgroundColor: '#202020',
               },
-              height: 160,
+              height: '100%',
               width: '100%',
               padding: 1,
 

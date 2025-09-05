@@ -184,7 +184,7 @@ const App = () => {
                   component='span'
                   sx={{
                     fontFamily: 'MontserratCustom',
-                    paddingLeft: 2,
+                    paddingLeft: 1,
                   }}
                 >
                   LiveTape.ai
