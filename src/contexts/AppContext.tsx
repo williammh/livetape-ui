@@ -12,7 +12,7 @@ import {
 import Nvda20250815 from '../assets/NVDA.bars.2025-08-15.csv?raw';
 
 // import nVda20250815positions from '../assets/NVDA.2025-08-15.positions.json';
-// import nVda20250815Orders from '../assets/NVDA.2025-08-15.orders.json';
+import nVda20250815Orders from '../assets/NVDA.2025-08-15.orders.json';
 
 
 
@@ -32,7 +32,7 @@ export interface IPosition {
 
 }
 
-interface IOrder {
+export interface IOrder {
   id: number;
   action: string;
   type: string;
@@ -123,15 +123,16 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
     useEffect(() => {
         if (replayDate) {
             const replayBars = parseCSV(Nvda20250815);
+            const replayOrders = nVda20250815Orders;
 
-            let firstDate = new Date(replayBars[0].timestamp);
-            firstDate = addToDate(firstDate, { minutes: -1 });
+            let startDate = new Date(replayBars[0].timestamp);
+            startDate = addToDate(startDate, { minutes: -1 });
 
             let idx = 0;
             let replayBarCloseTimestamp = replayBars[0].timestamp;
 
             const mockBarWebSocket = setInterval(() => {
-                const now = addToDate(firstDate, {seconds: idx});
+                const now = addToDate(startDate, {seconds: idx});
                 timestampRef.current = toRfc3339Str(now);
                 priceRef.current = parseFloat(replayBars[idx].close);
 
@@ -146,12 +147,18 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
                 openBarcallBackRef.current?.(mockBarMessage);
 
                 // replay orders
+                for (let order of replayOrders) {
+                    const isOrderOpened = timestampRef.current >= order.openTimestamp;
+                    if (isOrderOpened) {
+                        if (!(order.account in ordersRef.current)) {
+                            ordersRef.current[order.account] = {};
+                        }
+                        ordersRef.current[order.account][order.id] = order;
+                    }
+                }
 
-
-                
                 replayBarCloseTimestamp = replayBars[idx].timestamp;
                 idx++;
-
 
             }, 1000);
 

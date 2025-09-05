@@ -6,13 +6,15 @@ import {
 import { toLocalDateTimeStr } from '../util/misc';
 import { DataGrid } from '@mui/x-data-grid';
 import { textAlignRight } from '../util/misc';
-import { useAppContext } from '../contexts/AppContext';
-import { useEffect } from 'react';
+import { useAppContext, type IOrder } from '../contexts/AppContext';
+import { useEffect, useMemo, useState } from 'react';
 
 
 export const Orders = ({persona}) => {
-  const { ordersRef, replayDate, timezone } = useAppContext();
-  const personaStr = `${persona[0].toUpperCase()}${persona.slice(1)}`;
+  const { ordersRef, timezone } = useAppContext();
+  // const personaStr = `${persona[0].toUpperCase()}${persona.slice(1)}`;
+  
+  const [orderList, setOrderList] = useState<IOrder[]>([]);
 
   const columns = [
     {
@@ -38,63 +40,52 @@ export const Orders = ({persona}) => {
       width: 80
     },
     {
-      field: 'datetime',
+      field: 'openTimestamp',
       headerName: 'Opened',
-      width: 200
+      valueFormatter: (param: string) => toLocalDateTimeStr(param, timezone),
+      width: 200,
+      
     },
     {
       field: 'status',
       headerName: 'Status',
-      width: 80
+      width: 60
     },
     {
       field: 'price',
       headerName: 'Price',
       headerAlign: 'right',
       cellClassName: textAlignRight,
+      renderCell: (params: number) => params.value?.toFixed(2),
       width: 80,
     },
   ];
 
-  const orders = [
-    {
-      id: 0,
-      action: 'Buy',
-      type: 'Limit',
-      quantity: 1,
-      symbol: 'NVDA',
-      price: `${(29534.5).toFixed(2)}`,
-      status: 'Open',
-      datetime: toLocalDateTimeStr(new Date(), timezone),
-    },
-    {
-      id: 1,
-      action: 'Buy',
-      type: 'Stop',
-      quantity: 1,
-      symbol: 'NVDA',
-      price: `${(29600.5).toFixed(2)}`,
-      status: 'Open',
-      datetime: toLocalDateTimeStr(new Date(), timezone),
-    }
-  ]
-
-  // useEffect(() => {
-  //   const updateOrdersInterval = setInterval(() => {
+  useEffect(() => {
+    let prevOrders: IOrder[] = [];
+    const updateOrdersInterval = setInterval(() => {
       
-      
-  //     if (replayDate) {
+        if (persona in ordersRef.current) {
+          const newOrders = Object.values(ordersRef.current[persona]);
+          
+          const changed = newOrders.length !== prevOrders.length ||
+            newOrders.some((o, i) => o.id !== prevOrders[i]?.id || o.status !== prevOrders[i]?.status);
 
+          if (changed) {
+            prevOrders = newOrders;
+            setOrderList(newOrders);
+          }
+        }
         
-  //     }
+      }, 1000);
 
-  //   }, 1000);
+      return () => {
+        clearInterval(updateOrdersInterval);
+      };
 
-  //   return () => {
-  //     clearInterval(updateOrdersInterval);
-  //   };
+  }, [ordersRef]);
 
-  // }, [replayDate, ordersRef.current]);
+  console.log("RERENDER ORDERS");
 
   return (
     <Box>
@@ -109,10 +100,20 @@ export const Orders = ({persona}) => {
         </Typography>
       </Grid>
       <DataGrid
-        rows={orders}
+        rows={orderList}
         columns={columns}
-        showColumnVerticalBorder={false}
         hideFooter={true}
+        rowCount={2}
+        rowHeight={60}
+        sx={{
+     
+        '& .MuiDataGrid-columnHeader': {
+          background: '#181818',
+        },
+        background: '#181818',
+        height: 180,
+        width: '100%'
+      }}
       />
     </Box>
   );

@@ -28,11 +28,11 @@ export const toLocalTimeStr = (value: string) => {
 }
 
 export const textAlignRight = (params: any) => {
-    if (parseFloat(params.value)) {
-        return 'MuiDataGrid-cell--textRight'
-    }
-    return '';
+  if (parseFloat(params.value)) {
+      return 'MuiDataGrid-cell--textRight'
   }
+  return '';
+}
 
 /**
  * Increment a date by multiple units.
