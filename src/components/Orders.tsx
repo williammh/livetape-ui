@@ -82,11 +82,7 @@ export const Orders = ({persona}) => {
       };
 
   }, [ordersRef]);
-
-  console.log("RERENDER ORDERS");
-
   return (
-
       <Box
         sx={{
           marginTop: 1,
@@ -105,7 +101,7 @@ export const Orders = ({persona}) => {
             display: 'flex',
             alignItems: 'center',
             // justifyContent: 'center',
-            padding: 1,
+            padding: '16px',
             fontWeight: 'bold',
             zIndex: 1,
             borderBottom: '1px solid #444'
@@ -115,19 +111,13 @@ export const Orders = ({persona}) => {
         </Box>
 
         {/* Actual DataGrid with top padding to not overlap group header */}
-        <Box
-          sx={{
-            height: '100%',
-            pt: '30px',
-            paddingTop: 0,
-          }}
-        >
+        <Box>
           <DataGrid
             rows={orderList}
             columns={columns}
             hideFooter={true}
-            rowCount={2}
-            rowHeight={60}
+            rowCount={1}
+            rowHeight={56}
             sx={{
               fontWeight: 'bold',
               border: 'unset',
@@ -141,8 +131,10 @@ export const Orders = ({persona}) => {
               '& .MuiDataGrid-filler': {
                 backgroundColor: '#202020',
               },
-              height: 180,
-              width: '100%'
+              height: '100%',
+              width: '100%',
+              padding: 1,
+
             }}
           />
         </Box>

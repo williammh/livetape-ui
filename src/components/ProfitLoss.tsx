@@ -66,18 +66,30 @@ export const ProfitLoss = ({persona}) => {
     },
   ]
 
+  const cellStyles = {
+    fontWeight: 'bold',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  }
+
   return (
-    <Box> 
+    <Box
+      sx={{
+        width: '100%'
+      }}
+    > 
       <TableContainer
         component={Paper}
-        sx={{
-          width: '100%'
-        }}
+
       >
         <Table
-          aria-label="simple table"
+          aria-label="pnl table"
+          sx={{
+            tableLayout: 'fixed', 
+            width: '100%',
+          }}
         >
-        
           <TableBody>
             {rows.map((row) => (
               <TableRow
@@ -88,7 +100,8 @@ export const ProfitLoss = ({persona}) => {
                   component="th"
                   scope="row"
                   sx={{
-                    fontWeight: 'bold'
+                    ...cellStyles,
+                    width: 'auto', 
                   }}
                 >
                   {row.name}
@@ -96,7 +109,9 @@ export const ProfitLoss = ({persona}) => {
                 <TableCell
                   align="right"
                   sx={{
-                    fontWeight: 'bold'
+                    ...cellStyles,
+                    width: 140,
+                    minWidth: 140,
                   }}
                 >
                   {(row.value ?? beginningOfDayBalance).toFixed(2)} USD
@@ -105,6 +120,7 @@ export const ProfitLoss = ({persona}) => {
             ))}
           </TableBody>
         </Table>
+
       </TableContainer>
     </Box>
   );

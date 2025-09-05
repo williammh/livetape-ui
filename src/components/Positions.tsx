@@ -73,6 +73,13 @@ export const Positions = ({persona}) => {
 
   const positionsList = Object.values(openPositions);
 
+  const cellStyles = {
+    fontWeight: 'bold',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  }
+
   return (
     <Box
       sx={{
@@ -93,7 +100,8 @@ export const Positions = ({persona}) => {
             <Table
               aria-label="Position table"
               sx={{
-                fontWeight: 'bold'
+                tableLayout: 'fixed', 
+                ...cellStyles
               }}
             >
               <TableBody>
@@ -105,7 +113,8 @@ export const Positions = ({persona}) => {
                     component="th"
                     scope="row"
                     sx={{
-                      fontWeight: 'bold'
+                      width: 'auto', 
+                      ...cellStyles
                     }}
                   >
                     Position
@@ -113,7 +122,9 @@ export const Positions = ({persona}) => {
                   <TableCell
                     align="right"
                     sx={{
-                      fontWeight: 'bold'
+                      width: 160,
+                      minWidth: 160,
+                      ...cellStyles
                     }}
                   >
                     {`${pos.direction} ${pos.quantity} ${pos.symbol} @ ${pos.averagePrice.toFixed(2)} USD`}
@@ -127,17 +138,13 @@ export const Positions = ({persona}) => {
                   <TableCell
                     component="th"
                     scope="row"
-                    sx={{
-                      fontWeight: 'bold'
-                    }}
+                    sx={cellStyles}
                   >
                     Opened
                   </TableCell>
                   <TableCell
                     align="right"
-                    sx={{
-                      fontWeight: 'bold'
-                    }}
+                    sx={cellStyles}
                   >
                     {toLocalDateTimeStr(pos.openTimestamp, timezone)}
                   </TableCell>
@@ -150,9 +157,7 @@ export const Positions = ({persona}) => {
                   <TableCell
                     component="th"
                     scope="row"
-                    sx={{
-                      fontWeight: 'bold'
-                    }}
+                    sx={cellStyles}
                   >
                     Change
                   </TableCell>
@@ -160,7 +165,7 @@ export const Positions = ({persona}) => {
                     align="right"
                     sx={{
                       color: change > 0 ? colors.green[400] : colors.red[400],
-                      fontWeight: 'bold'
+                      ...cellStyles
                     }}
                   >
                     {`${change > 0 ? '+' : '-'} ${Math.abs(change).toFixed(2).padStart(5, '0')} USD`}
@@ -174,9 +179,7 @@ export const Positions = ({persona}) => {
                   <TableCell
                     component="th"
                     scope="row"
-                    sx={{
-                      fontWeight: 'bold'
-                    }}
+                    sx={cellStyles}
                   >
                     P/L
                   </TableCell>
@@ -184,7 +187,7 @@ export const Positions = ({persona}) => {
                     align="right"
                     sx={{
                       color: pnl > 0 ? colors.green[400] : colors.red[400],
-                      fontWeight: 'bold'
+                      ...cellStyles
                     }}
                   >
                     {`${pnl > 0 ? '+' : '-'} ${Math.abs(pnl).toFixed(2)} USD`}
