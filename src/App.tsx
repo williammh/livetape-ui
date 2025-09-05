@@ -8,13 +8,11 @@ import {
   Typography,
   colors,
 } from '@mui/material'
+import { Account } from './components//Account';
 import { CandlestickChart } from './components/Chart';
 import { MessageBox } from './components/MessageBox';
 import { styled, type SxProps } from '@mui/material/styles';
 import { StatusBar } from './components/StatusBar';
-import { Positions } from './components/Positions';
-import { Orders } from './components/Orders';
-import { ProfitLoss } from './components/ProfitLoss';
 import { toLocalDateTimeStr } from './util/misc';
 import { Cancel, CheckCircle } from '@mui/icons-material';
 import { useAppContext, serverAddress, symbolMap } from './contexts/AppContext';
@@ -22,7 +20,7 @@ import { addToDate } from './util/misc';
 import { EmailForm } from './components/EmailForm';
 import "./components/Shared.css";
 
-const Item = styled(Paper)(({ theme }) => ({
+export const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   padding: theme.spacing(1),
   textAlign: 'center',
@@ -296,94 +294,11 @@ const App = () => {
               size={2}
               flexGrow={1}
             >
-              {/* Moo account info */}
               <Grid size={1}>
-                <Item
-                  sx={{
-                    height: '100%'
-                }}>
-                  <Grid
-                    container
-                    direction='row'
-                    columns={2}
-                    spacing={1}
-                  >
-                    <Grid
-                      size={2}
-                      textAlign='left'
-                    >
-                      <Typography
-                        variant='h6'
-                        sx={{
-                          fontWeight: 'bold',
-                          paddingLeft: 1
-                        }}
-                      >
-                        Moo
-                      </Typography>
-                    </Grid>
-                    <Grid
-                      size={1}
-                    >
-                      <ProfitLoss persona='moo' />
-                    </Grid>
-                    <Grid
-                      size={1}
-                    >
-                      <Positions persona='moo' />
-                    </Grid>
-                  </Grid>
-                  <Grid
-                    size={2}
-                  >
-                    <Orders persona='moo' />
-                  </Grid>
-                </Item>
+                <Account persona='moo' />  
               </Grid>
-
-              {/* Grizz account Info */}
               <Grid size={1}>
-                <Item
-                  sx={{
-                    height: '100%'
-                }}>
-                  <Grid
-                    container
-                    direction='row'
-                    columns={2}
-                    spacing={1}
-                  >
-                    <Grid
-                      size={2}
-                      textAlign='left'
-                    >
-                      <Typography
-                        variant='h6'
-                        sx={{
-                          fontWeight: 'bold',
-                          paddingLeft: 1
-                        }}
-                      >
-                        Grizz
-                      </Typography>
-                    </Grid>
-                    <Grid
-                      size={1}
-                    >
-                      <ProfitLoss persona='grizz' />
-                    </Grid>
-                    <Grid
-                      size={1}
-                    >
-                      <Positions persona='grizz' />
-                    </Grid>
-                  </Grid>
-                  <Grid
-                    size={2}
-                  >
-                    <Orders persona='grizz' />
-                  </Grid>
-                </Item>
+                <Account persona='grizz' />  
               </Grid>
             </Grid>
           </Grid>

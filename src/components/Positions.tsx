@@ -122,12 +122,12 @@ export const Positions = ({persona}) => {
                   <TableCell
                     align="right"
                     sx={{
-                      width: 246,
-                      minWidth: 246,
+                      width: 180,
+                      minWidth: 180,
                       ...cellStyles
                     }}
                   >
-                    {`${pos.direction} ${pos.quantity} ${pos.symbol} @ ${pos.averagePrice.toFixed(2)} USD`}
+                    {`${pos.direction} ${pos.quantity} ${pos.symbol}`}
                   </TableCell>
                 </TableRow>
 
