@@ -3,9 +3,8 @@ import {
   Typography,
   Grid
 } from '@mui/material';
-import { toLocalDateTimeStr } from '../util/misc';
+import { textAlignRight, orderStatusMap, toLocalDateTimeStr } from '../util/misc';
 import { DataGrid } from '@mui/x-data-grid';
-import { textAlignRight } from '../util/misc';
 import { useAppContext, type IOrder } from '../contexts/AppContext';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -16,6 +15,8 @@ export const Orders = ({persona}) => {
   
   const [orderList, setOrderList] = useState<IOrder[]>([]);
 
+
+
   const columns = [
     {
       field: 'action',
@@ -25,7 +26,7 @@ export const Orders = ({persona}) => {
     {
       field: 'type',
       headerName: 'Type',
-      width: 60
+      width: 80
     },
     {
       field: 'quantity',
@@ -43,12 +44,13 @@ export const Orders = ({persona}) => {
       field: 'openTimestamp',
       headerName: 'Opened',
       valueFormatter: (param: string) => toLocalDateTimeStr(param, timezone),
-      width: 200,
+      width: 180,
       
     },
     {
       field: 'status',
       headerName: 'Status',
+      valueFormatter: (param: string) => orderStatusMap[param],
       width: 60
     },
     {
@@ -56,7 +58,7 @@ export const Orders = ({persona}) => {
       headerName: 'Price',
       headerAlign: 'right',
       cellClassName: textAlignRight,
-      renderCell: (params: number) => params.value?.toFixed(2),
+      valueFormatter: (param: number) => param.toFixed(2),
       width: 80,
     },
   ];
@@ -106,14 +108,13 @@ export const Orders = ({persona}) => {
         rowCount={2}
         rowHeight={60}
         sx={{
-     
-        '& .MuiDataGrid-columnHeader': {
+          '& .MuiDataGrid-columnHeader': {
+            background: '#181818',
+          },
           background: '#181818',
-        },
-        background: '#181818',
-        height: 180,
-        width: '100%'
-      }}
+          height: 180,
+          width: '100%'
+        }}
       />
     </Box>
   );

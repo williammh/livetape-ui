@@ -34,6 +34,10 @@ export const textAlignRight = (params: any) => {
   return '';
 }
 
+export const orderStatusMap = {
+  'FLL': 'Filled'
+}
+
 /**
  * Increment a date by multiple units.
  * @param date - original Date object
