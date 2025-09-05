@@ -13,7 +13,7 @@ export interface IMessageProps {
 export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
   const { timezone } = useAppContext();
   const localTimestamp = toLocalDateTimeStr(timestamp, timezone);
-  const bgColor = persona === 'moo' ? colors.green[900] : colors.red[900];
+  const bgColor = persona === 'moo' ? colors.green[400] : colors.red[400];
   const capitalized = `${persona?.[0].toUpperCase()}${persona?.slice(1)}`;
   const displayName = capitalized.includes(":") ? capitalized.slice(0, capitalized.indexOf(":") ) : capitalized;
   const avatar = persona?.startsWith('moo') ? moo : grizz;

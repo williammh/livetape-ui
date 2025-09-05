@@ -298,28 +298,92 @@ const App = () => {
               direction='row'
               size={2}
               flexGrow={1}
-        
             >
+              {/* Moo account info */}
               <Grid size={1}>
                 <Item
                   sx={{
                     height: '100%'
                 }}>
-                  <ProfitLoss persona='moo' />
-                  <Positions persona='moo' />
-                  <Orders persona='moo' />
+                  <Grid
+                    container
+                    direction='row'
+                    columns={2}
+                    spacing={1}
+                  >
+                    <Grid
+                      size={2}
+                      textAlign='left'
+                    >
+                      <Typography
+                        variant='h6'
+                        sx={{
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        Moo
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      size={1}
+                    >
+                      <ProfitLoss persona='moo' />
+                    </Grid>
+                    <Grid
+                      size={1}
+                    >
+                      <Positions persona='moo' />
+                    </Grid>
+                  </Grid>
+                  <Grid
+                    size={2}
+                  >
+                    <Orders persona='moo' />
+                  </Grid>
                 </Item>
               </Grid>
 
+              {/* Grizz account Info */}
               <Grid size={1}>
                 <Item
                   sx={{
                     height: '100%'
-                  }}
-                >
-                  <ProfitLoss persona='grizz' />
-                  <Positions persona='grizz' />
-                  <Orders persona='grizz' />
+                }}>
+                  <Grid
+                    container
+                    direction='row'
+                    columns={2}
+                    spacing={1}
+                  >
+                    <Grid
+                      size={2}
+                      textAlign='left'
+                    >
+                      <Typography
+                        variant='h6'
+                        sx={{
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        Grizz
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      size={1}
+                    >
+                      <ProfitLoss persona='grizz' />
+                    </Grid>
+                    <Grid
+                      size={1}
+                    >
+                      <Positions persona='grizz' />
+                    </Grid>
+                  </Grid>
+                  <Grid
+                    size={2}
+                  >
+                    <Orders persona='grizz' />
+                  </Grid>
                 </Item>
               </Grid>
             </Grid>

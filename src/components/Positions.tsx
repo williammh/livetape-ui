@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 import { 
   Box,
-  Grid,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
   colors,
+  Table,
+  TableBody,
+  Paper,
+  TableCell,
+  TableContainer,
+  TableRow,
 } from '@mui/material';
-import { toLocalDateTimeStr } from '../util/misc';
-import { textAlignRight } from '../util/misc';
 import { useAppContext, type IPosition } from '../contexts/AppContext';
 import nVda20250815positions from '../assets/NVDA.2025-08-15.positions.json';
 
@@ -72,79 +71,132 @@ export const Positions = ({persona}) => {
   }, [replayDate, openPositions]);
 
   const positionsList = Object.values(openPositions);
-  
-  const positionDisplay = (
-    <List>
-      {positionsList.map(pos => {
-        const pnlPerQty = pos.direction === 'Long' ? price - pos.averagePrice : pos.averagePrice - price;
-        const pnl = pnlPerQty * pos.quantity;
-        let color = colors.grey[400];
-        if (pnl > 0) {
-          color = colors.green[400]
-        }
-        if (pnl < 0) {
-          color = colors.red[400]
-        }
-        
-        const avgPriceStr = pos.averagePrice.toFixed(2);
-        const openTimeStamp = toLocalDateTimeStr(pos.openTimestamp);
-        const pnlStr = `${pnl >= 0 ? '+' : '-'}$${Math.abs(pnl).toFixed(2)}`;
-        const pnlDisplay = (
-          <Typography
-            component="span"
-            sx={{
-              color: color,
-              fontWeight: 'bold'
-            }}
-          >
-            {pnlStr}
-          </Typography>
-        );
 
-        return (
-          <ListItem
-            sx={{
-              padding: 0
-            }}
-          >
-            <ListItemText
-              primary={
-                <>
-                  {`${pos.direction} ${pos.quantity} ${pos.symbol} `}
-                  {pnlDisplay}
-                </>
-              }
-
-              secondary={`${avgPriceStr} at ${openTimeStamp}`}
-            />
-          </ListItem>
-        )
-      })}
-
-    </List>
-  )
+  console.log(persona);
+  console.log(price);
+  console.log(positionsList);
 
   return (
     <Box>
-      <Grid
-        textAlign={'left'}
-        sx={{
-          height: 88
-        }}
-      >
-        {
-          positionsList.length ?
-            positionDisplay :
-            <Typography
+
+      {positionsList.map(pos => {
+
+        const change = price - pos.averagePrice;
+        const pnl = pos.direction === 'Long' ? change * pos.quantity : Math.abs(change * pos.quantity);
+        
+        return (
+          <TableContainer
+            component={Paper}
+            sx={{
+              width: '100%',
+            }}
+          >
+            <Table
+              aria-label="Position table"
               sx={{
-                paddingTop: 2
+                fontWeight: 'bold'
               }}
             >
-              No open positions
-            </Typography>
-        }
-      
-      </Grid>
+              <TableBody>
+                <TableRow
+                  key={`${pos.account} ${pos.id}`}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    sx={{
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Position
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {`${pos.direction} ${pos.quantity} ${pos.symbol} @ ${pos.averagePrice.toFixed(2)} USD`}
+                  </TableCell>
+                </TableRow>
+
+                {/* <TableRow
+                  key={`${pos.account} ${pos.direction} opened`}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    sx={{
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Opened
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {toLocalDateTimeStr(pos.openTimestamp, timezone)}
+                  </TableCell>
+                </TableRow> */}
+
+                <TableRow
+                  key={`${pos.account} ${pos.direction} change`}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    sx={{
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Change
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      color: change > 0 ? colors.green[400] : colors.red[400],
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {`${change > 0 ? '+' : '-'} ${Math.abs(change).toFixed(2).padStart(5, '0')} USD`}
+                  </TableCell>
+                </TableRow>
+                
+                <TableRow
+                  key={`${pos.account} ${pos.direction} P/L`}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    sx={{
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    P/L
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      color: pnl > 0 ? colors.green[400] : colors.red[400],
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {`${pnl > 0 ? '+' : '-'} ${Math.abs(pnl).toFixed(2)} USD`}
+                  </TableCell>
+                </TableRow>
+                
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )
+      })}
     </Box>
   );
 }

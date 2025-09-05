@@ -3,15 +3,25 @@ import {
   Box,
   colors,
   Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
   Typography,
 } from '@mui/material';
 import { useAppContext } from '../contexts/AppContext';
 
-
 export const ProfitLoss = ({persona}) => {
 
-  const { priceRef, replayDate } = useAppContext();
+  const { priceRef, positionsRef, replayDate } = useAppContext();
+
   const [price, setPrice] = useState<number>();
+  const [accountValue, setAccountValue] = useState<number>();
+
+  const beginningOfDayBalance = 50000;
+
   
   useEffect(() => {
      
@@ -19,53 +29,83 @@ export const ProfitLoss = ({persona}) => {
         if (priceRef.current !== undefined) {
           setPrice(priceRef.current);
         }
+
+        if (positionsRef.current?.[persona]) {
+          const position = Object.values(positionsRef.current[persona])[0]; 
+          const quantity = position.quantity;
+          const direction = position.direction;
+          const avgPrice = position.averagePrice;
+          const change = direction === 'Long' ? price - avgPrice : avgPrice - price;
+          const unrealizedPNL = change * quantity;
+          const accountValue = beginningOfDayBalance + unrealizedPNL;
+
+          setAccountValue(accountValue);
+        }
+
       }, 1000);
   
       return () => {
         clearInterval(updateInterval);
       };
   
-    }, []);
+    }, [price, positionsRef]);
 
-  const quantity = 500;
-  const personaStr = `${persona[0].toUpperCase()}${persona.slice(1)}`;
-  const direction = persona === 'moo' ? 'long' : 'short';
-  const avgPrice = persona == 'moo' ? 181.50 : 181.70;
-  const change = direction === 'long' ? price - avgPrice: avgPrice - price;
-  const pnl = change * quantity;
+  const rows = [
+    {
+      name: 'Beginning of Day',
+      value: beginningOfDayBalance,
 
-  const pnlStr = `${pnl > 0 ? '+' : '-'} $${Math.abs(pnl || 0).toFixed(2)}`;
+    },
+    {
+      name: 'Account Value',
+      value: accountValue,
+    },
+    {
+      name: 'Realized P/L',
+      value: 0,
+    },
+  ]
 
   return (
-    <Box>
-      <Grid
-        container
-        columns={2}
+    <Box> 
+      <TableContainer
+        component={Paper}
+        sx={{
+          width: '100%'
+        }}
       >
-        <Grid
-          size={1}
-          sx={{
-            textAlign: 'left'
-          }}
+        <Table
+          aria-label="simple table"
         >
-          <Typography
-            variant='h6'
-            sx={{
-              fontWeight: 'bold'
-            }}
-          >
-            {`${personaStr} `}
-          </Typography>
-        </Grid>
-
-        <Grid
-          size={1}  
-          sx={{
-            textAlign: 'right'
-          }}
-        >
-        </Grid>
-      </Grid>
+        
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow
+                key={row.name}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell
+                  component="th"
+                  scope="row"
+                  sx={{
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {row.name}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {(row.value ?? beginningOfDayBalance).toFixed(2)} USD
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 }
