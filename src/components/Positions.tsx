@@ -8,12 +8,13 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  Typography,
 } from '@mui/material';
 import { useAppContext, type IPosition } from '../contexts/AppContext';
 import nVda20250815positions from '../assets/NVDA.2025-08-15.positions.json';
 
 export const Positions = ({persona}) => {
-  const { priceRef, timestampRef, positionsRef, replayDate, timezone } = useAppContext();
+  const { priceRef, timestampRef, positionsRef, replayDate } = useAppContext();
 
   const openDateTime = new Date();
   openDateTime.setHours(13);
@@ -72,18 +73,16 @@ export const Positions = ({persona}) => {
 
   const positionsList = Object.values(openPositions);
 
-  console.log(persona);
-  console.log(price);
-  console.log(positionsList);
-
   return (
-    <Box>
+    <Box
+      sx={{
+        height: '100%'
+      }}
+    >
 
-      {positionsList.map(pos => {
-
+      {positionsList.length > 0 ? positionsList.map(pos => {
         const change = price - pos.averagePrice;
         const pnl = pos.direction === 'Long' ? change * pos.quantity : Math.abs(change * pos.quantity);
-        
         return (
           <TableContainer
             component={Paper}
@@ -196,7 +195,26 @@ export const Positions = ({persona}) => {
             </Table>
           </TableContainer>
         )
-      })}
+      }) : (
+
+        <Box 
+          sx={{ 
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center', 
+            justifyContent: 'center',
+            backgroundColor: '#202020',
+            color: 'white'
+          }}
+        >
+          <Typography
+            fontWeight='bold'
+          >
+            No open positions
+          </Typography>
+        </Box>
+      )}
     </Box>
   );
 }

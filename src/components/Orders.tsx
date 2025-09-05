@@ -1,7 +1,5 @@
 import { 
   Box,
-  Typography,
-  Grid
 } from '@mui/material';
 import { textAlignRight, orderStatusMap, toLocalDateTimeStr } from '../util/misc';
 import { DataGrid } from '@mui/x-data-grid';
@@ -10,18 +8,14 @@ import { useEffect, useMemo, useState } from 'react';
 
 
 export const Orders = ({persona}) => {
-  const { ordersRef, timezone } = useAppContext();
-  // const personaStr = `${persona[0].toUpperCase()}${persona.slice(1)}`;
-  
+  const { ordersRef, timezone } = useAppContext();  
   const [orderList, setOrderList] = useState<IOrder[]>([]);
-
-
 
   const columns = [
     {
       field: 'action',
       headerName: 'Action',
-      width: 60
+      width: 80
     },
     {
       field: 'type',
@@ -51,7 +45,7 @@ export const Orders = ({persona}) => {
       field: 'status',
       headerName: 'Status',
       valueFormatter: (param: string) => orderStatusMap[param],
-      width: 60
+      width: 80
     },
     {
       field: 'price',
@@ -59,7 +53,9 @@ export const Orders = ({persona}) => {
       headerAlign: 'right',
       cellClassName: textAlignRight,
       valueFormatter: (param: number) => param.toFixed(2),
-      width: 80,
+      flex: 1,
+      minWidth: 80, 
+      
     },
   ];
 
@@ -90,32 +86,68 @@ export const Orders = ({persona}) => {
   console.log("RERENDER ORDERS");
 
   return (
-    <Box>
-      <Grid
-        textAlign={'left'}
-      >
-        <Typography
-          // variant="h6"
-          component="span"
-        >
-          Orders
-        </Typography>
-      </Grid>
-      <DataGrid
-        rows={orderList}
-        columns={columns}
-        hideFooter={true}
-        rowCount={2}
-        rowHeight={60}
+
+      <Box
         sx={{
-          '& .MuiDataGrid-columnHeader': {
-            background: '#181818',
-          },
-          background: '#181818',
-          height: 180,
+          marginTop: 1,
+          position: 'relative',
           width: '100%'
         }}
-      />
-    </Box>
+      >      
+        {/* Fake group header */}
+        <Box
+          sx={{
+            position: 'static',
+            width: '100%',
+            height: 56,
+            backgroundColor: '#202020',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            // justifyContent: 'center',
+            padding: 1,
+            fontWeight: 'bold',
+            zIndex: 1,
+            borderBottom: '1px solid #444'
+          }}
+        >
+          Orders
+        </Box>
+
+        {/* Actual DataGrid with top padding to not overlap group header */}
+        <Box
+          sx={{
+            height: '100%',
+            pt: '30px',
+            paddingTop: 0,
+          }}
+        >
+          <DataGrid
+            rows={orderList}
+            columns={columns}
+            hideFooter={true}
+            rowCount={2}
+            rowHeight={60}
+            sx={{
+              fontWeight: 'bold',
+              border: 'unset',
+              backgroundColor: '#202020',
+              '& .MuiDataGrid-columnHeader': {
+                backgroundColor: '#202020',
+              },
+              '& .MuiDataGrid-columnHeaderTitle': {
+                fontWeight: 'bold',
+              },
+              '& .MuiDataGrid-filler': {
+                backgroundColor: '#202020',
+              },
+              height: 180,
+              width: '100%'
+            }}
+          />
+        </Box>
+      </Box>
+
+
   );
 }
