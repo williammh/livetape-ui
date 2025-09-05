@@ -186,6 +186,7 @@ const calculateCleanXAxisRange = (min: number, max: number, firstBarTime: number
 const getTickInterval = (min: number, max: number) => {
   const range = max - min;
   
+  if (range <= 5) return .5;
   if (range <= 10) return 1;
   if (range <= 25) return 5;
   if (range <= 50) return 10;
@@ -210,11 +211,11 @@ const calculateCleanYAxisRange = (min: number, max: number) => {
   const finalMin = cleanMax - cleanMin > 1 ? cleanMin : cleanMin - 1; 
   
   const tickAmount = Math.floor((cleanMax - finalMin) / tickInterval);
-  
+
   return {
     min: finalMin,
     max: cleanMax,
-    tickAmount: Math.max(tickAmount, 2)
+    tickAmount: Math.max(tickAmount, 4)
   };
 };
 
@@ -237,6 +238,7 @@ const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef,
       if (!userZoomedXAxis.current) {
         const firstBarTime = new Date(rawBarDataRef.current[0].timestamp).getTime();
         const lastBarTime = new Date(rawBarDataRef.current[rawBarDataRef.current.length - 1].timestamp).getTime();
+       
         const cleanXRange = calculateCleanXAxisRange(currentXAxisRange.min, currentXAxisRange.max, firstBarTime, lastBarTime);
         
         if (cleanXRange) {
@@ -357,7 +359,9 @@ export const CandlestickChart = () => {
     if (replayDate) {
       const startDateTime = new Date("2025-08-15T13:31:00Z");
 
-      const emptyRawBarData = Array(390).fill().map((_, index) => {
+      const initialBars = 12;
+
+      const emptyRawBarData = Array(initialBars).fill().map((_, index) => {
         const timestamp = addToDate(startDateTime, {minutes: index});
         return {
           timestamp: toRfc3339Str(timestamp),
@@ -370,12 +374,13 @@ export const CandlestickChart = () => {
         }
       });
 
-      const emptyConvertedBars = Array(390).fill().map((_, index) => ({
+      const emptyConvertedBars = Array(initialBars).fill().map((_, index) => ({
         x: addToDate(startDateTime, {minutes: index}),
         y: [null, null, null, null]
       }));
       
       rawBarDataRef.current = emptyRawBarData;
+
       setInitialData(emptyConvertedBars);
       setIsDataLoaded(true);
 
@@ -442,8 +447,7 @@ export const CandlestickChart = () => {
       const convertedBars = convertBars(closedBars);
       setInitialData(convertedBars);
       setIsDataLoaded(true);
-      console.log(`CONVERTED BARS ${convertedBars.length}`)
-      console.log(convertedBars);
+      
     })();
 
     return () => {

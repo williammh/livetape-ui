@@ -122,8 +122,8 @@ export const Positions = ({persona}) => {
                   <TableCell
                     align="right"
                     sx={{
-                      width: 240,
-                      minWidth: 240,
+                      width: 246,
+                      minWidth: 246,
                       ...cellStyles
                     }}
                   >
