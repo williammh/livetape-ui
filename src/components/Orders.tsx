@@ -116,7 +116,7 @@ export const Orders = ({persona}) => {
         {/* Actual DataGrid with top padding to not overlap group header */}
         <Box
           sx={{
-            height: 186,
+            height: 156,
           }}
         >
           <DataGrid
