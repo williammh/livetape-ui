@@ -183,7 +183,8 @@ const App = () => {
                   variant='h3'
                   component='span'
                   sx={{
-                    fontFamily: 'MontserratCustom'
+                    fontFamily: 'MontserratCustom',
+                    paddingLeft: 2,
                   }}
                 >
                   LiveTape.ai
@@ -282,11 +283,7 @@ const App = () => {
               columns={1}
               size={2}
             >
-              <Item
-                // sx={{
-                //   height: '100%'
-                // }}
-              >
+              <Item>
                 <StatusBar />
                 <CandlestickChart />
               </Item>
@@ -318,7 +315,8 @@ const App = () => {
                       <Typography
                         variant='h6'
                         sx={{
-                          fontWeight: 'bold'
+                          fontWeight: 'bold',
+                          paddingLeft: 1
                         }}
                       >
                         Moo
@@ -362,7 +360,8 @@ const App = () => {
                       <Typography
                         variant='h6'
                         sx={{
-                          fontWeight: 'bold'
+                          fontWeight: 'bold',
+                          paddingLeft: 1
                         }}
                       >
                         Grizz

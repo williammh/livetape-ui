@@ -15,37 +15,42 @@ export const Orders = ({persona}) => {
     {
       field: 'action',
       headerName: 'Action',
-      width: 80
+      flex: 1,
+      minWidth: 60
     },
     {
       field: 'type',
       headerName: 'Type',
-      width: 80
+      flex: 1,
+      minWidth: 60
     },
     {
       field: 'quantity',
       headerName: 'Qty',
       headerAlign: 'right',
-      cellClassName: textAlignRight,
-      width: 40
+      cellClassName:
+      textAlignRight,
+      flex: 1,
+      minWidth: 40
     },
     {
       field: 'symbol',
       headerName: 'Symbol',
-      width: 80
+      flex: 1,
+      minWidth: 80
     },
     {
       field: 'openTimestamp',
       headerName: 'Opened',
       valueFormatter: (param: string) => toLocalDateTimeStr(param, timezone),
-      width: 180,
-      
+      flex: 2,
+      minWidth: 120
     },
     {
       field: 'status',
       headerName: 'Status',
       valueFormatter: (param: string) => orderStatusMap[param],
-      width: 80
+      flex: 1, minWidth: 60
     },
     {
       field: 'price',
@@ -54,10 +59,10 @@ export const Orders = ({persona}) => {
       cellClassName: textAlignRight,
       valueFormatter: (param: number) => param.toFixed(2),
       flex: 1,
-      minWidth: 80, 
-      
-    },
+      minWidth: 80
+    }
   ];
+
 
   useEffect(() => {
     let prevOrders: IOrder[] = [];
@@ -131,7 +136,7 @@ export const Orders = ({persona}) => {
               '& .MuiDataGrid-filler': {
                 backgroundColor: '#202020',
               },
-              height: '100%',
+              height: 160,
               width: '100%',
               padding: 1,
 
