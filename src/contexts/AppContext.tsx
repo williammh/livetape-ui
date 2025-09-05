@@ -122,40 +122,37 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
 
     useEffect(() => {
         if (replayDate) {
-            const rerunBars = parseCSV(Nvda20250815);
+            const replayBars = parseCSV(Nvda20250815);
 
-            const firstTimeStamp = rerunBars[0].timestamp;
-            let firstDate = new Date(firstTimeStamp);
+            let firstDate = new Date(replayBars[0].timestamp);
             firstDate = addToDate(firstDate, { minutes: -1 });
 
-            let index = 0;
-            let secondsElapsed = 0;
+            let idx = 0;
+            let replayBarCloseTimestamp = replayBars[0].timestamp;
 
             const mockBarWebSocket = setInterval(() => {
-                const now = addToDate(firstDate, {seconds: secondsElapsed});
+                const now = addToDate(firstDate, {seconds: idx});
                 timestampRef.current = toRfc3339Str(now);
+                priceRef.current = parseFloat(replayBars[idx].close);
 
-                const rerunBarCloseTimestamp = rerunBars[index].timestamp;
+                // replay bars
+                const mockBarMessage = replayBarCloseTimestamp !== replayBars[idx].timestamp ? {
+                    type: 'closed_bar',
+                    data: replayBars[idx - 1]
+                } : {
+                    type: 'open_bar',
+                    data: replayBars[idx]
+                }
+                openBarcallBackRef.current?.(mockBarMessage);
+
+                // replay orders
+
 
                 
-                if (timestampRef.current < rerunBarCloseTimestamp) {
-                    const message = {
-                        type: 'open_bar',
-                        data: rerunBars[index]
-                    }
-                    openBarcallBackRef.current?.(message);
-                    priceRef.current = rerunBars[index].close;
-                } else {
-                    const message = {
-                        type: 'closed_bar',
-                        data: rerunBars[index - 1]
-                    }
-                    openBarcallBackRef.current?.(message);
-                }
+                replayBarCloseTimestamp = replayBars[idx].timestamp;
+                idx++;
 
 
-                index++;
-                secondsElapsed++;
             }, 1000);
 
             replayIntervalRef.current = mockBarWebSocket;
