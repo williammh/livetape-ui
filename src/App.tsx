@@ -18,6 +18,9 @@ import { Cancel, CheckCircle } from '@mui/icons-material';
 import { useAppContext, serverAddress, symbolMap } from './contexts/AppContext';
 import { addToDate } from './util/misc';
 import { EmailForm } from './components/EmailForm';
+import { Now } from './components/Now';
+import { Schedule } from './components/Schedule';
+
 import "./components/Shared.css";
 
 export const Item = styled(Paper)(({ theme }) => ({
@@ -40,24 +43,13 @@ const App = () => {
   
   const cpiTime = addToDate(now, {hours: 2, minutes: 30});
   const cpiTimeStr = toLocalDateTimeStr(cpiTime, timezone);
-  const announcement1 = `${cpiTimeStr}: Consumer Price Index report`;
+  // const announcement1 = `${cpiTimeStr}: Consumer Price Index report`;
   
   const tradeTslaTime = addToDate(now, {days: 1});
   const tradeTslaTimeStr = toLocalDateTimeStr(tradeTslaTime, timezone);
-  const announcement2 = `${tradeTslaTimeStr}: Moo and Grizz trade TSLA`;
+  // const announcement2 = `${tradeTslaTimeStr}: Moo and Grizz trade TSLA`;
   
   const announcement = `Moo shoots for the moon and Grizz puts Elon on blast trading TSLA at ${tradeTslaTimeStr}`;
-
-  const scheduleItems = [
-    {
-      'timestamp': cpiTimeStr,
-      'text': ' BTCUSD - Bitcoin.'
-    },
-   {
-      'timestamp': tradeTslaTimeStr,
-      'text': ' TSLA - Tesla, Inc.'
-    },
-  ];
 
   const [isServerOnline, setIsServerOnline] = useState<boolean>(false);
 
@@ -237,29 +229,21 @@ const App = () => {
                 direction='row'
                 alignItems='center'
                 justifyContent={'center'}
-                sx={{
-                  minHeight: 56,
-                }}
               >
-                <Typography
-                  variant='h6'
-                  // component='span'
-                  noWrap={true}
-                  sx={{
-                    fontWeight: 'bold'
-                  }}
-                >
-                  {`Now: ${symbolMap[symbol].name} (${symbolMap[symbol].exchange}: ${symbol})`}
-                </Typography>
+                <Now />
               </Grid>
               <Grid
                 sx={{
-                  height: isFixedWidthMode ? 895 : window.innerHeight - 72 - 56 - 40 - 24,
+                  // app bar - now playing - schedule - email form - padding
+                  height: isFixedWidthMode ? 895 : window.innerHeight - 72 - 64 - 322 - 40 - 24,
                   paddingTop: 1,
                   paddingBottom: 1
                 }}
               >
                 <MessageBox />
+              </Grid>
+              <Grid>
+                <Schedule />
               </Grid>
               <Grid>
                 <EmailForm />
@@ -286,7 +270,6 @@ const App = () => {
                 <CandlestickChart />
               </Item>
             </Grid>
-
 
             <Grid
               container

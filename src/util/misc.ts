@@ -27,6 +27,9 @@ export const toLocalTimeStr = (value: string) => {
   return (new Date(Number(value)).toLocaleTimeString('en-US', {timeZone: timeZone, timeStyle: 'short'}));
 }
 
+export const getTzLabel = (timezone: string) => timezone.split('/')[1].replace('_', ' ');
+
+
 export const textAlignRight = (params: any) => {
   if (parseFloat(params.value)) {
       return 'MuiDataGrid-cell--textRight'

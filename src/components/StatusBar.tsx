@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { PlayArrow, History, CalendarMonth } from '@mui/icons-material';
-import { toLocalDateTimeStr } from '../util/misc';
+import { getTzLabel, toLocalDateTimeStr } from '../util/misc';
 import { useAppContext, symbols } from '../contexts/AppContext';
 
 export const StatusBar = () => {
@@ -75,7 +75,7 @@ export const StatusBar = () => {
 
   }, []);
 
-  const tzLabel = timezone.split('/')[1].replace('_', ' ');
+  const tzLabel = getTzLabel(timezone);
   const localTimestamp = toLocalDateTimeStr(timestamp, timezone);
 
   const gridStyles = {
