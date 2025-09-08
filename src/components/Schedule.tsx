@@ -64,11 +64,16 @@ export const Schedule = () => {
     },
   ];
 
+  const rowHeight = 56
+  const fontSize = 18
+
   const cellStyles = {
     fontWeight: 'bold',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    height: rowHeight,
+    padding: '0px 16px'
   }
 
  return (
@@ -77,7 +82,7 @@ export const Schedule = () => {
       sx={{
         position: 'static',
         width: '100%',
-        height: 64,
+        height: rowHeight,
         backgroundColor: '#202020',
         color: '#fff',
         display: 'flex',
@@ -91,6 +96,7 @@ export const Schedule = () => {
       <Typography
         variant='h6'
         component='span'
+        fontSize={fontSize}
         fontWeight='bold'
       >
         {`Next`}
@@ -98,6 +104,7 @@ export const Schedule = () => {
       <Typography
         variant='h6'
         component='span'
+        fontSize={fontSize}
       >
         {"\u00A0"}{`(${getTzLabel(timezone)} time)`}
       </Typography>
@@ -124,21 +131,20 @@ export const Schedule = () => {
               <TableRow
                 key={`${item.text}}`}
                 sx={{
-                  height: 64,
                   '&:last-child td, &:last-child th': { border: 0 }
                 }}
-                
               >
                 <TableCell
                   align="left"
                   sx={{
+
                     width: 120,
                     ...cellStyles
                   }}
                 >
                   <Typography
                     variant='h6'
-                    fontWeight='bold'
+                    fontSize={fontSize}
                   >
                     {dayMap[item.date.getUTCDay()]}
                   </Typography>
@@ -147,13 +153,14 @@ export const Schedule = () => {
                   component="th"
                   scope="row"
                   sx={{
+
                     width: 'auto', 
                     ...cellStyles
                   }}
                 >
                   <Typography
                     variant='h6'
-                    fontWeight='bold'
+                    fontSize={fontSize}
                   >
                     {toLocalDateTimeStr(item.date, timezone)}
                   </Typography>
@@ -167,7 +174,9 @@ export const Schedule = () => {
                 >
                   <Typography
                     variant='h6'
-                    fontWeight='bold'
+                    fontSize={fontSize}
+
+                    // fontWeight='bold'
                   >
                     {`${item.assetClass}`}
                   </Typography>
@@ -181,7 +190,7 @@ export const Schedule = () => {
                 >
                   <Typography
                     variant='h6'
-                    fontWeight='bold'
+                    fontSize={fontSize}
                   >
                     {`${item.symbol}`}
                   </Typography>
@@ -194,7 +203,7 @@ export const Schedule = () => {
                 >
                   <Typography
                     variant='h6'
-                    fontWeight='bold'
+                    fontSize={fontSize}
                   >
                     {`${item.text}`}
                   </Typography>

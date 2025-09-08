@@ -15,7 +15,7 @@ import { styled, type SxProps } from '@mui/material/styles';
 import { StatusBar } from './components/StatusBar';
 import { toLocalDateTimeStr } from './util/misc';
 import { Cancel, CheckCircle } from '@mui/icons-material';
-import { useAppContext, serverAddress, symbolMap } from './contexts/AppContext';
+import { useAppContext, serverAddress } from './contexts/AppContext';
 import { addToDate } from './util/misc';
 import { EmailForm } from './components/EmailForm';
 import { Now } from './components/Now';
@@ -34,20 +34,16 @@ export const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const App = () => { 
-  const { symbol, timezone } = useAppContext();
+  const { timezone } = useAppContext();
   const now = new Date();
 
   now.setHours(13);
   now.setMinutes(30);
   now.setSeconds(0);
   
-  const cpiTime = addToDate(now, {hours: 2, minutes: 30});
-  const cpiTimeStr = toLocalDateTimeStr(cpiTime, timezone);
-  // const announcement1 = `${cpiTimeStr}: Consumer Price Index report`;
   
   const tradeTslaTime = addToDate(now, {days: 1});
   const tradeTslaTimeStr = toLocalDateTimeStr(tradeTslaTime, timezone);
-  // const announcement2 = `${tradeTslaTimeStr}: Moo and Grizz trade TSLA`;
   
   const announcement = `Moo shoots for the moon and Grizz puts Elon on blast trading TSLA at ${tradeTslaTimeStr}`;
 
@@ -114,7 +110,7 @@ const App = () => {
   }
   
   if (isServerOnline) {
-    chipProps.label = 'Server Online'
+    chipProps.label = 'Server'
     chipProps.icon = <CheckCircle />
     chipProps.color = "success"
     chipProps.sx = {
@@ -122,7 +118,7 @@ const App = () => {
       color: colors.green[400]
     }
   } else {
-    chipProps.label = 'Server Offline'
+    chipProps.label = 'Server'
     chipProps.icon = <Cancel />
     chipProps.color = colors.grey[600]
     chipProps.sx = {
@@ -235,7 +231,7 @@ const App = () => {
               <Grid
                 sx={{
                   // app bar - now playing - schedule - email form - padding
-                  height: isFixedWidthMode ? 895 : window.innerHeight - 72 - 64 - 322 - 40 - 24,
+                  height: isFixedWidthMode ? 895 : window.innerHeight - 72 - 56 - 280 - 40 - 24,
                   paddingTop: 1,
                   paddingBottom: 1
                 }}
@@ -264,6 +260,7 @@ const App = () => {
             <Grid
               columns={1}
               size={2}
+              flexgrow={0}
             >
               <Item>
                 <StatusBar />

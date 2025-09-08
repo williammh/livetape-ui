@@ -7,11 +7,17 @@ import moo from '../assets/moo.png';
 import grizz from '../assets/grizz.png';
 
 export const Account = ({persona}: {persona: string}) => {
+
+
+
     return (
         <Item
             sx={{
-            height: '100%'
-        }}>
+                height: '100%',
+                minHeight: 430,
+                // overflow: 'scroll',
+            }}
+        >
             <Grid
                 container
                 direction='row'

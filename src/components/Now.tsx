@@ -12,7 +12,7 @@ export const Now = () => {
     sx={{
       position: 'static',
       width: '100%',
-      height: 64,
+      height: 56,
       backgroundColor: '#202020',
       color: '#fff',
       display: 'flex',

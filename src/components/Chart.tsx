@@ -459,7 +459,7 @@ export const CandlestickChart = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const height = window.innerHeight * .6
+  const height = window.innerHeight * .5
  
   return (
     <Box
