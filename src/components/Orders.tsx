@@ -125,9 +125,11 @@ export const Orders = ({persona}) => {
             rowHeight={56}
             scrollbarSize={0}
             sx={{
-              fontSize: fontSize ,
-              border: 'unset',
               backgroundColor: '#202020',
+              // TODO: style scrollbars when screen width is too small instead of hiding
+               '& .MuiDataGrid-scrollbar--horizontal': {
+                overflowX: 'hidden',
+              },
               '& .MuiDataGrid-columnHeader': {
                 backgroundColor: '#202020',
               },
@@ -136,10 +138,12 @@ export const Orders = ({persona}) => {
               '& .MuiDataGrid-filler': {
                 backgroundColor: '#202020',
               },
+              fontSize: fontSize ,
+              border: 'unset',
               height: 128,
               width: '100%',
               padding: 1,
-
+              
             }}
           />
         </Box>
