@@ -115,6 +115,7 @@ export const Schedule = () => {
       component={Paper}
       sx={{
         width: '100%',
+        marginBottom: 1,
       }}
     >
       <Table
@@ -126,7 +127,6 @@ export const Schedule = () => {
       >
         <TableBody>
           {scheduleItems.map((item) => {
-
             return (
               <TableRow
                 key={`${item.text}}`}

@@ -17,7 +17,7 @@ import { toLocalDateTimeStr } from './util/misc';
 import { Cancel, CheckCircle } from '@mui/icons-material';
 import { useAppContext, serverAddress } from './contexts/AppContext';
 import { addToDate } from './util/misc';
-import { EmailForm } from './components/EmailForm';
+import { ButtonBar } from './components/ButtonBar';
 import { Now } from './components/Now';
 import { Schedule } from './components/Schedule';
 
@@ -105,7 +105,7 @@ const App = () => {
     icon: null,
     color: '',
     sx: {
-      fontWeight: 'bold'
+      fontSize: 18,
     },
   }
   
@@ -231,7 +231,7 @@ const App = () => {
               <Grid
                 sx={{
                   // app bar - now playing - schedule - email form - padding
-                  height: isFixedWidthMode ? 895 : window.innerHeight - 72 - 56 - 280 - 40 - 24,
+                  height: isFixedWidthMode ? 895 : window.innerHeight - 72 - 56 - 288 - 56 - 24,
                   paddingTop: 1,
                   paddingBottom: 1
                 }}
@@ -241,8 +241,12 @@ const App = () => {
               <Grid>
                 <Schedule />
               </Grid>
-              <Grid>
-                <EmailForm />
+              <Grid
+                sx={{
+                  height: 56
+                }}
+              >
+                <ButtonBar />
               </Grid>
 
             </Item>  

@@ -72,6 +72,7 @@ export const ProfitLoss = ({persona}) => {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     height: 56,
+    padding: '0px 16px'
   }
 
   return (
