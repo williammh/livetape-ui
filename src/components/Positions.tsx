@@ -73,11 +73,16 @@ export const Positions = ({persona}) => {
 
   const positionsList = Object.values(openPositions);
 
+  const rowHeight = 56
+  const fontSize = 18
+
   const cellStyles = {
-    fontWeight: 'bold',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    fontSize: fontSize,
+    padding: '0px 16px',
+    height: rowHeight
   }
 
   return (
@@ -211,9 +216,7 @@ export const Positions = ({persona}) => {
             color: 'white'
           }}
         >
-          <Typography
-            fontWeight='bold'
-          >
+          <Typography>
             No open positions
           </Typography>
         </Box>

@@ -18,6 +18,8 @@ export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
   const displayName = capitalized.includes(":") ? capitalized.slice(0, capitalized.indexOf(":") ) : capitalized;
   const avatar = persona?.startsWith('moo') ? moo : grizz;
 
+  const fontSize = 18;
+
   return (
     <Grid
       container
@@ -47,14 +49,15 @@ export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
             />
             <Typography
               sx={{
+                fontSize: fontSize,
                 fontWeight: 'bold'
               }}
             >{displayName}</Typography>
           </>
         ) : (
           <>
-            <Typography></Typography>
-            
+            {/* <Typography></Typography>
+             */}
           </>
         )}
       </Grid>
@@ -68,6 +71,7 @@ export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
         >
           <Typography
             sx={{
+              fontSize: fontSize,
               marginBottom: 1
             }}
           >

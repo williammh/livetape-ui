@@ -67,10 +67,11 @@ export const ProfitLoss = ({persona}) => {
   ]
 
   const cellStyles = {
-    fontWeight: 'bold',
+    fontSize: 18,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    height: 56,
   }
 
   return (
@@ -110,8 +111,9 @@ export const ProfitLoss = ({persona}) => {
                   align="right"
                   sx={{
                     ...cellStyles,
-                    width: 140,
-                    minWidth: 140,
+                    width: 160,
+                    minWidth: 160,
+                    paddingLeft: 0,
                   }}
                 >
                   {(row.value ?? beginningOfDayBalance).toFixed(2)} USD

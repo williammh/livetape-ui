@@ -87,6 +87,9 @@ export const Orders = ({persona}) => {
       };
 
   }, [ordersRef]);
+
+  const fontSize = 18
+
   return (
       <Box
         sx={{
@@ -104,9 +107,8 @@ export const Orders = ({persona}) => {
             color: '#fff',
             display: 'flex',
             alignItems: 'center',
-            // justifyContent: 'center',
             padding: '16px',
-            fontWeight: 'bold',
+            fontSize: fontSize,
             zIndex: 1,
             borderBottom: '1px solid #444'
           }}
@@ -114,11 +116,7 @@ export const Orders = ({persona}) => {
           Orders
         </Box>
         {/* Actual DataGrid with top padding to not overlap group header */}
-        <Box
-          sx={{
-            // height: '100%',
-          }}
-        >
+        <Box>
           <DataGrid
             rows={orderList}
             columns={columns}
@@ -127,19 +125,17 @@ export const Orders = ({persona}) => {
             rowHeight={56}
             
             sx={{
-              fontWeight: 'bold',
+              fontSize: fontSize ,
               border: 'unset',
               backgroundColor: '#202020',
               '& .MuiDataGrid-columnHeader': {
                 backgroundColor: '#202020',
               },
               '& .MuiDataGrid-columnHeaderTitle': {
-                fontWeight: 'bold',
               },
               '& .MuiDataGrid-filler': {
                 backgroundColor: '#202020',
               },
-              // height: '128px',
               height: 128,
               width: '100%',
               padding: 1,

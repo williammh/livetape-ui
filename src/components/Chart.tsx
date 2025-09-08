@@ -459,7 +459,8 @@ export const CandlestickChart = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const height = window.innerHeight * .5
+  // subtract height of header - StusBar - Accounts - padding
+  const height = window.innerHeight - 72 - 56 - 446 - 38
  
   return (
     <Box
