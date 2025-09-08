@@ -100,6 +100,7 @@ export const Positions = ({persona}) => {
             component={Paper}
             sx={{
               width: '100%',
+              overflowX: 'hidden'
             }}
           >
             <Table
@@ -127,33 +128,16 @@ export const Positions = ({persona}) => {
                   <TableCell
                     align="right"
                     sx={{
-                      width: 180,
-                      minWidth: 180,
-                      ...cellStyles
+                      ...cellStyles,
+                      width: 160,
+                      minWidth: 160,
+                      paddingLeft: 0,
+                    
                     }}
                   >
                     {`${pos.direction} ${pos.quantity} ${pos.symbol}`}
                   </TableCell>
                 </TableRow>
-
-                {/* <TableRow
-                  key={`${pos.account} ${pos.direction} opened`}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell
-                    component="th"
-                    scope="row"
-                    sx={cellStyles}
-                  >
-                    Opened
-                  </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={cellStyles}
-                  >
-                    {toLocalDateTimeStr(pos.openTimestamp, timezone)}
-                  </TableCell>
-                </TableRow> */}
 
                 <TableRow
                   key={`${pos.account} ${pos.direction} change`}
@@ -169,8 +153,9 @@ export const Positions = ({persona}) => {
                   <TableCell
                     align="right"
                     sx={{
+                      ...cellStyles,
+                      paddingLeft: 0,
                       color: change > 0 ? colors.green[400] : colors.red[400],
-                      ...cellStyles
                     }}
                   >
                     {`${change > 0 ? '+' : '-'} ${Math.abs(change).toFixed(2).padStart(5, '0')} USD`}
@@ -191,8 +176,9 @@ export const Positions = ({persona}) => {
                   <TableCell
                     align="right"
                     sx={{
+                      ...cellStyles,
+                      paddingLeft: 0,
                       color: pnl > 0 ? colors.green[400] : colors.red[400],
-                      ...cellStyles
                     }}
                   >
                     {`${pnl > 0 ? '+' : '-'} ${Math.abs(pnl).toFixed(2)} USD`}

@@ -123,7 +123,7 @@ export const Orders = ({persona}) => {
             hideFooter={true}
             rowCount={0}
             rowHeight={56}
-            
+            scrollbarSize={0}
             sx={{
               fontSize: fontSize ,
               border: 'unset',

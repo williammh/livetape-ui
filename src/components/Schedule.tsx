@@ -116,6 +116,7 @@ export const Schedule = () => {
       sx={{
         width: '100%',
         marginBottom: 1,
+        overflowX: 'unset'
       }}
     >
       <Table
@@ -204,6 +205,8 @@ export const Schedule = () => {
                   <Typography
                     variant='h6'
                     fontSize={fontSize}
+                    overflow={'hidden'}
+                    textOverflow={'ellipsis'}
                   >
                     {`${item.text}`}
                   </Typography>

@@ -83,7 +83,9 @@ export const ProfitLoss = ({persona}) => {
     > 
       <TableContainer
         component={Paper}
-
+        sx={{
+          overflowX: 'hidden'
+        }}
       >
         <Table
           aria-label="pnl table"
