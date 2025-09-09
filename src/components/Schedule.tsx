@@ -9,7 +9,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { addToDate, getTzLabel, toLocalDateTimeStr } from '../util/misc';
+import { addToDate, getTzLabel, toLocalDateTimeStr, toLocalTimeStr } from '../util/misc';
 import { useAppContext } from '../contexts/AppContext';
 
 export const Schedule = () => {
@@ -36,31 +36,41 @@ export const Schedule = () => {
     'Friday',
     'Saturday',
   ];
+
+  const dayMapShort = [
+    'Sun',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+  ];
   
   const scheduleItems = [
     {
       'date': btcTime,
       'assetClass': 'Crypto',
       'symbol': 'BTCUSD',
-      'text': 'Bitcoin'
+      'name': 'Bitcoin'
     },
     {
       'date': tslaTime,
       'assetClass': 'Stocks',
       'symbol': 'TSLA',
-      'text': 'Tesla, Inc.'
+      'name': 'Tesla, Inc.'
     },
     {
       'date': ethTime,
       'assetClass': 'Crypto',
       'symbol': 'ETHUSD',
-      'text': 'Ethereum'
+      'name': 'Ethereum'
     },
     {
       'date': esTime,
       'assetClass': 'Futures',
       'symbol': 'ESU25',
-      'text': 'S&P 500 E-Mini Sep 2025'
+      'name': 'S&P 500 E-Mini Sep 2025'
     },
   ];
 
@@ -73,152 +83,234 @@ export const Schedule = () => {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     height: rowHeight,
+    // padding: 0,
     padding: '0px 16px'
   }
 
- return (
-  <Box>
-    <Box
-      sx={{
-        position: 'static',
-        width: '100%',
-        height: rowHeight,
-        backgroundColor: '#202020',
-        color: '#fff',
-        display: 'flex',
-        alignItems: 'center',
-        padding: '16px',
-        fontWeight: 'bold',
-        zIndex: 1,
-        borderBottom: '1px solid #444'
-      }}
-    >
-      <Typography
-        variant='h6'
-        component='span'
-        fontSize={fontSize}
-        fontWeight='bold'
-      >
-        {`Next`}
-      </Typography>
-      <Typography
-        variant='h6'
-        component='span'
-        fontSize={fontSize}
-      >
-        {"\u00A0"}{`(${getTzLabel(timezone)} time)`}
-      </Typography>
+  const containerRef = useRef<HTMLDivElement>(null);
 
-    </Box>
-     
-    <TableContainer
-      component={Paper}
-      sx={{
-        width: '100%',
-        marginBottom: 1,
-        overflowX: 'unset'
-      }}
+  const defaultCols = ['day', 'datetime', 'assetClass', 'symbol', 'name'];
+  const [columns, setColumns] = useState<string[]>(defaultCols);
+
+
+  useEffect(() => {
+    console.log(containerRef.current?.offsetWidth);
+    const width: number = containerRef.current?.offsetWidth ?? 0;
+    if (width <= 360) {
+      setColumns(['dayShort', 'time', 'symbol']);
+    }
+    else if (width <= 420) {
+      setColumns(['datetime', 'symbol']);
+    }
+    else if (width <= 580) {
+      setColumns(['dayShort', 'datetime', 'symbol']);
+    }
+    else if (width <= 620) {
+      setColumns(['dayShort', 'datetime', 'assetClass', 'symbol']);
+    }
+    else if (width <= 740) {
+      setColumns(['dayShort', 'datetime', 'assetClass', 'symbol', 'name']);
+    }
+  }, []);
+
+  return (
+    <Box
+      ref={containerRef}
     >
-      <Table
-        aria-label="LiveTape schedule"
+      <Box
         sx={{
-          tableLayout: 'fixed', 
-          ...cellStyles
+          position: 'static',
+          width: '100%',
+          height: rowHeight,
+          backgroundColor: '#202020',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '16px',
+          fontWeight: 'bold',
+          zIndex: 1,
+          borderBottom: '1px solid #444'
         }}
       >
-        <TableBody>
-          {scheduleItems.map((item) => {
-            return (
-              <TableRow
-                key={`${item.text}}`}
-                sx={{
-                  '&:last-child td, &:last-child th': { border: 0 }
-                }}
-              >
-                <TableCell
-                  align="left"
-                  sx={{
+        <Typography
+          variant='h6'
+          component='span'
+          fontSize={fontSize}
+          fontWeight='bold'
+        >
+          {`Next`}
+        </Typography>
+        <Typography
+          variant='h6'
+          component='span'
+          fontSize={fontSize}
+        >
+          {"\u00A0"}{`(${getTzLabel(timezone)} time)`}
+        </Typography>
 
-                    width: 120,
-                    ...cellStyles
+      </Box>
+      
+      <TableContainer
+        component={Paper}
+        sx={{
+          width: '100%',
+          marginBottom: 1,
+          overflow: 'hidden'
+        }}
+      >
+        <Table
+          aria-label="LiveTape schedule"
+          sx={{
+            ...cellStyles,
+            width: '100%',
+            tableLayout: 'fixed', 
+          }}
+        >
+          <TableBody>
+            {scheduleItems.map((item) => {
+              return (
+                <TableRow
+                  key={`${item.text}}`}
+                  sx={{
+                    '&:last-child td, &:last-child th': { border: 0 }
                   }}
                 >
-                  <Typography
-                    variant='h6'
-                    fontSize={fontSize}
-                  >
-                    {dayMap[item.date.getUTCDay()]}
-                  </Typography>
-                </TableCell>
-                <TableCell
-                  component="th"
-                  scope="row"
-                  sx={{
+                  {columns.includes('day') && (
+                    <TableCell
+                      align="left"
+                      sx={{
+                        ...cellStyles,
+                        paddingLeft: 2,
+                        minWidth: 56,
+                        width: 130,
+                      }}
+                    >
+                      <Typography
+                        variant='h6'
+                        fontSize={fontSize}
+                        overflow={'hidden'}
+                        textOverflow={'ellipsis'}
+                      >
+                        {dayMap[item.date.getUTCDay()]}
+                      </Typography>
+                    </TableCell>
+                  )}
+                  {columns.includes('dayShort') && (
+                    <TableCell
+                      align="left"
+                      sx={{
+                        ...cellStyles,
+                        paddingLeft: 2,
+                        width: 80,
+                      }}
+                    >
+                      <Typography
+                        variant='h6'
+                        fontSize={fontSize}
+                        overflow={'hidden'}
+                        textOverflow={'ellipsis'}
+                      >
+                        {dayMapShort[item.date.getUTCDay()]}
+                      </Typography>
+                    </TableCell>
+                  )}
+                  {columns.includes('datetime') && (
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      sx={{
+                        ...cellStyles,
+                        width: 220, 
+                      }}
+                    >
+                      <Typography
+                        variant='h6'
+                        fontSize={fontSize}
+                      >
+                        {toLocalDateTimeStr(item.date, timezone)}
+                      </Typography>
+                    </TableCell>
+                  )}
+                  {columns.includes('time') && (
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      sx={{
+                        ...cellStyles,
+                        width: 80, 
+                      }}
+                    >
+                      <Typography
+                        variant='h6'
+                        fontSize={fontSize}
+                      >
+                        {toLocalTimeStr(item.date, timezone)}
+                      </Typography>
+                    </TableCell>
+                  )}
+                  {columns.includes('assetClass') && (
+                    <TableCell
+                      align="left"
+                      sx={{
+                        ...cellStyles,
+                        width: 80,
+                      }}
+                    >
+                      <Typography
+                        variant='h6'
+                        fontSize={fontSize}
+                      >
+                        {`${item.assetClass}`}
+                      </Typography>
+                    </TableCell>
+                  )}
+                  {columns.includes('symbol') && (
+                    <TableCell
+                      align="left"
+                      sx={{
+                        ...cellStyles,
+                        width: 120,
+                      }}
+                    >
+                      <Typography
+                        variant='h6'
+                        fontSize={fontSize}
+                        overflow={'hidden'}
+                        textOverflow={'ellipsis'}
+                      >
+                        {`${item.symbol}`}
+                      </Typography>
+                    </TableCell>
+                  )}
+                  {columns.includes('name') && (
+                    <TableCell
+                      align="left"
+                      sx={{
+                        ...cellStyles,
+                        paddingRight: 2,
+                      }}
+                    >
+                      <Typography
+                        variant='h6'
+                        fontSize={fontSize}
+                        overflow={'hidden'}
+                        textOverflow={'ellipsis'}
+                      >
+                        {`${item.name}`}
+                      </Typography>
+                    </TableCell>
+                  )}
+                  
 
-                    width: 'auto', 
-                    ...cellStyles
-                  }}
-                >
-                  <Typography
-                    variant='h6'
-                    fontSize={fontSize}
-                  >
-                    {toLocalDateTimeStr(item.date, timezone)}
-                  </Typography>
-                </TableCell>
-                <TableCell
-                  align="left"
-                  sx={{
-                    width: 100,
-                    ...cellStyles
-                  }}
-                >
-                  <Typography
-                    variant='h6'
-                    fontSize={fontSize}
 
-                    // fontWeight='bold'
-                  >
-                    {`${item.assetClass}`}
-                  </Typography>
-                </TableCell>
-                <TableCell
-                  align="left"
-                  sx={{
-                    width: 100,
-                    ...cellStyles
-                  }}
-                >
-                  <Typography
-                    variant='h6'
-                    fontSize={fontSize}
-                  >
-                    {`${item.symbol}`}
-                  </Typography>
-                </TableCell>
-                <TableCell
-                  align="left"
-                  sx={{
-                    ...cellStyles
-                  }}
-                >
-                  <Typography
-                    variant='h6'
-                    fontSize={fontSize}
-                    overflow={'hidden'}
-                    textOverflow={'ellipsis'}
-                  >
-                    {`${item.text}`}
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            )
-          })}
+                </TableRow>
+              )
+            })}
 
-          
-        </TableBody>
-      </Table>
-    </TableContainer>
-  </Box>
- )
+            
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
+  )
 }

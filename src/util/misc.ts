@@ -1,6 +1,6 @@
-export const toLocalDateTimeStr = (timestamp: string | Date, timeZone = 'America/Los_Angeles') => {
+export const toLocalDateTimeStr = (timestamp: string | Date, timezone: string) => {
     const options = {
-        timeZone: timeZone,
+        timeZone: timezone,
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
@@ -21,10 +21,8 @@ export const toRfc3339Str = (date: Date) => {
   return date.toISOString().replace('.000', '');
 }
 
-export const toLocalTimeStr = (value: string) => {
-  // const timeZone = 'UTC';
-  const timeZone = 'America/Los_Angeles';
-  return (new Date(Number(value)).toLocaleTimeString('en-US', {timeZone: timeZone, timeStyle: 'short'}));
+export const toLocalTimeStr = (value: number, timezone: string) => {
+  return (new Date(Number(value)).toLocaleTimeString('en-US', {timeZone: timezone, timeStyle: 'short'}));
 }
 
 export const getTzLabel = (timezone: string) => timezone.split('/')[1].replace('_', ' ');
