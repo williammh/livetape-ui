@@ -54,7 +54,7 @@ const WebSocketDataHandler = ({ onMessage }: {onMessage: () => void }) => {
   return null;
 }
 
-const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxis) => {
+const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxis, timezone) => {
   console.log(message.type);
   console.log(message.data);
   console.log(rawBarDataRef.current.length);
@@ -96,7 +96,7 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
       }], false);
       
       rawBarDataRef.current = currentBars;          
-      restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis);
+      restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, timezone);
       break;
       
     case 'open_bar':
@@ -124,7 +124,7 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
         }], false);
         
         rawBarDataRef.current = currentBars;  
-        restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, false);
+        restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, timezone, false);
       } else {
 
         if (receivedBarIndex !== -1) {
@@ -136,7 +136,7 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
           }], false);
 
           rawBarDataRef.current = currentBars;
-          restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, false);
+          restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, timezone, false);
 
         } else {
           currentBars.push(openBar);
@@ -146,7 +146,7 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
           }], false);
 
           rawBarDataRef.current = currentBars;
-          restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, true);
+          restoreZoom(chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, timezone, true);
         }
           
       }
@@ -219,7 +219,7 @@ const calculateCleanYAxisRange = (min: number, max: number) => {
   };
 };
 
-const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, panRight=false) => {
+const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, timezone, panRight=false) => {
   
   // Force restore zoom state immediately
   if (currentXAxisRange) {
@@ -248,12 +248,12 @@ const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef,
               max: cleanXRange.max,
               tickAmount: cleanXRange.tickAmount,
               labels: {
-                formatter: toLocalTimeStr,
+                formatter: (val: number) => toLocalTimeStr(val, timezone),
                 style: { colors: '#fff', fontSize: '18' },
               },
               tooltip: {
                 enabled: true,
-                formatter: toLocalTimeStr,
+                formatter: (val: number) => toLocalTimeStr(val, timezone),
               },
               axisBorder: {
                 show: true,
@@ -345,7 +345,7 @@ const calculateYAxisRange = (chart, data) => {
 
 
 export const CandlestickChart = () => {
-  const { setAssetClass, symbol, setSymbol, replayDate, setReplayDate } = useAppContext();
+  const { setAssetClass, symbol, setSymbol, timezone, replayDate, setReplayDate } = useAppContext();
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [initialData, setInitialData] = useState([]); // New state for initial data
@@ -470,7 +470,7 @@ export const CandlestickChart = () => {
       }}
     >
       <WebSocketDataHandler
-        onMessage={(msg) => handleWebSocketMessage(msg, chartRef, rawBarDataRef, userZoomedXAxis)} 
+        onMessage={(msg) => handleWebSocketMessage(msg, chartRef, rawBarDataRef, userZoomedXAxis, timezone)} 
         symbol={symbol}
       />
       {isDataLoaded ? (
@@ -580,7 +580,8 @@ export const CandlestickChart = () => {
             xaxis: {
               type: 'datetime',
               labels: {
-                formatter: toLocalTimeStr,
+                formatter: (val) => (toLocalTimeStr(val, timezone)),
+                // formatter: toLocalTimeStr,
                 style: {
                   colors: '#fff',
                   fontSize: '18',
@@ -592,7 +593,8 @@ export const CandlestickChart = () => {
               },
               tooltip: {
                 enabled: true,
-                formatter: toLocalTimeStr,
+                formatter: (val) => (toLocalTimeStr(val, timezone)),
+                // formatter: toLocalTimeStr,
               }
             },
             yaxis: {

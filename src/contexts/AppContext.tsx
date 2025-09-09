@@ -103,7 +103,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
     // const [ assetClass, setAssetClass ] = useState<string>('Futures');
     const [ symbol, setSymbol ] = useState<string>('NVDA');
     const [ replayDate, setReplayDate ] = useState<string>('');
-    const [ timezone, setTimezone ] = useState<string>('America/Los_Angeles');
+    const [ timezone, setTimezone ] = useState<string>('America/New_York');
     
     // bar data websocket connection
     const openBarcallBackRef = useRef<((msg: any) => void) | null>(null);
