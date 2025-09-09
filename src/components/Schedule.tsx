@@ -97,13 +97,19 @@ export const Schedule = () => {
     console.log(containerRef.current?.offsetWidth);
     const width: number = containerRef.current?.offsetWidth ?? 0;
     if (width <= 360) {
+      setColumns(['dayShort', 'time', 'symbol']);
+    }
+    else if (width <= 420) {
       setColumns(['datetime', 'symbol']);
     }
-    else if (width <= 400) {
+    else if (width <= 580) {
       setColumns(['dayShort', 'datetime', 'symbol']);
     }
-    else if (width <= 700) {
-      setColumns(['day', 'datetime', 'assetClass', 'symbol']);
+    else if (width <= 620) {
+      setColumns(['dayShort', 'datetime', 'assetClass', 'symbol']);
+    }
+    else if (width <= 740) {
+      setColumns(['dayShort', 'datetime', 'assetClass', 'symbol', 'name']);
     }
   }, []);
 
@@ -231,7 +237,7 @@ export const Schedule = () => {
                       scope="row"
                       sx={{
                         ...cellStyles,
-                        width: 220, 
+                        width: 80, 
                       }}
                     >
                       <Typography
@@ -263,7 +269,7 @@ export const Schedule = () => {
                       align="left"
                       sx={{
                         ...cellStyles,
-                        width: 100,
+                        width: 120,
                       }}
                     >
                       <Typography
