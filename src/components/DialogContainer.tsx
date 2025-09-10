@@ -138,7 +138,7 @@ export const DialogContainer = () => {
                   verticalAlign: 'top'
                 }}
               >
-                Here's a replay of some old tape while we get back online.
+                We'll be back shortly. Here's a replay of some old tape.
               </Typography>
           </Box>
         </DialogContent>

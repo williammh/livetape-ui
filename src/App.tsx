@@ -106,9 +106,6 @@ const App = () => {
               </Grid>
               <Grid
                 size={1}
-                sx={{
-                  textAlign: 'right',
-                }}
               >
                 <ServerStatus />
               </Grid>

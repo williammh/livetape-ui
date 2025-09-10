@@ -130,6 +130,8 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
     const isServerOnlineRef = useRef<boolean>(false);
     
     useEffect(() => {
+
+      
       const pingIntervalSeconds = 5;
   
       // JS has no built in fetch with timeout
@@ -161,13 +163,17 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
           isServerOnlineRef.current = false;
         }
       };
+
+      setTimeout(async () => {
+        await getServerStatus();
+      }, 0);
       
-      const pingServer = setInterval(async () => {
+      const pingInterval = setInterval(async () => {
         await getServerStatus();
       }, pingIntervalSeconds * 1000);
   
       return () => {
-        clearInterval(pingServer);
+        clearInterval(pingInterval);
       };
   
     }, []);
