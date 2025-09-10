@@ -9,7 +9,7 @@ import {
     type SetStateAction
 } from 'react';
 // ?raw gets the text content
-// import Nvda2025_08_15 from '../assets/NVDA.bars.2025-08-15.csv?raw';
+import Nvda2025_08_15 from '../assets/NVDA.bars.2025-08-15.csv?raw';
 import Nvda2025_08_22 from '../assets/NVDA.bars.2025-08-22.csv?raw';
 
 // import nVda20250815positions from '../assets/NVDA.2025-08-15.positions.json';
@@ -124,7 +124,6 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
             const replayBars = parseCSV(Nvda2025_08_22);
 
             const replayOrders = Nvda2025_08_15Orders;
-
             let startDate = new Date(replayBars[0].timestamp);
             startDate = addToDate(startDate, { minutes: -1 });
 

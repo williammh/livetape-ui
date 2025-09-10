@@ -97,7 +97,7 @@ export const ProfitLoss = ({persona}) => {
           <TableBody>
             {rows.map((row) => (
               <TableRow
-                key={row.name}
+                key={persona + row.name}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell

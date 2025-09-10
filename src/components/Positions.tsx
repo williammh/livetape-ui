@@ -97,6 +97,7 @@ export const Positions = ({persona}) => {
         const pnl = pos.direction === 'Long' ? change * pos.quantity : Math.abs(change * pos.quantity);
         return (
           <TableContainer
+            key={pos.id + pos.account}
             component={Paper}
             sx={{
               width: '100%',

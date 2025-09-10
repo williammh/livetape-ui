@@ -162,6 +162,7 @@ export const MessageBox = () => {
     >
       {messageList.map((m, i) => (
         <Message
+          key={i + m.persona}
           persona={m.persona}
           text={m.text}
           timestamp={m.timestamp}
