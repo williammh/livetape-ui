@@ -32,17 +32,17 @@ export const DialogContainer = () => {
 
 
   useEffect(() => {
-    if (isServerOnlineRef.current === false && replayDate !== '') {
+    if (replayDate !== '' && isServerOnlineRef.current === false) {
       setMooOpen(true);
       setTimeout(() => {
         setMooOpen(false);
-      }, 10000);
+      }, 5000);
 
       setTimeout(() => {
         setGrizzOpen(true);
         setTimeout(() => {
           setGrizzOpen(false);
-        }, 10000);
+        }, 5000);
       }, 1000);
      
     }
