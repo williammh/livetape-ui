@@ -1,27 +1,23 @@
-import { useEffect, useState } from 'react';
 import { 
   Box,
-  Button,
-  Chip,
   Grid,
   Paper,
   Typography,
-  colors,
 } from '@mui/material'
 import { Account } from './components//Account';
 import { CandlestickChart } from './components/Chart';
 import { MessageBox } from './components/MessageBox';
-import { styled, type SxProps } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { StatusBar } from './components/StatusBar';
 import { toLocalDateTimeStr } from './util/misc';
-import { Cancel, CheckCircle } from '@mui/icons-material';
-import { useAppContext, serverAddress } from './contexts/AppContext';
+import { useAppContext } from './contexts/AppContext';
 import { addToDate } from './util/misc';
 import { ButtonBar } from './components/ButtonBar';
 import { Now } from './components/Now';
 import { Schedule } from './components/Schedule';
-
 import "./components/Shared.css";
+import { DialogContainer } from './components/DialogContainer';
+import { ServerStatus } from './components/ServerStatus';
 
 export const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -40,99 +36,18 @@ const App = () => {
   now.setHours(13);
   now.setMinutes(30);
   now.setSeconds(0);
-  
-  
+
   const tradeTslaTime = addToDate(now, {days: 1});
   const tradeTslaTimeStr = toLocalDateTimeStr(tradeTslaTime, timezone);
   
   const announcement = `Moo shoots for the moon and Grizz puts Elon on blast trading TSLA at ${tradeTslaTimeStr}`;
-
-  const [isServerOnline, setIsServerOnline] = useState<boolean>(false);
-
-  useEffect(() => {
-    const pingIntervalSeconds = 5;
-
-    const fetchTimeout = async (url: string, timeout: number) => {
-      const controller = new AbortController();
-      const id = setTimeout(() => {
-        controller.abort();
-      }, timeout * 1000);
-      try {
-        const response = await fetch(url, { signal: controller.signal });
-        return response;
-      } finally {
-        clearTimeout(id);
-      }
-    };
-    
-    const getServerStatus = async () => {
-      try {
-        const res = await fetchTimeout(`http://${serverAddress}/`, pingIntervalSeconds);
-        const resJson = await res.json();
-        if (resJson === true) {
-          setIsServerOnline(true);
-        } else {
-          setIsServerOnline(false);
-        }
-      } catch (error) {
-        console.log(error);
-        setIsServerOnline(false);
-      }
-    };
-    
-   
-    const pingServer = setInterval(async () => {
-      await getServerStatus();
-    }, pingIntervalSeconds * 1000);
-
-    return () => {
-      clearInterval(pingServer);
-    };
-
-  }, [isServerOnline]);
-
   
-  const chipProps: {
-    variant: string,
-    label: string,
-    icon: React.ReactNode,
-    color: string,
-    sx?: SxProps,
-
-  } = {
-    variant: 'outlined',
-    label: '',
-    icon: null,
-    color: '',
-    sx: {
-      fontSize: 18,
-    },
-  }
-  
-  if (isServerOnline) {
-    chipProps.label = 'Server'
-    chipProps.icon = <CheckCircle />
-    chipProps.color = "success"
-    chipProps.sx = {
-      ...chipProps.sx,
-      color: colors.green[400]
-    }
-  } else {
-    chipProps.label = 'Server'
-    chipProps.icon = <Cancel />
-    chipProps.color = colors.grey[600]
-    chipProps.sx = {
-      ...chipProps.sx,
-      color: colors.grey[600]
-    }
-  }
-
   const isPortraitMode = window.outerWidth < window.outerHeight;
   const isFixedWidthMode = false;
   // const isFixedWidthMode = true;
 
   console.log(`isPostraitMode: ${isPortraitMode}, ${window.outerWidth} * ${window.outerHeight}`);
-  
+
   return (
     <Box
       sx={{
@@ -140,6 +55,7 @@ const App = () => {
         height: isFixedWidthMode ? 1080: window.innerHeight,
       }}
     >
+      <DialogContainer />
       <Grid
         container
         direction={'column'}
@@ -193,9 +109,7 @@ const App = () => {
                   textAlign: 'right',
                 }}
               >
-                <Chip
-                  {...chipProps}
-                />
+                <ServerStatus />
               </Grid>
              
             </Grid>

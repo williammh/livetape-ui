@@ -1,15 +1,12 @@
-import { useEffect, useState, useRef, act } from 'react';
+import { useState } from 'react';
 import { 
   Box,
   Button,
-  Grid,
-  IconButton,
   TextField,
   Dialog,
   ButtonGroup,
   DialogTitle,
   DialogContent,
-  Paper,
   FormControl,
   InputLabel,
   MenuItem,
@@ -21,8 +18,6 @@ import {
   Email
 } from '@mui/icons-material';
 import { useAppContext } from '../contexts/AppContext';
-import { getTzLabel } from '../util/misc';
-
 
 export const ButtonBar = () => {
   const { timezone, setTimezone } = useAppContext();

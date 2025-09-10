@@ -403,7 +403,7 @@ const calculateYAxisRange = (chart, data) => {
 
 
 export const CandlestickChart = () => {
-  const { setAssetClass, symbol, setSymbol, timezone, replayDate, setReplayDate } = useAppContext();
+  const { setAssetClass, symbol, setSymbol, timezone, replayDate, setReplayDate, isServerOnlineRef } = useAppContext();
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [initialData, setInitialData] = useState([]); // New state for initial data
@@ -425,6 +425,7 @@ export const CandlestickChart = () => {
 
       const emptyRawBarData = Array(initialBars).fill().map((_, index) => {
         const timestamp = addToDate(startDateTime, {minutes: index});
+
         return {
           timestamp: toRfc3339Str(timestamp),
           barstatus: 'open',
@@ -438,7 +439,7 @@ export const CandlestickChart = () => {
 
       const emptyConvertedBars = Array(initialBars).fill().map((_, index) => ({
         x: addToDate(startDateTime, {minutes: index}),
-        y: [null, null, null, null]
+        y: [NaN, NaN, NaN, NaN]
       }));
       
       rawBarDataRef.current = emptyRawBarData;
@@ -466,6 +467,7 @@ export const CandlestickChart = () => {
     const offlineTimeout = setTimeout(() => {
     
       if (rawBarDataRef?.current.length === 0) {
+        console.log('REPLAY!', isServerOnlineRef.current);
         setAssetClass('Stocks');
         setSymbol('NVDA');
         setReplayDate('2025-08-22');
@@ -545,11 +547,7 @@ export const CandlestickChart = () => {
                       const yRange = calculateYAxisRange(chart, convertedData);
                       if (yRange.min !== undefined && yRange.max !== undefined) {
                         
-                        // console.log("GGGGXXX");
-                        // console.log(new Date(xaxis.min));
-                        // console.log(new Date(xaxis.max));
-                        // console.log(xaxis);;
-
+            
                         const cleanXRange = calculateCleanXAxisRange(xaxis.min, xaxis.max);
                         const cleanYRange = calculateCleanYAxisRange(yRange.min, yRange.max);
 
@@ -593,16 +591,14 @@ export const CandlestickChart = () => {
                   }
                 },
                 beforeZoom: (chart, { xaxis }) => {
-                  // console.log(`before ZOOM? ${xaxis}`);
                   const firstTime = convertBars([rawBarDataRef.current[0]])[0].x.getTime();     
                   const newMin = new Date(xaxis.min).getTime();
   
                   if (newMin == firstTime) {
-                    // console.log("UNZOOMED");
                     userZoomedYAxis.current = false;
                     userZoomedXAxis.current = false; 
                   } else {
-                    // console.log(firstTime, newMin, "ZOOMED");
+
                     userZoomedYAxis.current = true;
                     userZoomedXAxis.current = true; 
                   }
@@ -630,8 +626,8 @@ export const CandlestickChart = () => {
               theme: 'dark',
               custom: ({ seriesIndex, dataPointIndex, w }) => {
                 const [o, h, l, c] = w.globals.initialSeries[seriesIndex].data[dataPointIndex].y;
-                
-              
+                  
+                // console.log(w.globals.initialSeries[seriesIndex].data[dataPointIndex]);
                 return `
                   <div style="padding:5px; text-align: right;">
                     Open: ${o.toFixed(2)}<br/>

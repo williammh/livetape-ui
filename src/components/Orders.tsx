@@ -121,7 +121,6 @@ export const Orders = ({persona}) => {
             rows={orderList}
             columns={columns}
             hideFooter={true}
-            rowCount={0}
             rowHeight={56}
             scrollbarSize={0}
             sx={{

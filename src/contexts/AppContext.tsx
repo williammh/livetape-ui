@@ -43,6 +43,7 @@ export interface IOrder {
 }
 
 interface IAppContext {
+    isServerOnlineRef: RefObject<boolean>;
     assetClass: 'Stocks' | 'Crypto' | 'Futures';
     setAssetClass: Dispatch<SetStateAction<string>>;
     symbol: string;
@@ -97,8 +98,16 @@ export const symbolMap = {
     },
   }
 
+const replayDateMap = {
+    'NVDA': {
+        '2025-08-15': Nvda2025_08_15,
+        '2025-08-22': Nvda2025_08_22,
+    }
+}
 
 export const AppProvider = ({children}: {children: React.ReactNode}) => {
+
+    
     // app settings
     const [ assetClass, setAssetClass ] = useState<'Stocks' | 'Crypto' | 'Futures'>('Stocks');
     // const [ assetClass, setAssetClass ] = useState<string>('Futures');
@@ -118,12 +127,60 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
     const timestampRef = useRef<string>('');
     const priceRef = useRef<number>(NaN);
 
+    const isServerOnlineRef = useRef<boolean>(false);
+    
+    useEffect(() => {
+      const pingIntervalSeconds = 5;
+  
+      // JS has no built in fetch with timeout
+      const fetchTimeout = async (url: string, timeout: number) => {
+        const controller = new AbortController();
+        const id = setTimeout(() => {
+          controller.abort();
+        }, timeout * 1000);
+        try {
+          const response = await fetch(url, { signal: controller.signal });
+          return response;
+        } finally {
+          clearTimeout(id);
+        }
+      };
+      
+      const getServerStatus = async () => {
+        try {
+          const res = await fetchTimeout(`http://${serverAddress}/`, pingIntervalSeconds);
+          const resJson = await res.json();
+        
+          if (resJson === true) {
+              isServerOnlineRef.current = true;
+          } else {
+              isServerOnlineRef.current = false;
+          }
+        } catch (error) {
+          console.log(error);
+          isServerOnlineRef.current = false;
+        }
+      };
+      
+      const pingServer = setInterval(async () => {
+        await getServerStatus();
+      }, pingIntervalSeconds * 1000);
+  
+      return () => {
+        clearInterval(pingServer);
+      };
+  
+    }, []);
+    
+
     useEffect(() => {
         if (replayDate) {
-            // const replayBars = parseCSV(Nvda2025_08_15);
-            const replayBars = parseCSV(Nvda2025_08_22);
+            
+            const replayBars = parseCSV(replayDateMap[symbol][replayDate]);
 
             const replayOrders = Nvda2025_08_15Orders;
+
+
             let startDate = new Date(replayBars[0].timestamp);
             startDate = addToDate(startDate, { minutes: -1 });
 
@@ -251,6 +308,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
                 positionsRef,
                 priceRef,
                 timestampRef,
+                isServerOnlineRef,
             }}
         >
             {children}

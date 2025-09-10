@@ -67,8 +67,9 @@ export const addToDate = (
 }
 
 export const parseCSV = (csvText: string) => {
-  const lines = csvText.trim().split('\r');
+  const lines = csvText.split(/\r\n|\r|\n/);
   const headers = lines.shift()?.split(',') ?? [];
+  
   return lines.map(line => {
       const values = line.split(',');
 
