@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import { serverAddress, useAppContext } from '../contexts/AppContext';
-import { toLocalTimeStr, addToDate, toRfc3339Str } from '../util/misc';
+import { toLocalTimeStr, addToDate, toRfc3339Str, isDST } from '../util/misc';
 
 interface IBar {
   open: number;
@@ -155,31 +155,70 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
   }
 };
 
+const ONE_MIN_MS = 1 * 60 * 1000;
+const FIVE_MIN_MS = 5 * 60 * 1000;
+const TEN_MIN_MS = 10 * 60 * 1000;
+
 const THIRTY_MIN_MS = 30 * 60 * 1000;
 
-const calculateCleanXAxisRange = (min: number, max: number, firstBarTime: number, lastBarTime: number) => {
-  if (min === undefined || max === undefined || lastBarTime === undefined) {
+const calculateCleanXAxisRange = (min: number, max: number, firstBarTime?: number, lastBarTime?: number) => {
+  if (min === undefined || max === undefined) {
     return null;
   }
   
   const roundDownTo30Min = (time: number) => Math.floor(time / THIRTY_MIN_MS) * THIRTY_MIN_MS;
   const roundUpTo30Min = (time: number) => Math.ceil(time / THIRTY_MIN_MS) * THIRTY_MIN_MS;
+  const roundUpTo10Min = (time: number) => Math.ceil(time / TEN_MIN_MS) * TEN_MIN_MS;
+  const roundUpTo5Min = (time: number) => Math.ceil(time / FIVE_MIN_MS) * FIVE_MIN_MS;
+  const roundUpTo1Min = (time: number) => Math.ceil(time / ONE_MIN_MS) * ONE_MIN_MS;
+
+
+
+  if (firstBarTime && lastBarTime && lastBarTime - firstBarTime < FIVE_MIN_MS) {
+    const cleanMin = min;
+    const cleanMax = roundUpTo10Min(firstBarTime);
+    const tickAmount = undefined;
+    const stepSize = 60000;
+    return { min: cleanMin, max: cleanMax, tickAmount, stepSize };
+
+  } else {
+
+  }
 
   const roundedMin = roundDownTo30Min(min);
-  const cleanMin = Math.max(roundedMin, firstBarTime);
+  const cleanMin = Math.max(roundedMin, firstBarTime ?? min);
+  const next5Min = roundUpTo5Min(lastBarTime ?? max);
+  const maxTopOfMinute = roundUpTo1Min(max);
+  const cleanMax = Math.min(maxTopOfMinute, next5Min);
+  const visibleMinuteBars = Math.ceil((cleanMax - min) / 60 / 1000);
+  const maxTicks = Math.min(visibleMinuteBars, 12);
+  const minTicks = 6;
+  const tickAmount = Math.min(visibleMinuteBars, maxTicks);
+  // const tickAmount = visibleMinuteBars < minTicks ? visibleMinuteBars : maxTicks;
+  // const tickAmount = Math.max(visibleMinuteBars, minTicks);
+
+  // console.log(new Date(firstBarTime));
+  // console.log(new Date(lastBarTime));
+
 
   
-  // Only extend max if current max < lastBarTime
-  const cleanMax = max < lastBarTime
-  ? roundUpTo30Min(lastBarTime)
-  : roundUpTo30Min(max);
+  // console.log('min', 'max');
+  // console.log(new Date(min));
+  // console.log(new Date(max));
+
+  // console.log('calcCleanXRange');
+  // console.log(new Date(cleanMin));
+  // console.log(new Date(cleanMax));
+  // console.log('tickAmount', tickAmount);
   
-  // const tickAmount = Math.floor((cleanMax - cleanMin) / THIRTY_MIN_MS);
-  const tickAmount = 8;
+  // console.log('visibleMinuteBars',visibleMinuteBars);
 
-  // const tickAmount = THIRTY_MIN_MS;
+  const stepSizeMin = Math.ceil((visibleMinuteBars + 1) / tickAmount);
+  // console.log("stepSizeMin", stepSizeMin);
+  const stepSize = stepSizeMin * 60 * 1000;
+  // console.log("stepSize", stepSize);
 
-  return { min: cleanMin, max: cleanMax, tickAmount };
+  return { min: cleanMin, max: cleanMax, tickAmount, stepSize };
 };
 
 // Function to determine appropriate tick interval based on price range
@@ -219,16 +258,27 @@ const calculateCleanYAxisRange = (min: number, max: number) => {
   };
 };
 
-const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef, userZoomedXAxis, timezone, panRight=false) => {
+const restoreZoom = (chart, currentXRange, currentYRange, rawBarDataRef, userZoomedXAxis, timezone, panRight=false) => {
   
-  // Force restore zoom state immediately
-  if (currentXAxisRange) {
+  if (currentXRange) {
     try {
+
+      const firstBarTime = new Date(rawBarDataRef.current[0].timestamp).getTime();
+      // const lastBarTime = new Date(rawBarDataRef.current[rawBarDataRef.current.length - 1].timestamp).getTime();
+
+      const idx = rawBarDataRef.current.findIndex((bar) => {
+        return Number.isNaN(bar.open);
+      })
+      const lastBarIdx = idx !== -1 ? idx : rawBarDataRef.current.length - 1;
+
+      const lastBarTime = new Date(rawBarDataRef.current[lastBarIdx].timestamp).getTime();
+      const cleanXRange = calculateCleanXAxisRange(currentXRange.min, currentXRange.max, firstBarTime, lastBarTime);
+
       if (panRight) {
         // +60000 epoch time moves X axis range 1 minute forward
-        chart.zoomX(currentXAxisRange.min + 60000, currentXAxisRange.max + 60000);
+        chart.zoomX(cleanXRange.min + 60000, cleanXRange.max + 60000);
       } else {
-        chart.zoomX(currentXAxisRange.min, currentXAxisRange.max);
+        chart.zoomX(cleanXRange.min, cleanXRange.max);
       }
     } catch (error) {
       console.warn('Failed to restore X-axis zoom:', error);
@@ -237,16 +287,25 @@ const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef,
     try {
       if (!userZoomedXAxis.current) {
         const firstBarTime = new Date(rawBarDataRef.current[0].timestamp).getTime();
-        const lastBarTime = new Date(rawBarDataRef.current[rawBarDataRef.current.length - 1].timestamp).getTime();
-       
-        const cleanXRange = calculateCleanXAxisRange(currentXAxisRange.min, currentXAxisRange.max, firstBarTime, lastBarTime);
+        // const lastBarTime = new Date(rawBarDataRef.current[rawBarDataRef.current.length - 1].timestamp).getTime();
         
+        const idx = rawBarDataRef.current.findIndex((bar) => {
+          return Number.isNaN(bar.open);
+        })
+
+        const lastBarIdx = idx !== -1 ? idx : rawBarDataRef.current.length - 1;
+       
+        const lastBarTime = new Date(rawBarDataRef.current[lastBarIdx].timestamp).getTime();
+
+        const cleanXRange = calculateCleanXAxisRange(currentXRange.min, currentXRange.max, firstBarTime, lastBarTime);
+       
         if (cleanXRange) {
           chart.updateOptions({
             xaxis: {
               min: cleanXRange.min,
               max: cleanXRange.max,
               tickAmount: cleanXRange.tickAmount,
+              // stepSize: cleanXRange.stepSize,
               labels: {
                 formatter: (val: number) => toLocalTimeStr(val, timezone),
                 style: { colors: '#fff', fontSize: '18' },
@@ -259,8 +318,7 @@ const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef,
                 show: true,
                 color: '#fff',
               },
-              // nicely space ticks every 30 mins
-              tickPlacement: 'between',
+              tickPlacement: 'on',
             },
           }, false, false);
         }
@@ -271,9 +329,9 @@ const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef,
   }
 
   // Restore Y-axis range if it was manually set
-  if (currentYAxisRange && currentYAxisRange.min !== undefined && currentYAxisRange.max !== undefined && userZoomedXAxis.current) {
+  if (currentYRange && currentYRange.min !== undefined && currentYRange.max !== undefined && userZoomedXAxis.current) {
     try {
-      const cleanYRange = calculateCleanYAxisRange(currentYAxisRange.min, currentYAxisRange.max);
+      const cleanYRange = calculateCleanYAxisRange(currentYRange.min, currentYRange.max);
       chart.updateOptions({
         yaxis: {
           min: cleanYRange.min,
@@ -284,7 +342,7 @@ const restoreZoom = (chart, currentXAxisRange, currentYAxisRange, rawBarDataRef,
               colors: '#fff',
               fontSize: '18'
             },
-            formatter: (val) => Math.round(val).toFixed(2)
+            formatter: (val) => val.toFixed(2)
           },
           tooltip: {
             enabled: true,
@@ -357,7 +415,11 @@ export const CandlestickChart = () => {
 
   useEffect(() => {
     if (replayDate) {
-      const startDateTime = new Date("2025-08-15T13:31:00Z");
+      const startDateTime = new Date(replayDate);
+
+      startDateTime.setUTCHours(isDST(startDateTime) ? 13 : 14);
+      startDateTime.setUTCMinutes(31);
+      startDateTime.setUTCSeconds(0);
 
       const initialBars = 12;
 
@@ -380,7 +442,6 @@ export const CandlestickChart = () => {
       }));
       
       rawBarDataRef.current = emptyRawBarData;
-
       setInitialData(emptyConvertedBars);
       setIsDataLoaded(true);
 
@@ -405,35 +466,9 @@ export const CandlestickChart = () => {
     const offlineTimeout = setTimeout(() => {
     
       if (rawBarDataRef?.current.length === 0) {
-
         setAssetClass('Stocks');
         setSymbol('NVDA');
-        setReplayDate('2025-08-15');
-   
-        const startDateTime = new Date("2025-08-15T13:31:00Z");
-
-        const emptyRawBarData = Array(390).fill().map((_, index) => {
-          const timestamp = addToDate(startDateTime, {minutes: index});
-          return {
-            timestamp: toRfc3339Str(timestamp),
-            barstatus: 'open',
-            open: null,
-            high: null,
-            low: null,
-            close: null,
-            totalvolume: 0
-          }
-        });
-
-        const emptyConvertedBars = Array(390).fill().map((_, index) => ({
-          x: addToDate(startDateTime, {minutes: index}),
-          y: [null, null, null, null]
-        }));
-        
-        rawBarDataRef.current = emptyRawBarData;
-        setInitialData(emptyConvertedBars);
-        setIsDataLoaded(true);
-
+        setReplayDate('2025-08-22');
       }
     }, secondsToStartRerun * 1000);
 
@@ -509,9 +544,36 @@ export const CandlestickChart = () => {
                       const convertedData = convertBars(rawBarDataRef.current);
                       const yRange = calculateYAxisRange(chart, convertedData);
                       if (yRange.min !== undefined && yRange.max !== undefined) {
+                        
+                        // console.log("GGGGXXX");
+                        // console.log(new Date(xaxis.min));
+                        // console.log(new Date(xaxis.max));
+                        // console.log(xaxis);;
+
+                        const cleanXRange = calculateCleanXAxisRange(xaxis.min, xaxis.max);
                         const cleanYRange = calculateCleanYAxisRange(yRange.min, yRange.max);
 
+
                         chart.updateOptions({
+                          xaxis: {
+                            min: cleanXRange.min,
+                            max: cleanXRange.max,
+                            tickAmount: cleanXRange.tickAmount,
+                            // stepSize: cleanXRange.stepSize,
+                            labels: {
+                              formatter: (val: number) => toLocalTimeStr(val, timezone),
+                              style: { colors: '#fff', fontSize: '18' },
+                            },
+                            tooltip: {
+                              enabled: true,
+                              formatter: (val: number) => toLocalTimeStr(val, timezone),
+                            },
+                            axisBorder: {
+                              show: true,
+                              color: '#fff',
+                            },
+                            tickPlacement: 'on',
+                          },
                           yaxis: {
                             min: cleanYRange.min,
                             max: cleanYRange.max,
@@ -521,7 +583,7 @@ export const CandlestickChart = () => {
                                 colors: '#fff',
                                 fontSize: '18',
                               },
-                              formatter: (val) => Math.round(val).toFixed(2)
+                              formatter: (val) => (val).toFixed(2)
                             },
                             tooltip: { enabled: true },
                           }
@@ -558,9 +620,12 @@ export const CandlestickChart = () => {
                 colors: {
                   upward: colors.green[400],
                   downward: colors.red[400]
-                }
+                },
               }
             },
+            // stroke: {
+            //   width: 2
+            // },
             tooltip: {
               theme: 'dark',
               custom: ({ seriesIndex, dataPointIndex, w }) => {
@@ -569,10 +634,10 @@ export const CandlestickChart = () => {
               
                 return `
                   <div style="padding:5px; text-align: right;">
-                    open: ${o.toFixed(2)}<br/>
-                    high: ${h.toFixed(2)}<br/>
-                    low: ${l.toFixed(2)}<br/>
-                    close: ${c.toFixed(2)}
+                    Open: ${o.toFixed(2)}<br/>
+                    High: ${h.toFixed(2)}<br/>
+                    Low: ${l.toFixed(2)}<br/>
+                    Close: ${c.toFixed(2)}
                   </div>
                 `;
               }
@@ -581,12 +646,14 @@ export const CandlestickChart = () => {
               type: 'datetime',
               labels: {
                 formatter: (val) => (toLocalTimeStr(val, timezone)),
-                // formatter: toLocalTimeStr,
                 style: {
                   colors: '#fff',
                   fontSize: '18',
                 },
+                
               },
+              // stepSize: 60000,
+              tickPlacement: 'on',
               axisBorder: {
                 show: true,
                 color: '#fff'
@@ -594,7 +661,6 @@ export const CandlestickChart = () => {
               tooltip: {
                 enabled: true,
                 formatter: (val) => (toLocalTimeStr(val, timezone)),
-                // formatter: toLocalTimeStr,
               }
             },
             yaxis: {
@@ -603,7 +669,7 @@ export const CandlestickChart = () => {
                   colors: '#fff',
                   fontSize: '18',
                 },
-                formatter: (val) => Math.round(val).toFixed(2)
+                formatter: (val) => val.toFixed(2)
               },
               tooltip: { enabled: true },
             },

@@ -67,7 +67,7 @@ export const addToDate = (
 }
 
 export const parseCSV = (csvText: string) => {
-  const lines = csvText.trim().split('\n');
+  const lines = csvText.trim().split('\r');
   const headers = lines.shift()?.split(',') ?? [];
   return lines.map(line => {
       const values = line.split(',');
@@ -82,7 +82,50 @@ export const parseCSV = (csvText: string) => {
       values[3] = parseFloat(values[3]);
       // totalvolume
       values[4] = parseInt(values[4]);
+       // timestamp
+      values[5] = values[5];
 
-      return Object.fromEntries(headers.map((h, i) => [h, values[i]]));
+      const result = Object.fromEntries(headers.map((h, i) => [h, values[i]]));
+      return result;
   });
+}
+
+const getSundaysInMonth = (date: Date) => {
+  const sundays = [];
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const dayPointer = new Date(year, month, 1);
+
+  while (dayPointer.getMonth() === month) {
+    if (dayPointer.getDay() === 0) {
+      sundays.push(dayPointer.getDate());
+    }
+    dayPointer.setDate(dayPointer.getDate() + 1);
+  }
+
+  return sundays;
+}
+
+export const isDST = (date = new Date()) => {
+  const localDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+  const month = localDate.getMonth() + 1;
+  const day = localDate.getDate();
+  const sundays = getSundaysInMonth(localDate);
+
+  const dstMap: {[key: number]: boolean} = {
+    1: false,
+    2: false,
+    3: day >= sundays[1],
+    4: true,
+    5: true,
+    6: true,
+    7: true,
+    8: true,
+    9: true,
+    10: true,
+    11: day < sundays[0],
+    12: false
+  };
+
+  return dstMap[month];
 }
