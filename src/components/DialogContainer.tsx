@@ -36,13 +36,13 @@ export const DialogContainer = () => {
       setMooOpen(true);
       setTimeout(() => {
         setMooOpen(false);
-      }, 3000);
+      }, 10000);
 
       setTimeout(() => {
         setGrizzOpen(true);
         setTimeout(() => {
           setGrizzOpen(false);
-        }, 3000);
+        }, 10000);
       }, 1000);
      
     }
@@ -50,7 +50,7 @@ export const DialogContainer = () => {
 
   const dialogStyles = {
     height: 56,
-    width: 600
+    width: 720
   }
 
   return (
@@ -92,7 +92,7 @@ export const DialogContainer = () => {
                   verticalAlign: 'top'
                 }}
               >
-                Servers undergoing maintenance. We'll be back shortly.
+                Our servers are undergoing maintenance. Thanks for your patience.
               </Typography>
           </Box>
         </DialogContent>
@@ -138,7 +138,7 @@ export const DialogContainer = () => {
                   verticalAlign: 'top'
                 }}
               >
-                Here's a replay in the meantime.
+                Here's a replay of some old tape while we get back online.
               </Typography>
           </Box>
         </DialogContent>

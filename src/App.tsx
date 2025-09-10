@@ -53,6 +53,7 @@ const App = () => {
       sx={{
         width: isFixedWidthMode ? 1920 : window.innerWidth,
         height: isFixedWidthMode ? 1080: window.innerHeight,
+        overflow: 'hidden'
       }}
     >
       <DialogContainer />
