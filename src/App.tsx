@@ -5,7 +5,7 @@ import {
   Typography,
 } from '@mui/material'
 import { Account } from './components//Account';
-import { CandlestickChart } from './components/Chart';
+import { CandlestickChart } from './components/CandleStickChart';
 import { MessageBox } from './components/MessageBox';
 import { styled } from '@mui/material/styles';
 import { StatusBar } from './components/StatusBar';

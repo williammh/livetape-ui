@@ -4,7 +4,7 @@ import {
 import { textAlignRight, orderStatusMap, toLocalDateTimeStr } from '../util/misc';
 import { DataGrid } from '@mui/x-data-grid';
 import { useAppContext, type IOrder } from '../contexts/AppContext';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 
 export const Orders = ({persona}) => {
@@ -62,7 +62,6 @@ export const Orders = ({persona}) => {
       minWidth: 80
     }
   ];
-
 
   useEffect(() => {
     let prevOrders: IOrder[] = [];
@@ -147,7 +146,6 @@ export const Orders = ({persona}) => {
           />
         </Box>
       </Box>
-
 
   );
 }

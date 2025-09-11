@@ -29,7 +29,7 @@ export const ServerStatus = () => {
         height: 40,
         width: 'fit-content',
         padding: '0px 8px',
-        border: `1px solid ${isOnline ? colors.green[400] : colors.grey[600]}`,
+        border: `1px solid ${isOnline ? colors.green[400] : colors.grey[700]}`,
         borderRadius: 1,
         display: 'flex',
         alignItems: 'center',
@@ -43,7 +43,7 @@ export const ServerStatus = () => {
         height='40px'
         lineHeight={'40px'}
         display={'inline-block'}
-        color={isOnline ? colors.green[400] : colors.grey[600]}
+        color={isOnline ? colors.green[400] : colors.grey[700]}
       >
         Server
       </Typography>
@@ -56,7 +56,7 @@ export const ServerStatus = () => {
       ) : (
         <Cancel
            sx={{
-            color: colors.grey[600],
+            color: colors.grey[700],
           }}
         />
       )}

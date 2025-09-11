@@ -9,11 +9,20 @@ import {
     type SetStateAction
 } from 'react';
 // ?raw gets the text content
-import Nvda2025_08_15 from '../assets/NVDA.bars.2025-08-15.csv?raw';
-import Nvda2025_08_22 from '../assets/NVDA.bars.2025-08-22.csv?raw';
+import barsNvda_2025_08_15 from '../assets/NVDA.bars.2025-08-15.csv?raw';
+import barsNvda_2025_08_22 from '../assets/NVDA.bars.2025-08-22.csv?raw';
 
-// import nVda20250815positions from '../assets/NVDA.2025-08-15.positions.json';
-import Nvda2025_08_15Orders from '../assets/NVDA.2025-08-15.orders.json';
+import ordersNvda_2025_08_15 from '../assets/NVDA.2025-08-15.orders.json';
+import ordersNvda_2025_08_22 from '../assets/NVDA.2025-08-22.orders.json';
+
+import commentsNvda_2025_08_15 from '../assets/NVDA.2025-08-15.comments.json';
+import commentsNvda_2025_08_22 from '../assets/NVDA.2025-08-22.comments.json';
+
+import positionsNvda_2025_08_15 from '../assets/NVDA.2025-08-15.positions.json';
+import positionsNvda_2025_08_22 from '../assets/NVDA.2025-08-22.positions.json';
+
+
+
 
 import { parseCSV, addToDate, toRfc3339Str } from '../util/misc';
 
@@ -27,7 +36,6 @@ export interface IPosition {
   openTimestamp: string;
   closeTimestamp?: string;
   pnl?: number | string;
-
 }
 
 export interface IOrder {
@@ -98,10 +106,31 @@ export const symbolMap = {
     },
   }
 
-const replayDateMap = {
+const replayBarsDateMap = {
   'NVDA': {
-    '2025-08-15': Nvda2025_08_15,
-    '2025-08-22': Nvda2025_08_22,
+    '2025-08-15': barsNvda_2025_08_15,
+    '2025-08-22': barsNvda_2025_08_22,
+  }
+}
+
+const replayOrdersDateMap = {
+  'NVDA': {
+    '2025-08-15': ordersNvda_2025_08_15,
+    '2025-08-22': ordersNvda_2025_08_22,
+  }
+}
+
+export const replayCommentsDateMap = {
+  'NVDA': {
+    '2025-08-15': commentsNvda_2025_08_15,
+    '2025-08-22': commentsNvda_2025_08_22,
+  }
+}
+
+export const replayPositionsDateMap = {
+  'NVDA': {
+    '2025-08-15': positionsNvda_2025_08_15,
+    '2025-08-22': positionsNvda_2025_08_22,
   }
 }
 
@@ -179,9 +208,10 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
   useEffect(() => {
       if (replayDate) {
           
-          const replayBars = parseCSV(replayDateMap[symbol][replayDate]);
+          const replayBars = parseCSV(replayBarsDateMap[symbol][replayDate]);
+          const replayOrders = replayOrdersDateMap[symbol][replayDate];
+          const replayPositions = replayPositionsDateMap[symbol][replayDate];
 
-          const replayOrders = Nvda2025_08_15Orders;
 
 
           let startDate = new Date(replayBars[0].timestamp);
@@ -216,6 +246,34 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
                       ordersRef.current[order.account][order.id] = order;
                   }
               }
+
+              // replay positions      
+              for (let pos of replayPositions) {
+                if (
+                  (timestampRef.current >= pos.openTimestamp) &&
+                  (timestampRef.current < pos.closeTimestamp)
+                ) {
+                  if (!(pos.account in positionsRef.current)) {
+                    positionsRef.current[pos.account] = {};
+                  }
+                  const openedPosition: IPosition = { 
+                    id: pos.id,
+                    account: pos.account,
+                    direction: pos.direction,
+                    quantity: pos.quantity,
+                    symbol: pos.symbol,
+                    averagePrice: parseFloat(pos.averagePrice),
+                    openTimestamp: pos.openTimestamp,
+                    closeTimestamp: pos.closeTimestamp,
+                  }
+                  positionsRef.current[pos.account][pos.id] = openedPosition;
+                } else if (timestampRef.current > pos.closeTimestamp && pos.id in positionsRef.current[pos.account]) {
+                  const openPositions = {...positionsRef.current[pos.account]};
+                  Reflect.deleteProperty(openPositions, pos.id);
+                  positionsRef.current[pos.account] = openPositions;
+                }
+              }
+
 
               replayBarCloseTimestamp = replayBars[idx].timestamp;
               idx++;

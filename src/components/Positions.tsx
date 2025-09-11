@@ -10,7 +10,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { useAppContext, type IPosition } from '../contexts/AppContext';
+import { useAppContext, replayPositionsDateMap, type IPosition } from '../contexts/AppContext';
 import nVda20250815positions from '../assets/NVDA.2025-08-15.positions.json';
 
 export const Positions = ({persona}) => {
@@ -25,51 +25,30 @@ export const Positions = ({persona}) => {
   const [openPositions, setOpenPositions] = useState<object>({});
 
   useEffect(() => {
-    const updateInterval = setInterval(() => {
+
+    const updatePositionsInterval = setInterval(() => {
+
       if (priceRef.current !== undefined) {
         setPrice(priceRef.current);
       }
-     
-      if (replayDate) {
 
-        for (let pos in openPositions) {
-          if (timestampRef.current >= openPositions[pos].closeTimestamp) {
-            console.log(`${persona} closing position: ${pos}`);
-            const nextArray = Object.entries(openPositions).filter(([key]) => {
-              return key !== pos;
-            });
-            const nextObj = Object.fromEntries(nextArray);
-            positionsRef.current[persona] = nextObj;
-            setOpenPositions(nextObj);
-          }
-        }
+      if (persona in positionsRef.current) {
+        // TODO: only update if changed
+        //   const changed = newOrders.length !== prevOrders.length ||
+        //     newOrders.some((o, i) => o.id !== prevOrders[i]?.id || o.status !== prevOrders[i]?.status);
 
-        for (let pos of nVda20250815positions) {
-          if (
-            (timestampRef.current >= pos.openTimestamp) &&
-            (timestampRef.current < pos.closeTimestamp) &&
-            (pos.account === persona) &&
-            !(pos.id in openPositions)
-          ) {
-            console.log(`${persona} opening position: ${pos.id}`);
-            setOpenPositions((prev) => {
-              const next: {[id: string]: IPosition} = {...prev};
-              next[pos.id] = pos;
-              positionsRef.current[persona] = next;
-              return next;
-              
-            })
-          }
-        }
+        setOpenPositions(positionsRef.current[persona]);
+      } else if (!(persona in positionsRef.current)) {
+        setOpenPositions({});
       }
-
+   
     }, 1000);
 
     return () => {
-      clearInterval(updateInterval);
+      clearInterval(updatePositionsInterval);
     };
 
-  }, [replayDate, openPositions]);
+  }, [positionsRef]);
 
   const positionsList = Object.values(openPositions);
 

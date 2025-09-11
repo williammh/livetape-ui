@@ -7,46 +7,11 @@ import {
   Box,
  } from '@mui/material';
 import { Message, type IMessageProps } from './Message';
-import { useAppContext } from '../contexts/AppContext';
-import nVda20250815comments from '../assets/NVDA.2025-08-15.comments.json';
-
+import { useAppContext, replayCommentsDateMap } from '../contexts/AppContext';
 
 export const MessageBox = () => {
  
-  const placeholderMessages = [
-    {
-      persona: 'moo',
-      text: `
-        We paper trade but on live data when it's still possible to be wrong.
-        That's more risk than those who only post their takes after it's already safe.
-        The market move was confirmed but their trades are not.
-      `
-    },
-    {
-      persona: 'grizz',
-      text: `
-        We're not trading real money? Ohh, you caught us, genius. Yeah, we’re just a couple of robots running a show, not managing your grandma's 401(k).
-        If you want a money manager, go find one. If you want to know what we’re up to next — throw in your email. Or don’t.
-      `
-    },
-    {
-      persona: 'moo',
-      text: `
-        What Grizz is trying to say is if you want occasional reminders when we’re live,
-        toss in your email. We’ll never sell it, never spam, and we certainly won't ever send you an end of day market recap
-        with our best moves.
-      `
-    },
-    {
-      persona: 'grizz',
-      text: `
-        If you really enjoy what we do, we also offer a paid service with real-time market data and more.
-        It helps keep our servers alive — built and run by a sole developer with way too much caffeine.
-      `
-    },
-  ]
-
-  const { replayDate, timestampRef, messageListRef, positionsRef } = useAppContext();
+  const { symbol, replayDate, timestampRef, messageListRef, positionsRef } = useAppContext();
   const [ messageList, setMessageList] = useState<IMessageProps[]>([]);
   const messageBox = useRef<HTMLDivElement>(null);
   const positionsAppended = useRef(new Set());
@@ -64,7 +29,7 @@ export const MessageBox = () => {
     if (replayDate) {
 
       // load historic comments
-      const replayCommentQueue = [...nVda20250815comments];  
+      const replayCommentQueue = [...replayCommentsDateMap[symbol][replayDate]];  
     
       const interval = setInterval(() => {
         

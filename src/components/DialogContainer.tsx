@@ -36,21 +36,21 @@ export const DialogContainer = () => {
       setMooOpen(true);
       setTimeout(() => {
         setMooOpen(false);
-      }, 5000);
+      }, 6000);
 
       setTimeout(() => {
         setGrizzOpen(true);
         setTimeout(() => {
           setGrizzOpen(false);
-        }, 5000);
-      }, 1000);
+        }, 6000);
+      }, 500);
      
     }
   }, [replayDate]);
 
   const dialogStyles = {
     height: 56,
-    width: 720
+    width: 740
   }
 
   return (
@@ -138,7 +138,7 @@ export const DialogContainer = () => {
                   verticalAlign: 'top'
                 }}
               >
-                We'll be back shortly. Here's a replay of some old tape.
+                We'll be back online shortly. Meanwhile, here's a replay of some old tape.
               </Typography>
           </Box>
         </DialogContent>

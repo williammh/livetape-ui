@@ -31,15 +31,17 @@ export const ProfitLoss = ({persona}) => {
         }
 
         if (positionsRef.current?.[persona]) {
-          const position = Object.values(positionsRef.current[persona])[0]; 
-          const quantity = position.quantity;
-          const direction = position.direction;
-          const avgPrice = position.averagePrice;
-          const change = direction === 'Long' ? price - avgPrice : avgPrice - price;
-          const unrealizedPNL = change * quantity;
-          const accountValue = beginningOfDayBalance + unrealizedPNL;
-
-          setAccountValue(accountValue);
+          const position = Object.values(positionsRef.current[persona])[0];
+          if (position) {
+            const quantity = position.quantity;
+            const direction = position.direction;
+            const avgPrice = position.averagePrice;
+            const change = direction === 'Long' ? price - avgPrice : avgPrice - price;
+            const unrealizedPNL = change * quantity;
+            const accountValue = beginningOfDayBalance + unrealizedPNL;
+  
+            setAccountValue(accountValue);
+          }
         }
 
       }, 1000);
