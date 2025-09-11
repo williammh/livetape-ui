@@ -8,7 +8,11 @@ import {
   Box,
   Chip,
   colors,
+  FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
   Typography,
 } from '@mui/material';
@@ -27,6 +31,7 @@ export const StatusBar = () => {
     symbol,
     setSymbol,
     timezone,
+    setTimezone,
     timestampRef,
     priceRef,
     replayDate,
@@ -75,14 +80,16 @@ export const StatusBar = () => {
 
   }, []);
 
-  const tzLabel = getTzLabel(timezone);
   const localTimestamp = toLocalDateTimeStr(timestamp, timezone);
 
   const gridStyles = {
-    padding: 1
+    // padding: 0
+    marginRight: 1,
   }
 
   const displayPrice = (price || 0).toFixed(2);
+  const disabledAssetClasses = [];
+  const disabledIntervals = ['5 Minute'];
 
   return (
     <Box>
@@ -94,28 +101,34 @@ export const StatusBar = () => {
       >
         <Grid
           container
-          size={1}
+          // size={1}
           direction='row'
+          flexGrow={1}
           justifyContent='flex-start'
           alignItems='center'
           wrap='nowrap'
+          sx={{
+            height: 56,
+          }}
         >
           <Autocomplete 
             options={Object.keys(symbols)}
+            getOptionDisabled={(option) =>
+              disabledAssetClasses.includes(option)
+            }
             defaultValue={assetClass}
             value={assetClass}
             onChange={(_event, value) => setAssetClass(value!)}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Asset Class"
-                size="small"
                 color="default"
               />
             )}
             sx={{
-              width: 160,
-              ...gridStyles
+              ...gridStyles,
+              width: 140,
+              padding: 0
             }}
             disableClearable={true}
           />
@@ -127,74 +140,69 @@ export const StatusBar = () => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Symbol"
-                size="small"
                 color="default"
               />
             )}
             sx={{
-              width: 160,
-              ...gridStyles
-
+              ...gridStyles,
+              width: 140,
             }}
             disableClearable={true}
           />
           <Autocomplete 
             options={['1 Minute', '5 Minute']}
+            getOptionDisabled={(option) =>
+              disabledIntervals.includes(option)
+            }
             defaultValue={chartInterval}
             onChange={(_event, value) => setChartInterval(value!)}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Interval"
-                size="small"
                 color="default"
               />
             )}
             sx={{
-              width: 160,
-              ...gridStyles
+              ...gridStyles,
+              width: 140,
             }}
             disableClearable={true}
           />
-        </Grid>
-        <Grid
-          container
-          size={1}
-          direction='row'
-          justifyContent='flex-end'
-          alignItems='center'
-          wrap='no-wrap'
-        >
-          <Chip
-            variant='outlined'
-            {...chipProps}
+
+          {/* Timezone */}
+          <FormControl
             sx={{
-              color: chipProps.color,
-              fontWeight: 600,
-            }}
-          />
-          <Typography
-            variant='h6'
-            align='right'
-            noWrap={true}
-            sx={{
-              ...gridStyles,
-              
+              width: 340,
+              textAlign: 'left'
             }}
           >
-            {localTimestamp} {tzLabel}
-          </Typography>
-          <Typography
-            variant='h6'
-            align='right'
-            sx={{
-              ...gridStyles
-            }}
-          >
-            {displayPrice}
-          </Typography>
+            <Select
+              // labelId="timezone select"
+              id="timezone-select"
+              value={timezone}
+              color="default"
+              // label="Timezone"
+              onChange={(event) => setTimezone(event.target.value)}
+              renderValue={(value) => `${localTimestamp} ${getTzLabel(value)}`}
+            >
+              <MenuItem value={'America/Los_Angeles'}>Los Angeles</MenuItem>
+              <MenuItem value={'America/Denver'}>Denver</MenuItem>
+              <MenuItem value={'America/Chicago'}>Chicago</MenuItem>
+              <MenuItem value={'America/New_York'}>New York</MenuItem>
+              <MenuItem value={'America/Sao_Paulo'}>São Paulo</MenuItem>
+              <MenuItem value={'UTC'}>UTC</MenuItem>
+              <MenuItem value={'Europe/London'}>London</MenuItem>
+              <MenuItem value={'Europe/Frankfurt'}>Frankfurt</MenuItem>
+              <MenuItem value={'Europe/Moscow'}>Moscow</MenuItem>
+              <MenuItem value={'Asia/Dubai'}>Dubai</MenuItem>
+              <MenuItem value={'Asia/Kolkata'}>Mumbai</MenuItem>
+              <MenuItem value={'Asia/Hong_Kong'}>Hong Kong</MenuItem>
+              <MenuItem value={'Asia/Tokyo'}>Tokyo</MenuItem>
+              <MenuItem value={'Australia/Sydney'}>Sydney</MenuItem>
+            </Select>
+          </FormControl>
         </Grid>
+        
       
       </Grid>
 

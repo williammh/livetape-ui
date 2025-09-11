@@ -66,7 +66,7 @@ const AppContext = createContext({} as IAppContext);
 export const serverAddress = 'localhost:8001';
 
 export const symbols = {
-    'Stocks': ['NVDA', 'TSLA'],
+    'Stocks': ['NVDA', 'TSLA', 'AMZN', 'AAPL', 'AMD', 'META', 'MSFT'],
     'Crypto': ['BTCUSD', 'ETHUSD'],
     'Futures': ['NQU25', 'ESU25']
 };
@@ -99,227 +99,224 @@ export const symbolMap = {
   }
 
 const replayDateMap = {
-    'NVDA': {
-        '2025-08-15': Nvda2025_08_15,
-        '2025-08-22': Nvda2025_08_22,
-    }
+  'NVDA': {
+    '2025-08-15': Nvda2025_08_15,
+    '2025-08-22': Nvda2025_08_22,
+  }
 }
 
 export const AppProvider = ({children}: {children: React.ReactNode}) => {
-
-    
-    // app settings
-    const [ assetClass, setAssetClass ] = useState<'Stocks' | 'Crypto' | 'Futures'>('Stocks');
-    // const [ assetClass, setAssetClass ] = useState<string>('Futures');
-    const [ symbol, setSymbol ] = useState<string>('NVDA');
-    const [ replayDate, setReplayDate ] = useState<string>('');
-    const [ timezone, setTimezone ] = useState<string>('America/New_York');
-    
-    // bar data websocket connection
-    const openBarcallBackRef = useRef<((msg: any) => void) | null>(null);
-    const barWsRef = useRef<WebSocket | null>(null);
-    const commentWsRef = useRef<WebSocket | null>(null);
-    const messageListRef = useRef<object[]>([]);
-    const positionsRef = useRef<{[account: string]: {[id: string]: IPosition}}>({});
-    const ordersRef = useRef<{[account: string]: {[id: string]: IOrder}}>({});
-
-    const replayIntervalRef = useRef<ReturnType<typeof setInterval>>(null);
-    const timestampRef = useRef<string>('');
-    const priceRef = useRef<number>(NaN);
-
-    const isServerOnlineRef = useRef<boolean>(false);
-    
-    useEffect(() => {
-
-      
-      const pingIntervalSeconds = 5;
   
-      // JS has no built in fetch with timeout
-      const fetchTimeout = async (url: string, timeout: number) => {
-        const controller = new AbortController();
-        const id = setTimeout(() => {
-          controller.abort();
-        }, timeout * 1000);
-        try {
-          const response = await fetch(url, { signal: controller.signal });
-          return response;
-        } finally {
-          clearTimeout(id);
-        }
-      };
-      
-      const getServerStatus = async () => {
-        try {
-          const res = await fetchTimeout(`http://${serverAddress}/`, pingIntervalSeconds);
-          const resJson = await res.json();
-        
-          if (resJson === true) {
-              isServerOnlineRef.current = true;
-          } else {
-              isServerOnlineRef.current = false;
-          }
-        } catch (error) {
-          console.log(error);
-          isServerOnlineRef.current = false;
-        }
-      };
+  // app settings
+  const [ assetClass, setAssetClass ] = useState<'Stocks' | 'Crypto' | 'Futures'>('Stocks');
+  // const [ assetClass, setAssetClass ] = useState<string>('Futures');
+  const [ symbol, setSymbol ] = useState<string>('NVDA');
+  const [ replayDate, setReplayDate ] = useState<string>('');
+  const [ timezone, setTimezone ] = useState<string>('America/New_York');
+  
+  // bar data websocket connection
+  const openBarcallBackRef = useRef<((msg: any) => void) | null>(null);
+  const barWsRef = useRef<WebSocket | null>(null);
+  const commentWsRef = useRef<WebSocket | null>(null);
+  const messageListRef = useRef<object[]>([]);
+  const positionsRef = useRef<{[account: string]: {[id: string]: IPosition}}>({});
+  const ordersRef = useRef<{[account: string]: {[id: string]: IOrder}}>({});
 
-      setTimeout(async () => {
-        await getServerStatus();
-      }, 0);
-      
-      const pingInterval = setInterval(async () => {
-        await getServerStatus();
-      }, pingIntervalSeconds * 1000);
+  const replayIntervalRef = useRef<ReturnType<typeof setInterval>>(null);
+  const timestampRef = useRef<string>('');
+  const priceRef = useRef<number>(NaN);
+
+  const isServerOnlineRef = useRef<boolean>(false);
   
-      return () => {
-        clearInterval(pingInterval);
-      };
-  
-    }, []);
+  useEffect(() => {
+    const pingIntervalSeconds = 5;
+
+    // JS has no built in fetch with timeout
+    const fetchTimeout = async (url: string, timeout: number) => {
+      const controller = new AbortController();
+      const id = setTimeout(() => {
+        controller.abort();
+      }, timeout * 1000);
+      try {
+        const response = await fetch(url, { signal: controller.signal });
+        return response;
+      } finally {
+        clearTimeout(id);
+      }
+    };
     
-
-    useEffect(() => {
-        if (replayDate) {
-            
-            const replayBars = parseCSV(replayDateMap[symbol][replayDate]);
-
-            const replayOrders = Nvda2025_08_15Orders;
-
-
-            let startDate = new Date(replayBars[0].timestamp);
-            startDate = addToDate(startDate, { minutes: -1 });
-
-            let idx = 0;
-            let replayBarCloseTimestamp = replayBars[0].timestamp;
-
-            const mockBarWebSocket = setInterval(() => {
-                const now = addToDate(startDate, {seconds: idx});
-
-                timestampRef.current = toRfc3339Str(now);
-                priceRef.current = parseFloat(replayBars[idx].close);
-
-                // replay bars
-                const mockBarMessage = replayBarCloseTimestamp !== replayBars[idx].timestamp ? {
-                    type: 'closed_bar',
-                    data: replayBars[idx - 1]
-                } : {
-                    type: 'open_bar',
-                    data: replayBars[idx]
-                }
-                openBarcallBackRef.current?.(mockBarMessage);
-
-                // replay orders
-                for (let order of replayOrders) {
-                    const isOrderOpened = timestampRef.current >= order.openTimestamp;
-                    if (isOrderOpened) {
-                        if (!(order.account in ordersRef.current)) {
-                            ordersRef.current[order.account] = {};
-                        }
-                        ordersRef.current[order.account][order.id] = order;
-                    }
-                }
-
-                replayBarCloseTimestamp = replayBars[idx].timestamp;
-                idx++;
-
-            }, 1000);
-
-            replayIntervalRef.current = mockBarWebSocket;
-
-            return () => {
-                clearInterval(mockBarWebSocket);
-            }
-
+    const getServerStatus = async () => {
+      try {
+        const res = await fetchTimeout(`http://${serverAddress}/`, pingIntervalSeconds);
+        const resJson = await res.json();
+      
+        if (resJson === true) {
+            isServerOnlineRef.current = true;
         } else {
-            clearInterval(replayIntervalRef.current);
+            isServerOnlineRef.current = false;
         }
+      } catch (error) {
+        console.log(error);
+        isServerOnlineRef.current = false;
+      }
+    };
 
-    }, [replayDate])
-
-    useEffect(() => {
-        const barWs = new WebSocket(`ws://${serverAddress}/ws/bars/${symbol}`);
-        barWsRef.current = barWs;
-
+    setTimeout(async () => {
+      await getServerStatus();
+    }, 0);
     
-        barWs.onopen = () => {
-            console.log(`🌐 📊 ${symbol} Bars WebSocket connected`);
-        };
+    const pingInterval = setInterval(async () => {
+      await getServerStatus();
+    }, pingIntervalSeconds * 1000);
 
-        barWs.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            openBarcallBackRef.current?.(data);
-            timestampRef.current = data.system_time;
-            priceRef.current = data.data.close;
-        };
+    return () => {
+      clearInterval(pingInterval);
+    };
 
-        barWs.onclose = () => {
-            console.log(`🔌 📊 ${symbol} Bar WebSocket disconnected`);
-        };
+  }, []);
+  
+
+  useEffect(() => {
+      if (replayDate) {
+          
+          const replayBars = parseCSV(replayDateMap[symbol][replayDate]);
+
+          const replayOrders = Nvda2025_08_15Orders;
 
 
-        const commentWs = new WebSocket(`ws://${serverAddress}/ws/comments/${symbol}`);
-        commentWsRef.current = commentWs;
+          let startDate = new Date(replayBars[0].timestamp);
+          startDate = addToDate(startDate, { minutes: -1 });
 
-        commentWs.onopen = () => {
-            console.log(`🌐 💬 ${symbol} Comment WebSocket connected`);
-        };
+          let idx = 0;
+          let replayBarCloseTimestamp = replayBars[0].timestamp;
 
-        commentWs.onmessage = (event) => {
-            const data: IAppContext['commentList'] = JSON.parse(event.data);
-            // console.log(`💬 Comment Websocket received`);
+          const mockBarWebSocket = setInterval(() => {
+              const now = addToDate(startDate, {seconds: idx});
 
-            if (data.data instanceof Array) {
-                const parsedComments = data.data.map(comment => JSON.parse(comment))
-                console.log(parsedComments);
-                messageListRef.current = [...parsedComments];
+              timestampRef.current = toRfc3339Str(now);
+              priceRef.current = parseFloat(replayBars[idx].close);
 
-            } else if (data.data) {
-                const parsedComment = JSON.parse(data.data);
-                if ('timestamp' in parsedComment) {
-                    console.log(parsedComment);
-                    messageListRef.current = [...messageListRef.current, parsedComment];
-                }
-            }
+              // replay bars
+              const mockBarMessage = replayBarCloseTimestamp !== replayBars[idx].timestamp ? {
+                  type: 'closed_bar',
+                  data: replayBars[idx - 1]
+              } : {
+                  type: 'open_bar',
+                  data: replayBars[idx]
+              }
+              openBarcallBackRef.current?.(mockBarMessage);
 
-        };
+              // replay orders
+              for (let order of replayOrders) {
+                  const isOrderOpened = timestampRef.current >= order.openTimestamp;
+                  if (isOrderOpened) {
+                      if (!(order.account in ordersRef.current)) {
+                          ordersRef.current[order.account] = {};
+                      }
+                      ordersRef.current[order.account][order.id] = order;
+                  }
+              }
 
-        commentWs.onclose = () => {
-            console.log(`🔌 💬 ${symbol} Comment WebSocket disconnected`);
-        };
+              replayBarCloseTimestamp = replayBars[idx].timestamp;
+              idx++;
 
-        return () => {
-            barWs.close();
-            commentWs.close();
-            messageListRef.current = [];
+          }, 1000);
 
-        };
+          replayIntervalRef.current = mockBarWebSocket;
 
-    }, [symbol]);
+          return () => {
+              clearInterval(mockBarWebSocket);
+          }
 
-    return (
-        <AppContext.Provider
-            value={{
-                assetClass,
-                setAssetClass,
-                symbol,
-                setSymbol,
-                replayDate,
-                setReplayDate,
-                timezone,
-                setTimezone,
-                openBarCallback: (callback) => { openBarcallBackRef.current = callback; },
-                messageListRef,
-                ordersRef,
-                positionsRef,
-                priceRef,
-                timestampRef,
-                isServerOnlineRef,
-            }}
-        >
-            {children}
-        </AppContext.Provider>
-    );
+      } else {
+          clearInterval(replayIntervalRef.current);
+      }
+
+  }, [replayDate])
+
+  useEffect(() => {
+      const barWs = new WebSocket(`ws://${serverAddress}/ws/bars/${symbol}`);
+      barWsRef.current = barWs;
+
+  
+      barWs.onopen = () => {
+          console.log(`🌐 📊 ${symbol} Bars WebSocket connected`);
+      };
+
+      barWs.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          openBarcallBackRef.current?.(data);
+          timestampRef.current = data.system_time;
+          priceRef.current = data.data.close;
+      };
+
+      barWs.onclose = () => {
+          console.log(`🔌 📊 ${symbol} Bar WebSocket disconnected`);
+      };
+
+
+      const commentWs = new WebSocket(`ws://${serverAddress}/ws/comments/${symbol}`);
+      commentWsRef.current = commentWs;
+
+      commentWs.onopen = () => {
+          console.log(`🌐 💬 ${symbol} Comment WebSocket connected`);
+      };
+
+      commentWs.onmessage = (event) => {
+          const data: IAppContext['commentList'] = JSON.parse(event.data);
+          // console.log(`💬 Comment Websocket received`);
+
+          if (data.data instanceof Array) {
+              const parsedComments = data.data.map(comment => JSON.parse(comment))
+              console.log(parsedComments);
+              messageListRef.current = [...parsedComments];
+
+          } else if (data.data) {
+              const parsedComment = JSON.parse(data.data);
+              if ('timestamp' in parsedComment) {
+                  console.log(parsedComment);
+                  messageListRef.current = [...messageListRef.current, parsedComment];
+              }
+          }
+
+      };
+
+      commentWs.onclose = () => {
+          console.log(`🔌 💬 ${symbol} Comment WebSocket disconnected`);
+      };
+
+      return () => {
+          barWs.close();
+          commentWs.close();
+          messageListRef.current = [];
+
+      };
+
+  }, [symbol]);
+
+  return (
+      <AppContext.Provider
+          value={{
+              assetClass,
+              setAssetClass,
+              symbol,
+              setSymbol,
+              replayDate,
+              setReplayDate,
+              timezone,
+              setTimezone,
+              openBarCallback: (callback) => { openBarcallBackRef.current = callback; },
+              messageListRef,
+              ordersRef,
+              positionsRef,
+              priceRef,
+              timestampRef,
+              isServerOnlineRef,
+          }}
+      >
+          {children}
+      </AppContext.Provider>
+  );
 };
 
 export const useAppContext = () => useContext(AppContext);

@@ -3,7 +3,6 @@ import {
   useState,
   useRef,
   useEffect,
-  useMemo,
 } from 'react';
 import { 
   Box,
@@ -300,6 +299,9 @@ const restoreZoom = (chart, currentXRange, currentYRange, rawBarDataRef, userZoo
         const cleanXRange = calculateCleanXAxisRange(currentXRange.min, currentXRange.max, firstBarTime, lastBarTime);
        
         if (cleanXRange) {
+          // console.log(rawBarDataRef.current[lastBarIdx]);
+          // console.log(chart);
+          // const barWidth = chart.w.globals.barPadForNumericAxis;
           chart.updateOptions({
             xaxis: {
               min: cleanXRange.min,
@@ -319,6 +321,20 @@ const restoreZoom = (chart, currentXRange, currentYRange, rawBarDataRef, userZoo
                 color: '#fff',
               },
               tickPlacement: 'on',
+            },
+            annotations: {
+              yaxis: [
+                {
+                  y: rawBarDataRef.current[lastBarIdx - 1].close,
+                  borderWidth: 0,
+                  label: {
+                    text: `${rawBarDataRef.current[lastBarIdx - 1].close.toFixed(2)}`,
+                    // offsetX: -barWidth * 3,
+                    style: {},
+                    position: 'right'
+                  }
+                }
+              ]
             },
           }, false, false);
         }
@@ -421,7 +437,7 @@ export const CandlestickChart = () => {
       startDateTime.setUTCMinutes(31);
       startDateTime.setUTCSeconds(0);
 
-      const initialBars = 12;
+      const initialBars = 10;
 
       const emptyRawBarData = Array(initialBars).fill().map((_, index) => {
         const timestamp = addToDate(startDateTime, {minutes: index});
@@ -497,12 +513,13 @@ export const CandlestickChart = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // subtract height of header - StusBar - Accounts - padding
-  const height = window.innerHeight - 72 - 56 - 446 - 38
+  const height = window.innerHeight - 72 - 64 - 446 - 38
  
   return (
     <Box
       ref={containerRef}
       sx={{
+        marginTop: 1,
         height: height,
       }}
     >
@@ -553,6 +570,7 @@ export const CandlestickChart = () => {
 
 
                         chart.updateOptions({
+                      
                           xaxis: {
                             min: cleanXRange.min,
                             max: cleanXRange.max,
@@ -673,12 +691,12 @@ export const CandlestickChart = () => {
             //   yaxis: [
             //     {
             //       // last bar close
-            //       y: convertedBars.length > 0 
-            //         ? convertedBars[convertedBars.length - 1].y[3]
+            //       y: rawBarDataRef?.current.length > 0 
+            //         ? convertedData[convertedData.length - 1].y[3]
             //         : null,            
             //       borderWidth: 0,
             //       label: {
-            //         text: `${convertedBars[convertedBars.length - 1]?.y[3].toFixed(2)}`,
+            //         text: `${convertedData[convertedData.length - 1]?.y[3].toFixed(2)}`,
             //         style: {
             //           color: '#fff',
             //           background: '#222',

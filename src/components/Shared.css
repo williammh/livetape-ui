@@ -13,6 +13,26 @@
   color: #212121;
 }
 
+
+.apexcharts-yaxis-annotations {
+
+}
+
+.apexcharts-yaxis-annotations rect {
+  height: 28px;
+  fill:#0004;
+  stroke: unset;
+}
+
+.apexcharts-yaxis-annotations text {
+  background: #444;
+  fill: #fff;
+  font-size: 18px;
+  line-height: 40px;
+  height: 40px;
+
+}
+
 @font-face {
   font-family: "MontserratCustom";
   src: url("../assets/Montserrat-Medium.ttf") format("truetype");

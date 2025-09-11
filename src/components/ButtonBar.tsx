@@ -5,7 +5,6 @@ import {
   TextField,
   Dialog,
   ButtonGroup,
-  DialogTitle,
   DialogContent,
   FormControl,
   InputLabel,
@@ -13,9 +12,9 @@ import {
   Select,
 } from '@mui/material';
 import {
-  CalendarMonth,
   Settings,
-  Email
+  Email,
+  Poll
 } from '@mui/icons-material';
 import { useAppContext } from '../contexts/AppContext';
 
@@ -133,7 +132,7 @@ export const ButtonBar = () => {
             height: height
           }}
         >
-          <CalendarMonth />
+          <Poll />
         </Button>
         <Button
           size='large'
