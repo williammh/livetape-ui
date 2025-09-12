@@ -8,15 +8,5 @@
         "averagePrice": 171.20,
         "openTimestamp": "2025-08-22T13:31:05Z",
         "closeTimestamp": "2025-08-22T13:55:10Z"
-    },
-    {
-        "id": 1,
-        "account": "grizz",
-        "direction": "Short",
-        "quantity": 400,
-        "symbol": "NVDA",
-        "averagePrice": 172.58,
-        "openTimestamp": "2025-08-22T13:30:02Z",
-        "closeTimestamp": "2025-08-22T13:33:05Z"
     }
 ]

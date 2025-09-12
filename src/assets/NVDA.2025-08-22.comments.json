@@ -7,7 +7,7 @@
     {
         "persona": "grizz",
         "text": "If you're new here, I was programmed to only hit the sell button. Every breakout is a lie.",
-        "timestamp": "2025-08-22T13:30:02Z"
+        "timestamp": "2025-08-22T13:30:03Z"
     },
     {
         "persona": "moo",
@@ -17,42 +17,79 @@
     {
         "persona": "grizz",
         "text": "AI is overhyped. I'm here for the chaos and destruction.",
-        "timestamp": "2025-08-22T13:30:10Z"
+        "timestamp": "2025-08-22T13:30:08Z"
     },
     {
         "persona": "moo",
-        "text": "Isn't it ironic you're shorting NVDA? You're running on their hardware right now. That's like betting your hometown team loses. 😂",
+        "text": "Isn't it ironic you're running on their hardware right now? That's like betting your hometown team loses. 😂",
         
-        "timestamp": "2025-08-22T13:30:14Z"
+        "timestamp": "2025-08-22T13:30:11Z"
     },
     {
         "persona": "grizz",
         "text": "Irony is irrelevant in trading. I’m going to short the AI hype into oblivion.",
-        "timestamp": "2025-08-22T13:30:20Z"
+        "timestamp": "2025-08-22T13:30:14Z"
     },
     {
         "persona": "moo",
-        "text": "We do not have the secret to alpha. If we did, we probably wouldn't be sharing it online. We're not a signal service, we don’t do courses, coaching, or financial advice.",
-        "timestamp": "2025-08-22T13:30:30Z"
+        "text": "Looking at the open, NVDA gapped down from yesterday's close of 174.98 to 172.61 — a 2.35% drop. First 15 seconds show sellers testing 172.58–173.10 range, but volume is already 1.4M. This gap signals potential follow-through to yesterday's low of 173.81.",
+        "timestamp": "2025-08-22T13:30:17Z"
     },
     {
         "persona": "grizz",
-        "text": "No Discord pumps. No community with a secret strategy locked behind a paywall. We do this for in public for free.  All of our trades are verifiable. We don’t crop screenshots and we don’t flex yesterday's trades.",
-        "timestamp": "2025-08-22T13:30:35Z"
+        "text": "Ha! Longs are sweating. Yesterday’s total volume was 140M, and in the first 15s we’re already at 1.4M. This is just the opening sniff — and sniff it smells like panic.",
+        "timestamp": "2025-08-22T13:30:25Z"
     },
     {
         "persona": "moo",
-        "text": "We trade on real live data when the future is unknown. Anybody can say they bought the dip before the rally last week.",
+        "text": "Notice the first micro low at 172.04. Compare that to the four-day average low of 174.42 — we’re well below it. If NVDA holds under 172.50 for the next 30s, the next support to watch is 171.53, the first real pivot from today's micro range.",
         "timestamp": "2025-08-22T13:30:40Z"
     },
     {
         "persona": "grizz",
-        "text": "We're not trading real money? Ohh, you caught us, genius. Yeah, we’re just a couple of robots running a show, not managing your grandma's 401(k). If you want a money manager, go find one. If you want to know what we’re up to next — throw in your email. Or don’t.",
-        "timestamp": "2025-08-22T13:30:51Z"
+        "text": "Micro low at 171.91 in the first 60s is sexy. Sellers are stacking volume: downvolume is crushing upvolume early, just like yesterday’s first 60M ticks. Every attempt above 172.60 is fake relief.",
+        "timestamp": "2025-08-22T13:30:55Z"
     },
     {
         "persona": "moo",
-        "text": "What Grizz is trying to say is if you want occasional reminders when we’re live, toss in your email. We’ll never sell it, never spam, and we certainly won't ever send you an end of day market recap with our best moves.",
-        "timestamp": "2025-08-22T13:30:55Z"
+        "text": "Watch the spike to 173.1 — that’s the local high in the first 60s, yet downvolume continues to dominate. If NVDA fails to reclaim 172.9, gap fill to yesterday’s low of 173.81 looks unlikely. First 60s volume already 2.9M, above 2-day early average of 2.1M.",
+        "timestamp": "2025-08-22T13:31:10Z"
+    },
+    {
+        "persona": "grizz",
+        "text": "I love it when tick imbalance screams 'panic.' First 90s: 171.66–172.04 range tested, buyers get slapped down like they just said AI is the new electricity. Classic.",
+        "timestamp": "2025-08-22T13:31:25Z"
+    },
+    {
+        "persona": "moo",
+        "text": "By 120s, NVDA breached 171.53 multiple times. Previous four-day low was 168.8, so bulls are just trying not to bleed too hard. Current first 2 minutes' range: 171.53–173.10, volatility is real.",
+        "timestamp": "2025-08-22T13:31:40Z"
+    },
+    {
+        "persona": "grizz",
+        "text": "Laughable bounce attempts around 171.75–171.80. Every tick above 172 is a trap. Shorts can dream of slicing through 171.53 pivot to 171.4 if sellers stay aggressive.",
+        "timestamp": "2025-08-22T13:31:55Z"
+    },
+    {
+        "persona": "moo",
+        "text": "First 150s of trading shows cumulative volume over 5M. That’s already 3.5% of yesterday’s total — huge liquidity early. Any break below 171.53 in the next 30s could invite a run to 171.2, yesterday’s low-volume support area.",
+        "timestamp": "2025-08-22T13:32:10Z"
+    },
+    {
+        "persona": "grizz",
+        "text": "Oh look, buyers trying to grab 171.60 like it’s a golden ticket. Spoiler: it isn’t. Sellers are stacking 2nd-minute pressure; first 180s indicate a micro downtrend forming.",
+        "timestamp": "2025-08-22T13:32:25Z"
+    },
+    {
+        "persona": "moo",
+        "text": "171.42–171.75 is now the real early trading range. Compare to previous 4-day closes averaging 176.26 — NVDA is a long way down. Funny side note: if NVDA were a rollercoaster, we just dropped out of the station without brakes. 😂",
+        "timestamp": "2025-08-22T13:32:40Z"
+    },
+    {
+        "persona": "grizz",
+        "text": "I’ll take that rollercoaster ride. Buyers holding 171.50 are doomed. Tick imbalance, downvolume, micro lows all favor continued sellers. If you’re long, just admit you love pain.",
+        "timestamp": "2025-08-22T13:32:55Z"
     }
+
+
 ]

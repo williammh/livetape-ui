@@ -109,8 +109,8 @@ export const Positions = ({persona}) => {
                     align="right"
                     sx={{
                       ...cellStyles,
-                      width: 180,
-                      minWidth: 180,
+                      width: 160,
+                      minWidth: 160,
                       paddingLeft: 0,
                     
                     }}
