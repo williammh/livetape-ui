@@ -27,7 +27,6 @@ export const Now = () => {
   >
     <Typography
       variant='h6'
-      // component='span'
       fontWeight='bold'
       noWrap={true}
       textAlign={'center'}

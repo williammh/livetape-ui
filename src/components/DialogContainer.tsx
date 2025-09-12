@@ -27,24 +27,39 @@ const Transition = forwardRef(function Transition(
 export const DialogContainer = () => {
   const {replayDate, isServerOnlineRef } = useAppContext();
   
-  const [mooOpen, setMooOpen] = useState<boolean>(false);
-  const [grizzOpen, setGrizzOpen] = useState<boolean>(false);
+  const [mooMessage, setMooMessage] = useState<string>('');
+  const [grizzMessage, setGrizzMessage] = useState<string>('');
 
+  const displayDialog = (
+    persona: string,
+    text: string,
+    delay: number = 0,
+    duration: number = 5000
+  ) => {
+    switch (persona) {
+      case 'moo':
+        setTimeout(() => {
+          setMooMessage(text);
+          setTimeout(() => {
+            setMooMessage('');
+          }, duration);
+        }, delay);
+        break;
+      case 'grizz':
+        setTimeout(() => {
+          setGrizzMessage(text);
+          setTimeout(() => {
+            setGrizzMessage('');
+          }, duration);
+        }, delay);
+        break;
+    }
+  };
 
   useEffect(() => {
     if (replayDate !== '' && isServerOnlineRef.current === false) {
-      setMooOpen(true);
-      setTimeout(() => {
-        setMooOpen(false);
-      }, 6000);
-
-      setTimeout(() => {
-        setGrizzOpen(true);
-        setTimeout(() => {
-          setGrizzOpen(false);
-        }, 6000);
-      }, 500);
-     
+      displayDialog('moo', "Our servers are undergoing maintenance. Thanks for your patience.", 0);
+      displayDialog('grizz', "We'll be online shortly. Meanwhile, here's a replay of some old tape.", 500);
     }
   }, [replayDate]);
 
@@ -57,10 +72,10 @@ export const DialogContainer = () => {
     <>
     {/* Moo */}
       <Dialog
-        open={mooOpen}
+        open={mooMessage.length > 0}
         onClose={() => {
-          setMooOpen(false);
-          setGrizzOpen(false);
+          setMooMessage('');
+          setGrizzMessage('');
         }}
         hideBackdrop={true}
         maxWidth={false}
@@ -92,7 +107,7 @@ export const DialogContainer = () => {
                   verticalAlign: 'top'
                 }}
               >
-                Our servers are undergoing maintenance. Thanks for your patience.
+                {mooMessage}
               </Typography>
           </Box>
         </DialogContent>
@@ -100,10 +115,10 @@ export const DialogContainer = () => {
 
       {/* Grizz */}
       <Dialog
-        open={grizzOpen}
+        open={grizzMessage.length > 0}
         onClose={() => {
-          setMooOpen(false);
-          setGrizzOpen(false);
+          setMooMessage('');
+          setGrizzMessage('');
         }}
         hideBackdrop={true}
         maxWidth={false}
@@ -138,7 +153,7 @@ export const DialogContainer = () => {
                   verticalAlign: 'top'
                 }}
               >
-                We'll be back online shortly. Meanwhile, here's a replay of some old tape.
+                {grizzMessage}
               </Typography>
           </Box>
         </DialogContent>

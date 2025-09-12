@@ -56,8 +56,6 @@ export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
           </>
         ) : (
           <>
-            {/* <Typography></Typography>
-             */}
           </>
         )}
       </Grid>

@@ -109,13 +109,13 @@ export const Positions = ({persona}) => {
                     align="right"
                     sx={{
                       ...cellStyles,
-                      width: 160,
-                      minWidth: 160,
+                      width: 180,
+                      minWidth: 180,
                       paddingLeft: 0,
                     
                     }}
                   >
-                    {`${pos.direction} ${pos.quantity} ${pos.symbol}`}
+                    {`${pos.direction.toUpperCase()} ${pos.quantity} ${pos.symbol}`}
                   </TableCell>
                 </TableRow>
 
@@ -183,7 +183,7 @@ export const Positions = ({persona}) => {
           }}
         >
           <Typography>
-            No open positions
+            No positions
           </Typography>
         </Box>
       )}

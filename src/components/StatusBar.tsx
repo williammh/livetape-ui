@@ -88,7 +88,7 @@ export const StatusBar = () => {
   }
 
   const displayPrice = (price || 0).toFixed(2);
-  const disabledAssetClasses = [];
+  const disabledAssetClasses = ['Crypto'];
   const disabledIntervals = ['5 Minute'];
 
   return (
@@ -186,14 +186,12 @@ export const StatusBar = () => {
               renderValue={(value) => `${localTimestamp} ${getTzLabel(value)}`}
             >
               <MenuItem value={'America/Los_Angeles'}>Los Angeles</MenuItem>
-              <MenuItem value={'America/Denver'}>Denver</MenuItem>
               <MenuItem value={'America/Chicago'}>Chicago</MenuItem>
               <MenuItem value={'America/New_York'}>New York</MenuItem>
               <MenuItem value={'America/Sao_Paulo'}>São Paulo</MenuItem>
               <MenuItem value={'UTC'}>UTC</MenuItem>
               <MenuItem value={'Europe/London'}>London</MenuItem>
-              <MenuItem value={'Europe/Frankfurt'}>Frankfurt</MenuItem>
-              <MenuItem value={'Europe/Moscow'}>Moscow</MenuItem>
+              <MenuItem value={'Europe/Paris'}>Paris</MenuItem>
               <MenuItem value={'Asia/Dubai'}>Dubai</MenuItem>
               <MenuItem value={'Asia/Kolkata'}>Mumbai</MenuItem>
               <MenuItem value={'Asia/Hong_Kong'}>Hong Kong</MenuItem>
