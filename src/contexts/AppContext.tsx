@@ -74,9 +74,10 @@ const AppContext = createContext({} as IAppContext);
 export const serverAddress = 'localhost:8001';
 
 export const symbols = {
-    'Stocks': ['NVDA', 'TSLA', 'AMZN', 'AAPL', 'AMD', 'META', 'MSFT'],
+    'Stocks': ['NVDA', 'TSLA', 'AMZN', 'AAPL', 'AMD', 'GOOGL', 'META', 'MSFT'],
     'Crypto': ['BTCUSD', 'ETHUSD'],
-    'Futures': ['NQU25', 'ESU25']
+    'Futures': ['NQU25', 'ESU25'],
+    'Forex': []
 };
 
 export const symbolMap = {

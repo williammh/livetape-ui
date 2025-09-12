@@ -22,7 +22,6 @@ import { useAppContext, symbols } from '../contexts/AppContext';
 
 export const StatusBar = () => {
   const [timestamp, setTimestamp] = useState<string>('');
-  const [price, setPrice] = useState<number>();
   const [chartInterval, setChartInterval] = useState<string>('1 Minute');
 
   const {
@@ -33,7 +32,6 @@ export const StatusBar = () => {
     timezone,
     setTimezone,
     timestampRef,
-    priceRef,
     replayDate,
     setReplayDate
   } = useAppContext();
@@ -69,9 +67,6 @@ export const StatusBar = () => {
       if (timestampRef.current) {
         setTimestamp(timestampRef.current);
       }
-      if (priceRef.current !== undefined) {
-        setPrice(priceRef.current);
-      }
     }, 1000);
 
     return () => {
@@ -87,8 +82,8 @@ export const StatusBar = () => {
     marginRight: 1,
   }
 
-  const displayPrice = (price || 0).toFixed(2);
-  const disabledAssetClasses = ['Crypto'];
+  const disabledAssetClasses = ['Crypto', 'Forex'];
+  const disabledSymbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'AMD', 'META', 'BRK.B', 'JNJ'];
   const disabledIntervals = ['5 Minute'];
 
   return (
@@ -134,6 +129,9 @@ export const StatusBar = () => {
           />
           <Autocomplete 
             options={symbols[assetClass]}
+            getOptionDisabled={(option) =>
+              disabledSymbols.includes(option)
+            }
             defaultValue={symbol}
             value={symbol}
             onChange={(_event, value) => setSymbol(value!)}
