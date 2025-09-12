@@ -14,7 +14,7 @@ export const Orders = ({persona}) => {
   const columns = [
     {
       field: 'action',
-      headerName: 'Action',
+      headerName: 'Order',
       flex: 1,
       minWidth: 60
     },
@@ -97,7 +97,7 @@ export const Orders = ({persona}) => {
         }}
       >      
         {/* Fake group header */}
-        <Box
+        {/* <Box
           sx={{
             position: 'static',
             width: '100%',
@@ -113,7 +113,7 @@ export const Orders = ({persona}) => {
           }}
         >
           Orders
-        </Box>
+        </Box> */}
         {/* Actual DataGrid with top padding to not overlap group header */}
         <Box>
           <DataGrid
@@ -138,7 +138,7 @@ export const Orders = ({persona}) => {
               },
               fontSize: fontSize ,
               border: 'unset',
-              height: 128,
+              height: 184,
               width: '100%',
               padding: 1,
               
