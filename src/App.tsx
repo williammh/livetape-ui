@@ -9,9 +9,6 @@ import { CandlestickChart } from './components/CandleStickChart';
 import { MessageBox } from './components/MessageBox';
 import { styled } from '@mui/material/styles';
 import { StatusBar } from './components/StatusBar';
-import { toLocalDateTimeStr } from './util/misc';
-import { useAppContext } from './contexts/AppContext';
-import { addToDate } from './util/misc';
 import { ButtonBar } from './components/ButtonBar';
 import { Now } from './components/Now';
 import { Schedule } from './components/Schedule';
@@ -30,17 +27,15 @@ export const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const App = () => { 
-  const { timezone } = useAppContext();
+
   const now = new Date();
 
   now.setHours(13);
   now.setMinutes(30);
   now.setSeconds(0);
 
-  const tradeTslaTime = addToDate(now, {days: 1});
-  const tradeTslaTimeStr = toLocalDateTimeStr(tradeTslaTime, timezone);
-  
-  const announcement = `Moo shoots for the moon and Grizz puts Elon on blast trading TSLA at ${tradeTslaTimeStr}`;
+
+
   
   const isPortraitMode = window.outerWidth < window.outerHeight;
   const isFixedWidthMode = false;
@@ -100,7 +95,7 @@ const App = () => {
                   variant='h6'
                   noWrap={true}
                 >
-                  {announcement}
+                  {/* {announcement} */}
                 </Typography>
             
               </Grid>

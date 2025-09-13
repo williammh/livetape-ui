@@ -138,7 +138,7 @@ export const Orders = ({persona}) => {
               },
               fontSize: fontSize ,
               border: 'unset',
-              height: 184,
+              height: 192,
               width: '100%',
               padding: 1,
               
