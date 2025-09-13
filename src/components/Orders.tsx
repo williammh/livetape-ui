@@ -96,55 +96,34 @@ export const Orders = ({persona}) => {
           width: '100%'
         }}
       >      
-        {/* Fake group header */}
-        {/* <Box
+        <DataGrid
+          rows={orderList}
+          columns={columns}
+          hideFooter={true}
+          rowHeight={56}
+          scrollbarSize={0}
           sx={{
-            position: 'static',
-            width: '100%',
-            height: 56,
             backgroundColor: '#202020',
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '16px',
-            fontSize: fontSize,
-            zIndex: 1,
-            borderBottom: '1px solid #444'
-          }}
-        >
-          Orders
-        </Box> */}
-        {/* Actual DataGrid with top padding to not overlap group header */}
-        <Box>
-          <DataGrid
-            rows={orderList}
-            columns={columns}
-            hideFooter={true}
-            rowHeight={56}
-            scrollbarSize={0}
-            sx={{
+            // TODO: style scrollbars when screen width is too small instead of hiding
+              '& .MuiDataGrid-scrollbar--horizontal': {
+              overflowX: 'hidden',
+            },
+            '& .MuiDataGrid-columnHeader': {
               backgroundColor: '#202020',
-              // TODO: style scrollbars when screen width is too small instead of hiding
-               '& .MuiDataGrid-scrollbar--horizontal': {
-                overflowX: 'hidden',
-              },
-              '& .MuiDataGrid-columnHeader': {
-                backgroundColor: '#202020',
-              },
-              '& .MuiDataGrid-columnHeaderTitle': {
-              },
-              '& .MuiDataGrid-filler': {
-                backgroundColor: '#202020',
-              },
-              fontSize: fontSize ,
-              border: 'unset',
-              height: 192,
-              width: '100%',
-              padding: 1,
-              
-            }}
-          />
-        </Box>
+            },
+            '& .MuiDataGrid-columnHeaderTitle': {
+            },
+            '& .MuiDataGrid-filler': {
+              backgroundColor: '#202020',
+            },
+            fontSize: fontSize ,
+            border: 'unset',
+            height: 192,
+            width: '100%',
+            padding: 1,
+            
+          }}
+        />
       </Box>
 
   );
