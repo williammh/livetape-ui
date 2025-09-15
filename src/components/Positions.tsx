@@ -1,19 +1,14 @@
-import { useEffect, useState } from 'react';
-import { 
+import {
+  useEffect,
+  useState,
+  useRef
+} from 'react';
+import {
   Box,
-  colors,
-  Table,
-  TableBody,
-  Paper,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Typography,
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
 import { useAppContext, replayPositionsDateMap, type IPosition } from '../contexts/AppContext';
-import nVda20250815positions from '../assets/NVDA.2025-08-15.positions.json';
 import { textAlignRight, orderStatusMap, toLocalDateTimeStr, greenOrRed } from '../util/misc';
 
 
@@ -24,42 +19,6 @@ export const Positions = ({persona}) => {
   openDateTime.setHours(13);
   openDateTime.setMinutes(30);
   openDateTime.setSeconds(0);
-
-  const [postionList, setPositionList] = useState<IPosition[]>([]);
-  
-  useEffect(() => {
-    const updatePositionsInterval = setInterval(() => {
-      if (persona in positionsRef.current) {
-        // TODO: only update if changed
-        //   const changed = newOrders.length !== prevOrders.length ||
-        //     newOrders.some((o, i) => o.id !== prevOrders[i]?.id || o.status !== prevOrders[i]?.status);
-
-        const positions = Object.values(positionsRef.current[persona]);
-
-        const list = positions.map(pos => {
-          const change = priceRef.current - pos.averagePrice;
-          const pnl = change * pos.quantity * (pos.direction === 'Long' ? 1 : -1);
-          return {
-            ...pos,
-            change: change,
-            pnl: pnl
-          }
-        });
-        console.log(list);
-        setPositionList(list);
-
-
-      } else if (!(persona in positionsRef.current)) {
-        setPositionList([]);
-      }
-   
-    }, 1000);
-
-    return () => {
-      clearInterval(updatePositionsInterval);
-    };
-
-  }, [positionsRef]);
 
   const columns = [
     {
@@ -120,20 +79,47 @@ export const Positions = ({persona}) => {
     }
   ];
 
-  const rowHeight = 56
-  const fontSize = 18
+  const [postionList, setPositionList] = useState<IPosition[]>([]);
+  
+  useEffect(() => {
+    const updatePositionsInterval = setInterval(() => {
+      if (persona in positionsRef.current) {
+        // TODO: only update if changed
+        //   const changed = newOrders.length !== prevOrders.length ||
+        //     newOrders.some((o, i) => o.id !== prevOrders[i]?.id || o.status !== prevOrders[i]?.status);
 
-  const cellStyles = {
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    fontSize: fontSize,
-    padding: '0px 16px',
-    height: rowHeight
-  }
+        const positions = Object.values(positionsRef.current[persona]);
+
+        const list = positions.map(pos => {
+          const change = priceRef.current - pos.averagePrice;
+          const pnl = change * pos.quantity * (pos.direction === 'Long' ? 1 : -1);
+          return {
+            ...pos,
+            change: change,
+            pnl: pnl
+          }
+        });
+        console.log(list);
+        setPositionList(list);
+
+
+      } else if (!(persona in positionsRef.current)) {
+        setPositionList([]);
+      }
+   
+    }, 1000);
+
+    return () => {
+      clearInterval(updatePositionsInterval);
+    };
+
+  }, [positionsRef]);
+
+  const positionBoxRef = useRef<HTMLDivElement>(null);
 
   return (
     <Box
+      ref={positionBoxRef}
       sx={{
         height: '100%'
       }}
@@ -141,6 +127,14 @@ export const Positions = ({persona}) => {
       <DataGrid
         rows={postionList}
         columns={columns}
+        columnVisibilityModel={{
+          direction: true,
+          quantity: positionBoxRef?.current?.offsetWidth > 400,
+          symbol: true,
+          averagePrice: positionBoxRef?.current?.offsetWidth > 640,
+          change: positionBoxRef?.current?.offsetWidth > 520,
+          pnl: true
+        }}
         hideFooter={true}
         rowHeight={56}
         scrollbarSize={0}
@@ -158,7 +152,7 @@ export const Positions = ({persona}) => {
           '& .MuiDataGrid-filler': {
             backgroundColor: '#202020',
           },
-          fontSize: fontSize ,
+          fontSize: 18,
           border: 'unset',
           height: 180,
           width: '100%',

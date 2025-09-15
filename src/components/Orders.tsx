@@ -1,10 +1,14 @@
+import {
+  useEffect,
+  useState,
+  useRef
+} from 'react';
 import { 
   Box,
 } from '@mui/material';
 import { textAlignRight, orderStatusMap, toLocalDateTimeStr } from '../util/misc';
 import { DataGrid } from '@mui/x-data-grid';
 import { useAppContext, type IOrder } from '../contexts/AppContext';
-import { useEffect, useState } from 'react';
 
 
 export const Orders = ({persona}) => {
@@ -28,35 +32,37 @@ export const Orders = ({persona}) => {
       headerAlign: 'right',
       cellClassName:
       textAlignRight,
-      minWidth: 40
+      width: 60,
+      minWidth: 60
     },
     {
       field: 'symbol',
       headerName: 'Symbol',
-      flex: 1,
+      // flex: 1,
       minWidth: 80
     },
     {
       field: 'openTimestamp',
       headerName: 'Opened',
       valueFormatter: (param: string) => toLocalDateTimeStr(param, timezone),
-      flex: 2,
-      minWidth: 120
+      // flex: 2,
+      width: 240,
+      minWidth: 240,
     },
-    {
-      field: 'status',
-      headerName: 'Status',
-      valueFormatter: (param: string) => orderStatusMap[param],
-      flex: 1, minWidth: 60
-    },
+    // {
+    //   field: 'status',
+    //   headerName: 'Status',
+    //   valueFormatter: (param: string) => orderStatusMap[param],
+    //   minWidth: 60
+    // },
     {
       field: 'price',
-      headerName: 'Price',
+      headerName: 'Filled',
       headerAlign: 'right',
       cellClassName: textAlignRight,
-      valueFormatter: (param: number) => param.toFixed(2),
+      valueFormatter: (param: number) => `${param.toFixed(2)} USD`,
       flex: 1,
-      minWidth: 80
+      minWidth: 140
     }
   ];
 
@@ -84,10 +90,12 @@ export const Orders = ({persona}) => {
 
   }, [ordersRef]);
 
-  const fontSize = 18
+  const orderBoxRef = useRef<HTMLDivElement>(null);
+
 
   return (
       <Box
+        ref={orderBoxRef}
         sx={{
           marginTop: 1,
           width: '100%'
@@ -96,6 +104,14 @@ export const Orders = ({persona}) => {
         <DataGrid
           rows={orderList}
           columns={columns}
+          columnVisibilityModel={{
+            action: true,
+            type: true,
+            symbol: true,
+            quantity: true,
+            openTimestamp: orderBoxRef?.current?.offsetWidth > 760,
+            price: true
+          }}
           hideFooter={true}
           rowHeight={56}
           scrollbarSize={0}
@@ -113,7 +129,7 @@ export const Orders = ({persona}) => {
             '& .MuiDataGrid-filler': {
               backgroundColor: '#202020',
             },
-            fontSize: fontSize ,
+            fontSize: 18,
             border: 'unset',
             height: 180,
             width: '100%',
