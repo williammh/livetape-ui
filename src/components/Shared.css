@@ -33,6 +33,15 @@
 
 }
 
+.green {
+  color: #4caf50
+}
+
+.red {
+  color: #f44336;
+}
+
+
 @font-face {
   font-family: "MontserratCustom";
   src: url("../assets/Montserrat-Medium.ttf") format("truetype");

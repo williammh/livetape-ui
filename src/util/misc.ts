@@ -35,6 +35,15 @@ export const textAlignRight = (params: any) => {
   return '';
 }
 
+export const greenOrRed = (params: any) => {
+  if (parseFloat(params.value) < 0) {
+    return 'red'
+  } else {
+    return 'green'
+  }
+  return '';
+}
+
 export const orderStatusMap = {
   'FLL': 'Filled'
 }

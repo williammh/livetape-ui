@@ -32,9 +32,7 @@ export const Account = ({persona}: {persona: string}) => {
                 size={2}
                 textAlign='left'
             >
-                <Grid
-      
-                >
+                <Grid>
                     <Avatar
                         src={persona === 'moo' ? moo : grizz}
                         sx={{
@@ -61,22 +59,20 @@ export const Account = ({persona}: {persona: string}) => {
                         {`${persona[0].toUpperCase()}${persona.slice(1)}`}
                     </Typography>
                 </Grid>
+                <Grid>
+                    <ProfitLoss persona={persona} />
+                </Grid>
+            </Grid>
+                <Grid
+                    size={2}
+                >
+                    <Positions persona={persona} />
+                </Grid>
             </Grid>
             <Grid
-                size={1}
+                size={2}
             >
-                <ProfitLoss persona={persona} />
-            </Grid>
-            <Grid
-                size={1}
-            >
-                <Positions persona={persona} />
-            </Grid>
-            </Grid>
-            <Grid
-            size={2}
-            >
-            <Orders persona={persona} />
+                <Orders persona={persona} />
             </Grid>
         </Item>
     )

@@ -15,13 +15,11 @@ export const Orders = ({persona}) => {
     {
       field: 'action',
       headerName: 'Order',
-      flex: 1,
       minWidth: 60
     },
     {
       field: 'type',
       headerName: 'Type',
-      flex: 1,
       minWidth: 60
     },
     {
@@ -30,7 +28,6 @@ export const Orders = ({persona}) => {
       headerAlign: 'right',
       cellClassName:
       textAlignRight,
-      flex: 1,
       minWidth: 40
     },
     {
@@ -118,7 +115,7 @@ export const Orders = ({persona}) => {
             },
             fontSize: fontSize ,
             border: 'unset',
-            height: 192,
+            height: 180,
             width: '100%',
             padding: 1,
             

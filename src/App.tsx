@@ -33,9 +33,6 @@ const App = () => {
   now.setHours(13);
   now.setMinutes(30);
   now.setSeconds(0);
-
-
-
   
   const isPortraitMode = window.outerWidth < window.outerHeight;
   const isFixedWidthMode = false;

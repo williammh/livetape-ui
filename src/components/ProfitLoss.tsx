@@ -80,10 +80,19 @@ export const ProfitLoss = ({persona}) => {
   return (
     <Box
       sx={{
-        width: '100%'
+        width: '100%',
+        paddingRight: 1
       }}
     > 
-      <TableContainer
+      <Typography
+        sx={{
+          fontSize: 18,
+          fontWeight: 'bold'
+        }}
+      >
+        +0.00 USD
+      </Typography>
+      {/* <TableContainer
         component={Paper}
         sx={{
           overflowX: 'hidden'
@@ -128,7 +137,7 @@ export const ProfitLoss = ({persona}) => {
           </TableBody>
         </Table>
 
-      </TableContainer>
+      </TableContainer> */}
     </Box>
   );
 }
