@@ -24,6 +24,8 @@ export const Positions = ({persona}) => {
     {
       field: 'direction',
       headerName: 'Position',
+      width: 80,
+      minWidth: 80,
       flex: 1,
     },
     {
