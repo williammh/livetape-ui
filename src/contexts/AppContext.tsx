@@ -72,6 +72,7 @@ const AppContext = createContext({} as IAppContext);
 
 
 
+
 export const symbols = {
     'Stocks': ['NVDA', 'TSLA', 'AMZN', 'AAPL', 'AMD', 'GOOGL', 'META', 'MSFT'],
     'Crypto': ['BTCUSD', 'ETHUSD'],
@@ -216,6 +217,9 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
 
           let startDate = new Date(replayBars[0].timestamp);
           startDate = addToDate(startDate, { minutes: -1 });
+
+
+
 
           let idx = 0;
           let replayBarCloseTimestamp = replayBars[0].timestamp;

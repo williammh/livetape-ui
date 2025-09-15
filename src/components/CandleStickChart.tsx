@@ -160,7 +160,7 @@ const TEN_MIN_MS = 10 * 60 * 1000;
 
 const THIRTY_MIN_MS = 30 * 60 * 1000;
 
-const calculateCleanXAxisRange = (min: number, max: number, firstBarTime?: number, lastBarTime?: number) => {
+const calcCleanXAxisRange = (min: number, max: number, firstBarTime?: number, lastBarTime?: number) => {
   if (min === undefined || max === undefined) {
     return null;
   }
@@ -236,7 +236,7 @@ const getTickInterval = (min: number, max: number) => {
 };
 
 // Function to calculate clean Y-axis min/max and tick interval
-const calculateCleanYAxisRange = (min: number, max: number) => {
+const calcCleanYAxisRange = (min: number, max: number) => {
   const tickInterval = getTickInterval(min, max);
   
   // Round min down to nearest tick interval
@@ -271,7 +271,7 @@ const restoreZoom = (chart, currentXRange, currentYRange, rawBarDataRef, userZoo
       const lastBarIdx = idx !== -1 ? idx : rawBarDataRef.current.length - 1;
 
       const lastBarTime = new Date(rawBarDataRef.current[lastBarIdx].timestamp).getTime();
-      const cleanXRange = calculateCleanXAxisRange(currentXRange.min, currentXRange.max, firstBarTime, lastBarTime);
+      const cleanXRange = calcCleanXAxisRange(currentXRange.min, currentXRange.max, firstBarTime, lastBarTime);
 
       if (panRight) {
         // +60000 epoch time moves X axis range 1 minute forward
@@ -296,7 +296,7 @@ const restoreZoom = (chart, currentXRange, currentYRange, rawBarDataRef, userZoo
        
         const lastBarTime = new Date(rawBarDataRef.current[lastBarIdx].timestamp).getTime();
 
-        const cleanXRange = calculateCleanXAxisRange(currentXRange.min, currentXRange.max, firstBarTime, lastBarTime);
+        const cleanXRange = calcCleanXAxisRange(currentXRange.min, currentXRange.max, firstBarTime, lastBarTime);
        
         if (cleanXRange) {
           // console.log(rawBarDataRef.current[lastBarIdx]);
@@ -347,7 +347,7 @@ const restoreZoom = (chart, currentXRange, currentYRange, rawBarDataRef, userZoo
   // Restore Y-axis range if it was manually set
   if (currentYRange && currentYRange.min !== undefined && currentYRange.max !== undefined && userZoomedXAxis.current) {
     try {
-      const cleanYRange = calculateCleanYAxisRange(currentYRange.min, currentYRange.max);
+      const cleanYRange = calcCleanYAxisRange(currentYRange.min, currentYRange.max);
       chart.updateOptions({
         yaxis: {
           min: cleanYRange.min,
@@ -509,15 +509,11 @@ export const CandlestickChart = () => {
 
   }, [symbol]);
   
-
-  const containerRef = useRef<HTMLDivElement>(null);
-
   // subtract height of header - StusBar - Accounts - padding
   const height = window.innerHeight - 72 - 64 - 446 - 38
  
   return (
     <Box
-      ref={containerRef}
       sx={{
         marginTop: 1,
         height: height,
@@ -565,8 +561,8 @@ export const CandlestickChart = () => {
                       if (yRange.min !== undefined && yRange.max !== undefined) {
                         
             
-                        const cleanXRange = calculateCleanXAxisRange(xaxis.min, xaxis.max);
-                        const cleanYRange = calculateCleanYAxisRange(yRange.min, yRange.max);
+                        const cleanXRange = calcCleanXAxisRange(xaxis.min, xaxis.max);
+                        const cleanYRange = calcCleanYAxisRange(yRange.min, yRange.max);
 
 
                         chart.updateOptions({
