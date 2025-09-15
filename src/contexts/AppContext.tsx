@@ -21,10 +21,9 @@ import commentsNvda_2025_08_22 from '../assets/NVDA.2025-08-22.comments.json';
 import positionsNvda_2025_08_15 from '../assets/NVDA.2025-08-15.positions.json';
 import positionsNvda_2025_08_22 from '../assets/NVDA.2025-08-22.positions.json';
 
-
-
-
 import { parseCSV, addToDate, toRfc3339Str } from '../util/misc';
+
+export const serverAddress = 'localhost:8001';
 
 export interface IPosition {
   id: number;
@@ -71,7 +70,7 @@ interface IAppContext {
 
 const AppContext = createContext({} as IAppContext);
 
-export const serverAddress = 'localhost:8001';
+
 
 export const symbols = {
     'Stocks': ['NVDA', 'TSLA', 'AMZN', 'AAPL', 'AMD', 'GOOGL', 'META', 'MSFT'],
