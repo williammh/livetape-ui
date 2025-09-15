@@ -19,7 +19,9 @@ export const Orders = ({persona}) => {
     {
       field: 'action',
       headerName: 'Order',
-      minWidth: 60
+      width: 80,
+      minWidth: 80,
+      flex: 1,
     },
     {
       field: 'type',
@@ -39,6 +41,7 @@ export const Orders = ({persona}) => {
       field: 'symbol',
       headerName: 'Symbol',
       // flex: 1,
+      width: 80,
       minWidth: 80
     },
     {
@@ -92,7 +95,6 @@ export const Orders = ({persona}) => {
 
   const orderBoxRef = useRef<HTMLDivElement>(null);
 
-
   return (
       <Box
         ref={orderBoxRef}
@@ -106,9 +108,9 @@ export const Orders = ({persona}) => {
           columns={columns}
           columnVisibilityModel={{
             action: true,
-            type: true,
+            type: orderBoxRef?.current?.offsetWidth > 440,
             symbol: true,
-            quantity: true,
+            quantity: orderBoxRef?.current?.offsetWidth > 380,
             openTimestamp: orderBoxRef?.current?.offsetWidth > 760,
             price: true
           }}

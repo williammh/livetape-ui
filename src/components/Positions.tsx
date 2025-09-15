@@ -24,8 +24,7 @@ export const Positions = ({persona}) => {
     {
       field: 'direction',
       headerName: 'Position',
-      // flex: 1,
-      minWidth: 60
+      flex: 1,
     },
     {
       field: 'quantity',
@@ -33,13 +32,13 @@ export const Positions = ({persona}) => {
       headerAlign: 'right',
       cellClassName:
       textAlignRight,
-      // flex: 1,
       minWidth: 60,
       width: 60,
     },
     {
       field: 'symbol',
       headerName: 'Symbol',
+      width: 80,
       minWidth: 80
     },
     // {
