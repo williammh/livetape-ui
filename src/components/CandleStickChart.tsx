@@ -10,18 +10,8 @@ import {
   colors,
   Typography,
 } from '@mui/material';
-import { serverAddress, useAppContext } from '../contexts/AppContext';
+import { serverAddress, useAppContext, type IBar } from '../contexts/AppContext';
 import { toLocalTimeStr, addToDate, toRfc3339Str, isDST } from '../util/misc';
-
-interface IBar {
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  timestamp: string;
-  barstatus: string;
-  totalvolume?: number;
-}
 
 const convertBars = (barData) => {
   if (!barData || !Array.isArray(barData) || barData.length === 0) {
@@ -268,7 +258,11 @@ const restoreZoom = (chart, currentXRange, currentYRange, rawBarDataRef, userZoo
       const idx = rawBarDataRef.current.findIndex((bar) => {
         return Number.isNaN(bar.open);
       })
-      const lastBarIdx = idx !== -1 ? idx : rawBarDataRef.current.length - 1;
+      const lastBarIdx = idx !== -1 ? idx - 1 : rawBarDataRef.current.length - 1;
+
+      console.log(idx);
+      console.log(lastBarIdx);
+      console.log(rawBarDataRef.current);
 
       const lastBarTime = new Date(rawBarDataRef.current[lastBarIdx].timestamp).getTime();
       const cleanXRange = calcCleanXAxisRange(currentXRange.min, currentXRange.max, firstBarTime, lastBarTime);
@@ -292,7 +286,7 @@ const restoreZoom = (chart, currentXRange, currentYRange, rawBarDataRef, userZoo
           return Number.isNaN(bar.open);
         })
 
-        const lastBarIdx = idx !== -1 ? idx : rawBarDataRef.current.length - 1;
+        const lastBarIdx = idx !== -1 ? idx - 1 : rawBarDataRef.current.length - 1;
        
         const lastBarTime = new Date(rawBarDataRef.current[lastBarIdx].timestamp).getTime();
 
@@ -325,10 +319,10 @@ const restoreZoom = (chart, currentXRange, currentYRange, rawBarDataRef, userZoo
             annotations: {
               yaxis: [
                 {
-                  y: rawBarDataRef.current[lastBarIdx - 1].close,
+                  y: rawBarDataRef.current[lastBarIdx].close,
                   borderWidth: 0,
                   label: {
-                    text: `${rawBarDataRef.current[lastBarIdx - 1].close.toFixed(2)}`,
+                    text: `${rawBarDataRef.current[lastBarIdx].close.toFixed(2)}`,
                     // offsetX: -barWidth * 3,
                     style: {},
                     position: 'right'
@@ -422,7 +416,7 @@ export const CandlestickChart = () => {
   const { setAssetClass, symbol, setSymbol, timezone, replayDate, setReplayDate, isServerOnlineRef } = useAppContext();
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const [initialData, setInitialData] = useState([]); // New state for initial data
+  const [initialData, setInitialData] = useState([]);
   const rawBarDataRef = useRef<Array<IBar>>([]);
   const chartRef = useRef(null);
 

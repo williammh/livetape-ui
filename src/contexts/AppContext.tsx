@@ -25,6 +25,16 @@ import { parseCSV, addToDate, toRfc3339Str } from '../util/misc';
 
 export const serverAddress = 'localhost:8001';
 
+export interface IBar {
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  timestamp: string;
+  totalvolume: number;
+  barstatus?: string;
+}
+
 export interface IPosition {
   id: number;
   account: string;
@@ -49,29 +59,26 @@ export interface IOrder {
   closeTimestamp: string;
 }
 
+
 interface IAppContext {
-    isServerOnlineRef: RefObject<boolean>;
-    assetClass: 'Stocks' | 'Crypto' | 'Futures';
-    setAssetClass: Dispatch<SetStateAction<string>>;
-    symbol: string;
-    setSymbol: Dispatch<SetStateAction<string>>;
-    timezone: string;
-    setTimezone: Dispatch<SetStateAction<string>>;
-    openBarCallback: (callback: ((msg: any) => void) | null) => void;
-    replayDate: string;
-    setReplayDate: Dispatch<SetStateAction<string>>;
-    messageListRef: RefObject<object[]>;
-    positionsRef: RefObject<{[account: string]: {[id: string]: IPosition}}>;
-    ordersRef: RefObject<{[account: string]: {[id: string]: IOrder}}>
-    priceRef: RefObject<number>;
-    timestampRef: RefObject<string>;
+  isServerOnlineRef: RefObject<boolean>;
+  assetClass: 'Stocks' | 'Crypto' | 'Futures';
+  setAssetClass: Dispatch<SetStateAction<string>>;
+  symbol: string;
+  setSymbol: Dispatch<SetStateAction<string>>;
+  timezone: string;
+  setTimezone: Dispatch<SetStateAction<string>>;
+  openBarCallback: (callback: ((msg: any) => void) | null) => void;
+  replayDate: string;
+  setReplayDate: Dispatch<SetStateAction<string>>;
+  messageListRef: RefObject<object[]>;
+  positionsRef: RefObject<{[account: string]: {[id: string]: IPosition}}>;
+  ordersRef: RefObject<{[account: string]: {[id: string]: IOrder}}>
+  priceRef: RefObject<number>;
+  timestampRef: RefObject<string>;
 }
 
-
 const AppContext = createContext({} as IAppContext);
-
-
-
 
 export const symbols = {
     'Stocks': ['NVDA', 'TSLA', 'AMZN', 'AAPL', 'AMD', 'GOOGL', 'META', 'MSFT'],
@@ -143,6 +150,9 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
   const [ symbol, setSymbol ] = useState<string>('NVDA');
   const [ replayDate, setReplayDate ] = useState<string>('');
   const [ timezone, setTimezone ] = useState<string>('America/New_York');
+
+  // const [ initialBars, setInitialBars ] = useState<IBar[]>([]);
+
   
   // bar data websocket connection
   const openBarcallBackRef = useRef<((msg: any) => void) | null>(null);
@@ -217,70 +227,86 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
 
           let startDate = new Date(replayBars[0].timestamp);
           startDate = addToDate(startDate, { minutes: -1 });
+          // startDate = addToDate(startDate, { minutes: 15 });
 
+          // const startTimestamp = toRfc3339Str(startDate)
 
+          // const barsBeforeStartTime: IBar[] = [];
+          // let curBar = {};
+          // let idx = 0;
+          // while (replayBars[idx].timestamp <= startTimestamp) {
+          //   if ('timestamp' in curBar && replayBars[idx].timestamp !== curBar.timestamp) {
+          //     barsBeforeStartTime.push(curBar as IBar);
+          //     curBar = {};
+          //   }
+          //   curBar = replayBars[idx];
+          //   idx++;
+          // }
+          
+          // console.log("INIT");
+          // console.log(barsBeforeStartTime);
+          // setInitialBars(barsBeforeStartTime);
 
-
-          let idx = 0;
+        
+          idx = 0;
           let replayBarCloseTimestamp = replayBars[0].timestamp;
 
           const mockBarWebSocket = setInterval(() => {
-              const now = addToDate(startDate, {seconds: idx});
+            const now = addToDate(startDate, {seconds: idx});
+            timestampRef.current = toRfc3339Str(now);
+            priceRef.current = parseFloat(replayBars[idx].close);
 
-              timestampRef.current = toRfc3339Str(now);
-              priceRef.current = parseFloat(replayBars[idx].close);
+            // replay bars
+            const mockBarMessage = replayBarCloseTimestamp !== replayBars[idx].timestamp ? {
+              type: 'closed_bar',
+              data: replayBars[idx - 1]
+            } : {
+              type: 'open_bar',
+              data: replayBars[idx]
+            }
+            openBarcallBackRef.current?.(mockBarMessage);
 
-              // replay bars
-              const mockBarMessage = replayBarCloseTimestamp !== replayBars[idx].timestamp ? {
-                  type: 'closed_bar',
-                  data: replayBars[idx - 1]
-              } : {
-                  type: 'open_bar',
-                  data: replayBars[idx]
-              }
-              openBarcallBackRef.current?.(mockBarMessage);
-
-              // replay orders
-              for (let order of replayOrders) {
-                  const isOrderOpened = timestampRef.current >= order.openTimestamp;
-                  if (isOrderOpened) {
-                      if (!(order.account in ordersRef.current)) {
-                          ordersRef.current[order.account] = {};
-                      }
-                      ordersRef.current[order.account][order.id] = order;
-                  }
-              }
-
-              // replay positions      
-              for (let pos of replayPositions) {
-                if (
-                  (timestampRef.current >= pos.openTimestamp) &&
-                  (timestampRef.current < pos.closeTimestamp)
-                ) {
-                  if (!(pos.account in positionsRef.current)) {
-                    positionsRef.current[pos.account] = {};
-                  }
-                  const openedPosition: IPosition = { 
-                    id: pos.id,
-                    account: pos.account,
-                    direction: pos.direction,
-                    quantity: pos.quantity,
-                    symbol: pos.symbol,
-                    averagePrice: parseFloat(pos.averagePrice),
-                    openTimestamp: pos.openTimestamp,
-                    closeTimestamp: pos.closeTimestamp,
-                  }
-                  positionsRef.current[pos.account][pos.id] = openedPosition;
-                } else if (timestampRef.current > pos.closeTimestamp && pos.id in positionsRef.current[pos.account]) {
-                  const openPositions = {...positionsRef.current[pos.account]};
-                  Reflect.deleteProperty(openPositions, pos.id);
-                  positionsRef.current[pos.account] = openPositions;
+            // replay orders
+            for (let order of replayOrders) {
+                const isOrderOpened = timestampRef.current >= order.openTimestamp;
+                if (isOrderOpened) {
+                    if (!(order.account in ordersRef.current)) {
+                        ordersRef.current[order.account] = {};
+                    }
+                    ordersRef.current[order.account][order.id] = order;
                 }
+            }
+
+            // replay positions      
+            for (let pos of replayPositions) {
+              if (
+                (timestampRef.current >= pos.openTimestamp) &&
+                (timestampRef.current < pos.closeTimestamp)
+              ) {
+                if (!(pos.account in positionsRef.current)) {
+                  positionsRef.current[pos.account] = {};
+                }
+                const openedPosition: IPosition = { 
+                  id: pos.id,
+                  account: pos.account,
+                  direction: pos.direction,
+                  quantity: pos.quantity,
+                  symbol: pos.symbol,
+                  averagePrice: parseFloat(pos.averagePrice),
+                  openTimestamp: pos.openTimestamp,
+                  closeTimestamp: pos.closeTimestamp,
+                }
+                positionsRef.current[pos.account][pos.id] = openedPosition;
+              } else if (timestampRef.current > pos.closeTimestamp && pos.id in positionsRef.current[pos.account]) {
+                const openPositions = {...positionsRef.current[pos.account]};
+                Reflect.deleteProperty(openPositions, pos.id);
+                positionsRef.current[pos.account] = openPositions;
               }
+            }
 
 
-              replayBarCloseTimestamp = replayBars[idx].timestamp;
-              idx++;
+            replayBarCloseTimestamp = replayBars[idx].timestamp;
+            idx++;
 
           }, 1000);
 
