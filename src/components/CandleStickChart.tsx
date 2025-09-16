@@ -90,6 +90,7 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
       
     case 'open_bar':
       const lastBar = currentBars[currentBars.length - 1];
+
       const lastBarTimeStamp = lastBar?.['timestamp'];
       const openBarTimeStamp = message.data['timestamp'];
       const openBar = {
@@ -260,10 +261,6 @@ const restoreZoom = (chart, currentXRange, currentYRange, rawBarDataRef, userZoo
       })
       const lastBarIdx = idx !== -1 ? idx - 1 : rawBarDataRef.current.length - 1;
 
-      console.log(idx);
-      console.log(lastBarIdx);
-      console.log(rawBarDataRef.current);
-
       const lastBarTime = new Date(rawBarDataRef.current[lastBarIdx].timestamp).getTime();
       const cleanXRange = calcCleanXAxisRange(currentXRange.min, currentXRange.max, firstBarTime, lastBarTime);
 
@@ -413,99 +410,51 @@ const calculateYAxisRange = (chart, data) => {
 
 
 export const CandlestickChart = () => {
-  const { setAssetClass, symbol, setSymbol, timezone, replayDate, setReplayDate, isServerOnlineRef } = useAppContext();
+  const {
+    symbol,
+    initialBars,
+    timezone,
+    replayDate,
+  } = useAppContext();
 
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const [initialData, setInitialData] = useState([]);
   const rawBarDataRef = useRef<Array<IBar>>([]);
   const chartRef = useRef(null);
 
   const userZoomedYAxis = useRef(false);
   const userZoomedXAxis = useRef(false);
 
-  useEffect(() => {
-    if (replayDate) {
-      const startDateTime = new Date(replayDate);
-
-      startDateTime.setUTCHours(isDST(startDateTime) ? 13 : 14);
-      startDateTime.setUTCMinutes(31);
-      startDateTime.setUTCSeconds(0);
-
-      const initialBars = 10;
-
-      const emptyRawBarData = Array(initialBars).fill().map((_, index) => {
-        const timestamp = addToDate(startDateTime, {minutes: index});
-
-        return {
-          timestamp: toRfc3339Str(timestamp),
-          barstatus: 'open',
-          open: NaN,
-          high: NaN,
-          low: NaN,
-          close: NaN,
-          totalvolume: 0
-        }
-      });
-
-      const emptyConvertedBars = Array(initialBars).fill().map((_, index) => ({
-        x: addToDate(startDateTime, {minutes: index}),
-        y: [NaN, NaN, NaN, NaN]
-      }));
-      
-      rawBarDataRef.current = emptyRawBarData;
-      setInitialData(emptyConvertedBars);
-      setIsDataLoaded(true);
-
-    } else {
-      rawBarDataRef.current = [];
-      setInitialData([]);
-    }
-
-  }, [replayDate]);
+  const [convertedInitialBars, setConvertedInitialBars] = useState([]);
 
   useEffect(() => {
   
     console.log(`RENDER CHART: ${symbol} ${replayDate}`);
 
-    setIsDataLoaded(false);
-    setInitialData([]);
     rawBarDataRef.current = [];
     userZoomedXAxis.current = false;
     userZoomedYAxis.current = false;
-
-    const secondsToStartRerun = 5;
-    const offlineTimeout = setTimeout(() => {
-    
-      if (rawBarDataRef?.current.length === 0) {
-        console.log('REPLAY!', isServerOnlineRef.current);
-        setAssetClass('Stocks');
-        setSymbol('NVDA');
-        setReplayDate('2025-08-15');
-      }
-    }, secondsToStartRerun * 1000);
-
-    const getclosedBars = (async () => {
-      const res = await fetch(`http://${serverAddress}/closed_bars/${symbol}`);
-      const closedBars = await res.json();
-      console.log(`CLOSED BARS: ${symbol}`);
-      console.log(closedBars);
-      rawBarDataRef.current = closedBars;
-      
-      const convertedBars = convertBars(closedBars);
-      setInitialData(convertedBars);
-      setIsDataLoaded(true);
-      
-    })();
-
-    return () => {
-      clearTimeout(offlineTimeout);
-    };
 
   }, [symbol]);
   
   // subtract height of header - StusBar - Accounts - padding
   const height = window.innerHeight - 72 - 64 - 446 - 38
- 
+
+  // rawBarDataRef.current = initialBars;
+
+  useEffect(() => {
+    rawBarDataRef.current = initialBars;
+    const convertedBars = initialBars.map((bar) => ({
+      x: new Date(bar['timestamp']),
+      y: [
+        parseFloat(bar['open']) || 0,
+        parseFloat(bar['high']) || 0,
+        parseFloat(bar['low']) || 0,
+        parseFloat(bar['close']) || 0
+      ]
+    }));
+    setConvertedInitialBars(convertedBars)
+  }, [initialBars]);
+  
+
   return (
     <Box
       sx={{
@@ -517,11 +466,11 @@ export const CandlestickChart = () => {
         onMessage={(msg) => handleWebSocketMessage(msg, chartRef, rawBarDataRef, userZoomedXAxis, timezone)} 
         symbol={symbol}
       />
-      {isDataLoaded ? (
+      {initialBars.length ? (
        
         <Chart
           series={[{
-            data: initialData
+            data: convertedInitialBars
           }]}
           type='candlestick'
           height={height - 15}

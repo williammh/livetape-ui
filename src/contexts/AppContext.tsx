@@ -23,7 +23,7 @@ import positionsNvda_2025_08_22 from '../assets/NVDA.2025-08-22.positions.json';
 
 import { parseCSV, addToDate, toRfc3339Str } from '../util/misc';
 
-export const serverAddress = 'localhost:8001';
+export const serverAddress = 'localhost:8000';
 
 export interface IBar {
   open: number;
@@ -68,6 +68,7 @@ interface IAppContext {
   setSymbol: Dispatch<SetStateAction<string>>;
   timezone: string;
   setTimezone: Dispatch<SetStateAction<string>>;
+  initialBars: IBar[];
   openBarCallback: (callback: ((msg: any) => void) | null) => void;
   replayDate: string;
   setReplayDate: Dispatch<SetStateAction<string>>;
@@ -151,7 +152,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
   const [ replayDate, setReplayDate ] = useState<string>('');
   const [ timezone, setTimezone ] = useState<string>('America/New_York');
 
-  // const [ initialBars, setInitialBars ] = useState<IBar[]>([]);
+  const [ initialBars, setInitialBars ] = useState<IBar[]>([]);
 
   
   // bar data websocket connection
@@ -188,6 +189,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
     const getServerStatus = async () => {
       try {
         const res = await fetchTimeout(`http://${serverAddress}/`, pingIntervalSeconds);
+
         const resJson = await res.json();
       
         if (resJson === true) {
@@ -223,36 +225,31 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
           const replayOrders = replayOrdersDateMap[symbol][replayDate];
           const replayPositions = replayPositionsDateMap[symbol][replayDate];
 
+          const firstBarCloseTime = new Date(replayBars[0].timestamp);
+          const firstBarOpenTime = addToDate(firstBarCloseTime, { minutes: -1});
+          const replayStartTime = addToDate(firstBarOpenTime, { minutes: 15 });
+          const replayStartTimestamp = toRfc3339Str(replayStartTime)
 
+          const barsBeforeStartTime: IBar[] = [];
+          let curBar = {};
+          let idx = 0;
+          while (replayBars[idx].timestamp <= replayStartTimestamp) {
+            if ('timestamp' in curBar && replayBars[idx].timestamp !== curBar.timestamp) {
+              barsBeforeStartTime.push(curBar as IBar);
+              curBar = {};
+            }
+            curBar = replayBars[idx];
+            idx++;
+          }
+         
+          setInitialBars(barsBeforeStartTime);
 
-          let startDate = new Date(replayBars[0].timestamp);
-          startDate = addToDate(startDate, { minutes: -1 });
-          // startDate = addToDate(startDate, { minutes: 15 });
-
-          // const startTimestamp = toRfc3339Str(startDate)
-
-          // const barsBeforeStartTime: IBar[] = [];
-          // let curBar = {};
-          // let idx = 0;
-          // while (replayBars[idx].timestamp <= startTimestamp) {
-          //   if ('timestamp' in curBar && replayBars[idx].timestamp !== curBar.timestamp) {
-          //     barsBeforeStartTime.push(curBar as IBar);
-          //     curBar = {};
-          //   }
-          //   curBar = replayBars[idx];
-          //   idx++;
-          // }
-          
-          // console.log("INIT");
-          // console.log(barsBeforeStartTime);
-          // setInitialBars(barsBeforeStartTime);
-
-        
-          idx = 0;
-          let replayBarCloseTimestamp = replayBars[0].timestamp;
+          idx--;
+          let replayBarCloseTimestamp = replayBars[idx].timestamp;
 
           const mockBarWebSocket = setInterval(() => {
-            const now = addToDate(startDate, {seconds: idx});
+            const now = addToDate(firstBarOpenTime, {seconds: idx});
+
             timestampRef.current = toRfc3339Str(now);
             priceRef.current = parseFloat(replayBars[idx].close);
 
@@ -297,7 +294,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
                   closeTimestamp: pos.closeTimestamp,
                 }
                 positionsRef.current[pos.account][pos.id] = openedPosition;
-              } else if (timestampRef.current > pos.closeTimestamp && pos.id in positionsRef.current[pos.account]) {
+              } else if (positionsRef.current[pos.account] && timestampRef.current > pos.closeTimestamp) {
                 const openPositions = {...positionsRef.current[pos.account]};
                 Reflect.deleteProperty(openPositions, pos.id);
                 positionsRef.current[pos.account] = openPositions;
@@ -323,9 +320,32 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
   }, [replayDate])
 
   useEffect(() => {
+
+      const secondsToStartReplay = 5;
+      const offlineTimeout = setTimeout(() => {
+        if (initialBars.length === 0) {
+          console.log('REPLAY!', isServerOnlineRef.current);
+          setAssetClass('Stocks');
+          setSymbol('NVDA');
+          setReplayDate('2025-08-15');
+        }
+      }, secondsToStartReplay * 1000);
+  
+      if (initialBars.length === 0) {
+        const getclosedBars = (async () => {
+          console.log("Fetching closed bars");
+          const res = await fetch(`http://${serverAddress}/closed_bars/${symbol}`);
+          const closedBars = await res.json();
+          console.log(`CLOSED BARS: ${symbol}`);
+          console.log(closedBars);
+
+          setInitialBars(closedBars);
+    
+        })();
+      }
+
       const barWs = new WebSocket(`ws://${serverAddress}/ws/bars/${symbol}`);
       barWsRef.current = barWs;
-
   
       barWs.onopen = () => {
           console.log(`🌐 📊 ${symbol} Bars WebSocket connected`);
@@ -377,10 +397,10 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
           barWs.close();
           commentWs.close();
           messageListRef.current = [];
-
+          clearTimeout(offlineTimeout);
       };
 
-  }, [symbol]);
+  }, [symbol, initialBars]);
 
   return (
       <AppContext.Provider
@@ -393,6 +413,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
               setReplayDate,
               timezone,
               setTimezone,
+              initialBars,
               openBarCallback: (callback) => { openBarcallBackRef.current = callback; },
               messageListRef,
               ordersRef,
