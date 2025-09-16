@@ -480,7 +480,7 @@ export const CandlestickChart = () => {
         console.log('REPLAY!', isServerOnlineRef.current);
         setAssetClass('Stocks');
         setSymbol('NVDA');
-        setReplayDate('2025-08-22');
+        setReplayDate('2025-08-15');
       }
     }, secondsToStartRerun * 1000);
 

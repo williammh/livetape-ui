@@ -6,7 +6,7 @@
         "type": "Market",
         "quantity": 400,
         "symbol": "NVDA",
-        "price": 181.10,
+        "price": 181.60,
         "status": "FLL",
         "openTimestamp": "2025-08-15T13:30:02Z",
         "closeTimestamp": "2025-08-15T13:30:02Z"
