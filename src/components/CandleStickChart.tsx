@@ -90,7 +90,6 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
       
     case 'open_bar':
       const lastBar = currentBars[currentBars.length - 1];
-
       const lastBarTimeStamp = lastBar?.['timestamp'];
       const openBarTimeStamp = message.data['timestamp'];
       const openBar = {
@@ -262,7 +261,11 @@ const restoreZoom = (chart, currentXRange, currentYRange, rawBarDataRef, userZoo
       const lastBarIdx = idx !== -1 ? idx - 1 : rawBarDataRef.current.length - 1;
 
       const lastBarTime = new Date(rawBarDataRef.current[lastBarIdx].timestamp).getTime();
+
+
+
       const cleanXRange = calcCleanXAxisRange(currentXRange.min, currentXRange.max, firstBarTime, lastBarTime);
+
 
       if (panRight) {
         // +60000 epoch time moves X axis range 1 minute forward
@@ -449,6 +452,7 @@ export const CandlestickChart = () => {
         parseFloat(bar['close']) || 0
       ]
     }));
+  
     setConvertedInitialBars(convertedBars)
   }, [initialBars]);
   
@@ -504,6 +508,8 @@ export const CandlestickChart = () => {
             
                         const cleanXRange = calcCleanXAxisRange(xaxis.min, xaxis.max);
                         const cleanYRange = calcCleanYAxisRange(yRange.min, yRange.max);
+
+                 
 
 
                         chart.updateOptions({

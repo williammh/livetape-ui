@@ -23,7 +23,7 @@ import positionsNvda_2025_08_22 from '../assets/NVDA.2025-08-22.positions.json';
 
 import { parseCSV, addToDate, toRfc3339Str } from '../util/misc';
 
-export const serverAddress = 'localhost:8000';
+export const serverAddress = 'localhost:8001';
 
 export interface IBar {
   open: number;
@@ -231,25 +231,21 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
           const replayStartTimestamp = toRfc3339Str(replayStartTime)
 
           const barsBeforeStartTime: IBar[] = [];
-          let curBar = {};
+
           let idx = 0;
           while (replayBars[idx].timestamp <= replayStartTimestamp) {
-            if ('timestamp' in curBar && replayBars[idx].timestamp !== curBar.timestamp) {
-              barsBeforeStartTime.push(curBar as IBar);
-              curBar = {};
+            const currentBar = replayBars[idx];
+            if (replayBars[idx + 1].timestamp !== currentBar.timestamp) {
+              barsBeforeStartTime.push(currentBar as IBar);
             }
-            curBar = replayBars[idx];
             idx++;
           }
          
           setInitialBars(barsBeforeStartTime);
 
-          idx--;
           let replayBarCloseTimestamp = replayBars[idx].timestamp;
-
           const mockBarWebSocket = setInterval(() => {
-            const now = addToDate(firstBarOpenTime, {seconds: idx});
-
+            const now = addToDate(firstBarOpenTime, {seconds: idx + 1});
             timestampRef.current = toRfc3339Str(now);
             priceRef.current = parseFloat(replayBars[idx].close);
 

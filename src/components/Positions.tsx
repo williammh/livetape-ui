@@ -100,7 +100,6 @@ export const Positions = ({persona}) => {
             pnl: pnl
           }
         });
-        console.log(list);
         setPositionList(list);
 
 
