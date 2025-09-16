@@ -327,7 +327,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
           console.log('REPLAY!', isServerOnlineRef.current);
           setAssetClass('Stocks');
           setSymbol('NVDA');
-          setReplayDate('2025-08-15');
+          setReplayDate('2025-08-22');
         }
       }, secondsToStartReplay * 1000);
   

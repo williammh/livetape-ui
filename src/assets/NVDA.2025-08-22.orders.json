@@ -6,9 +6,21 @@
         "type": "Market",
         "quantity": 400,
         "symbol": "NVDA",
-        "price": 181.10,
+        "price": 173.06,
         "status": "FLL",
-        "openTimestamp": "2025-08-22T13:31:05Z",
+        "openTimestamp": "2025-08-22T13:37:00Z",
         "closeTimestamp": "2025-08-22T13:31:05Z"
+    },
+    {
+        "id": 1,
+        "account": "grizz",
+        "action": "Sell",
+        "type": "Market",
+        "quantity": 400,
+        "symbol": "NVDA",
+        "price": 177.21,
+        "status": "FLL",
+        "openTimestamp": "2025-08-22T13:45:07Z",
+        "closeTimestamp": "2025-08-22T13:43:59Z"
     }
 ]
