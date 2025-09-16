@@ -435,10 +435,8 @@ export const CandlestickChart = () => {
 
   }, [symbol]);
   
-  // subtract height of header - StusBar - Accounts - padding
+  // subtract height of header - SatusBar - Accounts - padding
   const height = window.innerHeight - 72 - 64 - 446 - 38
-
-  // rawBarDataRef.current = initialBars;
 
   useEffect(() => {
     rawBarDataRef.current = initialBars;
