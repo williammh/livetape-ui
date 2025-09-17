@@ -7,13 +7,11 @@ import {
   Box,
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-
-import { useAppContext, replayPositionsDateMap, type IPosition } from '../contexts/AppContext';
-import { textAlignRight, orderStatusMap, toLocalDateTimeStr, greenOrRed } from '../util/misc';
-
+import { useAppContext, type IPosition } from '../contexts/AppContext';
+import { textAlignRight, greenOrRed } from '../util/misc';
 
 export const Positions = ({persona}) => {
-  const { priceRef, timestampRef, positionsRef, timezone } = useAppContext();
+  const { priceRef, positionsRef } = useAppContext();
 
   const openDateTime = new Date();
   openDateTime.setHours(13);
