@@ -274,6 +274,10 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
           for (let pos of positions) {
             if (pos.openTimestamp <= replayStartTimestamp) {
               initialPositions.push(pos);
+              if (!(pos.account in positionsRef.current)) {
+                positionsRef.current[pos.account] = {};
+              }
+              positionsRef.current[pos.account][pos.id] = pos;
             } else {
               replayPositions.push(pos);
             }
@@ -282,12 +286,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
           initialComments.push(...initialPositions.map(pos => systemMessage(pos)));
           initialComments.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
-          console.log("IC");
-          console.log(initialComments);
-
           messageListRef.current = initialComments;
-        
-          // const remainingCommentsQueue = comments.filter(comment => comment.timestamp > replayStartTimestamp);
 
           let replayBarCloseTimestamp = bars[idx].timestamp;
           const mockBarWebSocket = setInterval(() => {
@@ -332,11 +331,6 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
                   positionsRef.current[pos.account] = {};
                 }
                 if (!(pos.id in positionsRef.current[pos.account])) {
-                  // const systemMessage = {
-                  //   persona: 'system',
-                  //   text: `${pos.account[0].toUpperCase()}${pos.account.slice(1)} enters ${pos.direction.toUpperCase()} ${pos.quantity} ${pos.symbol} position`,
-                  //   timestamp: pos.openTimestamp
-                  // }
                   messageListRef.current.push(systemMessage(pos));
                 }
                 const openedPosition: IPosition = { 
