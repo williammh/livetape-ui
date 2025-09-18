@@ -303,7 +303,7 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
                 if (!(pos.id in positionsRef.current[pos.account])) {
                   const systemMessage = {
                     persona: 'system',
-                    text: `${pos.account[0].toUpperCase()}${pos.account.slice(1)} enters ${pos.direction.toUpperCase()} ${pos.symbol} ${pos.quantity} position`,
+                    text: `${pos.account[0].toUpperCase()}${pos.account.slice(1)} enters ${pos.direction.toUpperCase()} ${pos.quantity} ${pos.symbol} position`,
                     timestamp: pos.openTimestamp
                   }
                   messageListRef.current.push(systemMessage);
