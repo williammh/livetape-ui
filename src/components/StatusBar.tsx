@@ -99,8 +99,8 @@ export const StatusBar = () => {
       >
         <Grid
           container
-          // size={1}
           direction='row'
+          size={1}
           flexGrow={1}
           justifyContent='flex-start'
           alignItems='center'
@@ -173,7 +173,7 @@ export const StatusBar = () => {
           {/* Timezone */}
           <FormControl
             sx={{
-              width: 340,
+              marginRight: 1,
               textAlign: 'left'
             }}
           >
@@ -202,7 +202,9 @@ export const StatusBar = () => {
           </FormControl>
         </Grid>
         <Grid
-          minWidth={108}
+          // minWidth={82}
+          // size={1}
+          // flexShrink={0}
         >
             <ServerStatus />
 
