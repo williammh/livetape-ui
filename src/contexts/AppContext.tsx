@@ -194,10 +194,8 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
         }
       } catch (error) {
         console.log(`Error fetching server status: ${error}`);
+       
         isServerOnlineRef.current = false;
-        setAssetClass('Stocks');
-        setSymbol('NVDA');
-        setReplayDate('2025-08-22T13:45:00Z');
       }
     };
 
@@ -368,6 +366,9 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
             
           } catch (error) {
             console.log("Error fetching closed bars:", error);
+            setAssetClass('Stocks');
+            setSymbol('NVDA');
+            setReplayDate('2025-08-22T13:45:00Z');
           }
         };
 

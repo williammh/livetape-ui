@@ -204,7 +204,7 @@ export const StatusBar = () => {
           </FormControl>
         </Grid>
         <Grid>
-            <ServerStatus />
+          <ServerStatus />
         </Grid>
       </Grid>
 
