@@ -174,7 +174,9 @@ export const StatusBar = () => {
           <FormControl
             sx={{
               marginRight: 1,
-              textAlign: 'left'
+              textAlign: 'left',
+              flexGrow: 1,
+              maxWidth: 340,
             }}
           >
             <Select
@@ -201,16 +203,9 @@ export const StatusBar = () => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid
-          // minWidth={82}
-          // size={1}
-          // flexShrink={0}
-        >
+        <Grid>
             <ServerStatus />
-
         </Grid>
-        
-      
       </Grid>
 
     </Box>
