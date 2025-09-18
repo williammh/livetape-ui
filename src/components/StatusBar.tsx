@@ -19,6 +19,7 @@ import {
 import { PlayArrow, History, CalendarMonth } from '@mui/icons-material';
 import { getTzLabel, toLocalDateTimeStr } from '../util/misc';
 import { useAppContext, symbols } from '../contexts/AppContext';
+import { ServerStatus } from './ServerStatus';
 
 export const StatusBar = () => {
   const [timestamp, setTimestamp] = useState<string>('');
@@ -93,6 +94,8 @@ export const StatusBar = () => {
         columns={2}
         size={2}
         direction='row'
+        alignItems={'center'}
+        wrap='no-wrap'
       >
         <Grid
           container
@@ -197,6 +200,12 @@ export const StatusBar = () => {
               <MenuItem value={'Australia/Sydney'}>Sydney</MenuItem>
             </Select>
           </FormControl>
+        </Grid>
+        <Grid
+          minWidth={108}
+        >
+            <ServerStatus />
+
         </Grid>
         
       

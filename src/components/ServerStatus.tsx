@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { 
   colors,
-  Chip,
   Box,
   Typography,
 } from '@mui/material';
 import { useAppContext } from '../contexts/AppContext';
-import { CheckCircle, Cancel } from '@mui/icons-material';
+import { Cloud, CloudOff } from '@mui/icons-material';
 
 export const ServerStatus = () => {
   const {isServerOnlineRef } = useAppContext();
@@ -26,14 +25,13 @@ export const ServerStatus = () => {
   return (
     <Box
       sx={{
-        height: 40,
-        width: 'fit-content',
+        height: 56,
+        width: 74,
         padding: '0px 8px',
         border: `1px solid ${isOnline ? colors.green[400] : colors.grey[700]}`,
         borderRadius: 1,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'end',
         float: 'right'
       }}
     >
@@ -44,17 +42,21 @@ export const ServerStatus = () => {
         lineHeight={'40px'}
         display={'inline-block'}
         color={isOnline ? colors.green[400] : colors.grey[700]}
+        fontWeight='bold'
+        sx={{
+          marginRight: 1,
+        }}
       >
-        Server
+        {isOnline ? 'On' : 'Off'}
       </Typography>
       {isOnline ? (
-        <CheckCircle
+        <Cloud
           sx={{
             color: colors.green[400],
           }}
         /> 
       ) : (
-        <Cancel
+        <CloudOff
            sx={{
             color: colors.grey[700],
           }}
