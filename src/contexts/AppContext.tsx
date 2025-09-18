@@ -23,7 +23,13 @@ import positionsNvda_2025_08_22 from '../assets/NVDA.2025-08-22.positions.json';
 
 import { parseCSV, addToDate, toRfc3339Str } from '../util/misc';
 
-export const serverAddress = 'localhost:8001';
+const addresses = {
+  local: 'localhost:8000',
+  forwarded: 'localhost:8001',
+  domain: 'api.livetape.ai'
+}
+
+export const serverAddress = 'localhost:8000';
 
 export interface IBar {
   open: number;
@@ -224,6 +230,8 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
           const replayBars = parseCSV(replayBarsDateMap[symbol][replayDate]);
           const replayOrders = replayOrdersDateMap[symbol][replayDate];
           const replayPositions = replayPositionsDateMap[symbol][replayDate];
+          const replayComments = replayCommentsDateMap[symbol][replayDate];  
+
 
           const firstBarCloseTime = new Date(replayBars[0].timestamp);
           const firstBarOpenTime = addToDate(firstBarCloseTime, { minutes: -1});
@@ -243,6 +251,13 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
          
           setInitialBars(barsBeforeStartTime);
 
+          const initialComments = replayComments.filter(comment => comment.timestamp <= replayStartTimestamp);
+          // TODO: initial positions in comments
+
+          messageListRef.current = initialComments;
+        
+          const remainingCommentsQueue = replayComments.filter(comment => comment.timestamp > replayStartTimestamp);
+
           let replayBarCloseTimestamp = replayBars[idx].timestamp;
           const mockBarWebSocket = setInterval(() => {
             const now = addToDate(firstBarOpenTime, {seconds: idx + 1});
@@ -259,6 +274,12 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
             }
             openBarcallBackRef.current?.(mockBarMessage);
 
+            // replay comments
+            if (timestampRef.current >= remainingCommentsQueue[0]?.timestamp) {
+              const comment = remainingCommentsQueue.shift();
+              messageListRef.current.push(comment)
+            }
+           
             // replay orders
             for (let order of replayOrders) {
                 const isOrderOpened = timestampRef.current >= order.openTimestamp;
@@ -279,6 +300,14 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
                 if (!(pos.account in positionsRef.current)) {
                   positionsRef.current[pos.account] = {};
                 }
+                if (!(pos.id in positionsRef.current[pos.account])) {
+                  const systemMessage = {
+                    persona: 'system',
+                    text: `${pos.account[0].toUpperCase()}${pos.account.slice(1)} enters ${pos.direction.toUpperCase()} ${pos.symbol} ${pos.quantity} position`,
+                    timestamp: pos.openTimestamp
+                  }
+                  messageListRef.current.push(systemMessage);
+                }
                 const openedPosition: IPosition = { 
                   id: pos.id,
                   account: pos.account,
@@ -290,6 +319,8 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
                   closeTimestamp: pos.closeTimestamp,
                 }
                 positionsRef.current[pos.account][pos.id] = openedPosition;
+
+
               } else if (positionsRef.current[pos.account] && timestampRef.current > pos.closeTimestamp) {
                 const openPositions = {...positionsRef.current[pos.account]};
                 Reflect.deleteProperty(openPositions, pos.id);
@@ -392,7 +423,6 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
       return () => {
           barWs.close();
           commentWs.close();
-          messageListRef.current = [];
           clearTimeout(offlineTimeout);
       };
 

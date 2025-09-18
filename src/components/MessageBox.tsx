@@ -15,6 +15,10 @@ export const MessageBox = () => {
   const [ messageList, setMessageList] = useState<IMessageProps[]>([]);
   const messageBox = useRef<HTMLDivElement>(null);
   const positionsAppended = useRef(new Set());
+  
+  useEffect(() => {
+    setMessageList([...messageListRef.current]);
+  }, []);
 
   useEffect(() => {
     if (messageBox.current) {
@@ -26,70 +30,21 @@ export const MessageBox = () => {
   }, [messageList.length]);
 
   useEffect(() => {
-    if (replayDate) {
-
-      // load historic comments
-      const replayCommentQueue = [...replayCommentsDateMap[symbol][replayDate]];  
     
-      const interval = setInterval(() => {
-        
-        if (timestampRef.current >= replayCommentQueue[0]?.timestamp) {
-          const comment = replayCommentQueue.shift();
-          console.log(comment);
-        
-          setMessageList((prev) => {
-            const nextMessageList = [...prev, comment];
-            return nextMessageList;
-          });
-        }
+    const interval = setInterval(() => {
+      if (messageListRef?.current.length !== messageList.length) {
+        setMessageList([...messageListRef.current]);
+      }
+      
+    }, 1000);
 
-        for (let account in positionsRef?.current) {          
-          const positions = positionsRef.current[account];
-          for (let id in positions) {
-            const pos = positions[id];
-            if(timestampRef.current >= pos.openTimestamp && !(positionsAppended.current.has(id))) {
-              const persona = `${pos.account?.[0].toUpperCase()}${pos.account?.slice(1)}`;
-              
-              const systemComment = {
-                persona: 'system',
-                text: `${persona} enters ${pos.direction.toUpperCase()} ${pos.quantity} ${pos.symbol} at ${(pos.averagePrice as number).toFixed(2)} USD`,
-                timestamp: pos.openTimestamp
-              };
-              positionsAppended.current.add(id);
-              setMessageList((prev) => {
-                const nextMessageList = [...prev, systemComment];
-                return nextMessageList;
-              });
-            }
-          }
-        }
+    return () => {
+      clearInterval(interval);
+    };
 
-        
-      }, 1000);
-  
-      return () => {
-        setMessageList([]);
-        clearInterval(interval);
-      };
-    
-    // live or delayed data
-    } else {
-      setMessageList([...messageListRef.current]);
-      const interval = setInterval(() => {
-        if (messageListRef?.current.length !== messageList.length) {
-          setMessageList(messageListRef.current);
-        }
+  }, [messageList]);
 
-      }, 1000);
-  
-      return () => {
-        setMessageList([]);
-        clearInterval(interval);
-      };
 
-    }
-
-  }, [replayDate, messageListRef.current.length, positionsRef.current, positionsAppended.current]);
 
   return (
     <Box
