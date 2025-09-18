@@ -7,14 +7,14 @@ import {
   Box,
  } from '@mui/material';
 import { Message, type IMessageProps } from './Message';
-import { useAppContext, replayCommentsDateMap } from '../contexts/AppContext';
+import { useAppContext } from '../contexts/AppContext';
 
 export const MessageBox = () => {
  
-  const { symbol, replayDate, timestampRef, messageListRef, positionsRef } = useAppContext();
+  const {messageListRef } = useAppContext();
   const [ messageList, setMessageList] = useState<IMessageProps[]>([]);
   const messageBox = useRef<HTMLDivElement>(null);
-  const positionsAppended = useRef(new Set());
+
   
   useEffect(() => {
     setMessageList([...messageListRef.current]);

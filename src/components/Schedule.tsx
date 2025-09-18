@@ -94,7 +94,6 @@ export const Schedule = () => {
 
 
   useEffect(() => {
-    console.log(containerRef.current?.offsetWidth);
     const width: number = containerRef.current?.offsetWidth ?? 0;
     if (width <= 360) {
       setColumns(['dayShort', 'time', 'symbol']);

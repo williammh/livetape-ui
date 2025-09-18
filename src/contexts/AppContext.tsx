@@ -21,7 +21,7 @@ import commentsNvda_2025_08_22 from '../assets/NVDA.2025-08-22.comments.json';
 import positionsNvda_2025_08_15 from '../assets/NVDA.2025-08-15.positions.json';
 import positionsNvda_2025_08_22 from '../assets/NVDA.2025-08-22.positions.json';
 
-import { parseCSV, addToDate, toRfc3339Str } from '../util/misc';
+import { parseCSV, addToDate, toRfc3339Str, fetchTimeout } from '../util/misc';
 
 const endpoints = {
   local: 'localhost:8000',
@@ -121,28 +121,28 @@ export const symbolMap = {
     },
   }
 
-const replayBarsDateMap = {
+const replayBarsMap = {
   'NVDA': {
     '2025-08-15': barsNvda_2025_08_15,
     '2025-08-22': barsNvda_2025_08_22,
   }
 }
 
-const replayOrdersDateMap = {
+const replayOrdersMap = {
   'NVDA': {
     '2025-08-15': ordersNvda_2025_08_15,
     '2025-08-22': ordersNvda_2025_08_22,
   }
 }
 
-export const replayCommentsDateMap = {
+const replayCommentsMap = {
   'NVDA': {
     '2025-08-15': commentsNvda_2025_08_15,
     '2025-08-22': commentsNvda_2025_08_22,
   }
 }
 
-export const replayPositionsDateMap = {
+const replayPositionsMap = {
   'NVDA': {
     '2025-08-15': positionsNvda_2025_08_15,
     '2025-08-22': positionsNvda_2025_08_22,
@@ -156,7 +156,7 @@ const systemMessage = (pos) => ({
 })
 
 export const AppProvider = ({children}: {children: React.ReactNode}) => {
-  
+
   // app settings
   const [ assetClass, setAssetClass ] = useState<'Stocks' | 'Crypto' | 'Futures'>('Stocks');
   // const [ assetClass, setAssetClass ] = useState<string>('Futures');
@@ -165,7 +165,6 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
   const [ timezone, setTimezone ] = useState<string>('America/New_York');
 
   const [ initialBars, setInitialBars ] = useState<IBar[]>([]);
-
   
   // bar data websocket connection
   const openBarcallBackRef = useRef<((msg: any) => void) | null>(null);
@@ -183,20 +182,6 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
   
   useEffect(() => {
     const pingIntervalSeconds = 5;
-
-    // JS has no built in fetch with timeout
-    const fetchTimeout = async (url: string, timeout: number) => {
-      const controller = new AbortController();
-      const id = setTimeout(() => {
-        controller.abort();
-      }, timeout * 1000);
-      try {
-        const response = await fetch(url, { signal: controller.signal });
-        return response;
-      } finally {
-        clearTimeout(id);
-      }
-    };
     
     const getServerStatus = async () => {
       try {
@@ -210,14 +195,12 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
             isServerOnlineRef.current = false;
         }
       } catch (error) {
-        console.log(error);
+        console.log(`Error fetching server status: ${error}`);
         isServerOnlineRef.current = false;
       }
     };
 
-    setTimeout(async () => {
-      await getServerStatus();
-    }, 0);
+    getServerStatus();
     
     const pingInterval = setInterval(async () => {
       await getServerStatus();
@@ -231,143 +214,142 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
   
 
   useEffect(() => {
-      if (replayDate) {
-          
-          const bars = parseCSV(replayBarsDateMap[symbol][replayDate]);
-          const orders = replayOrdersDateMap[symbol][replayDate];
-          const positions = replayPositionsDateMap[symbol][replayDate];
-          const comments = replayCommentsDateMap[symbol][replayDate];  
+    if (replayDate) {
+      console.log(`Replay starting at: ${replayDate}`);
+      const replayDateStr = replayDate.slice(0, 10);
+      const bars = parseCSV(replayBarsMap[symbol][replayDateStr]);
+      const orders = replayOrdersMap[symbol][replayDateStr];
+      const positions = replayPositionsMap[symbol][replayDateStr];
+      const comments = replayCommentsMap[symbol][replayDateStr];  
 
-          const firstBarCloseTime = new Date(bars[0].timestamp);
-          const firstBarOpenTime = addToDate(firstBarCloseTime, { minutes: -1});
-          const replayStartTime = addToDate(firstBarOpenTime, { minutes: 15 });
-          const replayStartTimestamp = toRfc3339Str(replayStartTime)
+      const firstBarCloseTime = new Date(bars[0].timestamp);
+      const firstBarOpenTime = addToDate(firstBarCloseTime, { minutes: -1});
+      const replayStartTimestamp = replayDate;
 
-          const initBars: IBar[] = [];
+      const initBars: IBar[] = [];
 
-          let idx = 0;
-          while (bars[idx].timestamp <= replayStartTimestamp) {
-            const currentBar = bars[idx];
-            if (bars[idx + 1].timestamp !== currentBar.timestamp) {
-              initBars.push(currentBar as IBar);
-            }
-            idx++;
-          }
-         
-          setInitialBars(initBars);
-          
-          
-          const initialComments = [];
-          const replayComments = [];
-
-          for (let comment of comments) {
-            if (comment.timestamp <= replayStartTimestamp) {
-              initialComments.push(comment);
-            } else {
-              replayComments.push(comment);
-            }
-          }
-
-          const initialPositions: IPosition[] = [];
-          const replayPositions: IPosition[] = [];
-
-          for (let pos of positions) {
-            if (pos.openTimestamp <= replayStartTimestamp) {
-              initialPositions.push(pos);
-              if (!(pos.account in positionsRef.current)) {
-                positionsRef.current[pos.account] = {};
-              }
-              positionsRef.current[pos.account][pos.id] = pos;
-            } else {
-              replayPositions.push(pos);
-            }
-          }
-
-          initialComments.push(...initialPositions.map(pos => systemMessage(pos)));
-          initialComments.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
-          messageListRef.current = initialComments;
-
-          let replayBarCloseTimestamp = bars[idx].timestamp;
-          const mockBarWebSocket = setInterval(() => {
-            const now = addToDate(firstBarOpenTime, {seconds: idx + 1});
-            timestampRef.current = toRfc3339Str(now);
-            priceRef.current = parseFloat(bars[idx].close);
-
-            // replay bars
-            const mockBarMessage = replayBarCloseTimestamp !== bars[idx].timestamp ? {
-              type: 'closed_bar',
-              data: bars[idx - 1]
-            } : {
-              type: 'open_bar',
-              data: bars[idx]
-            }
-            openBarcallBackRef.current?.(mockBarMessage);
-
-            // replay comments
-            if (timestampRef.current >= replayComments[0]?.timestamp) {
-              const comment = replayComments.shift();
-              messageListRef.current.push(comment)
-            }
-           
-            // replay orders
-            for (let order of orders) {
-                const isOrderOpened = timestampRef.current >= order.openTimestamp;
-                if (isOrderOpened) {
-                    if (!(order.account in ordersRef.current)) {
-                        ordersRef.current[order.account] = {};
-                    }
-                    ordersRef.current[order.account][order.id] = order;
-                }
-            }
-
-            // replay positions      
-            for (let pos of replayPositions) {
-              if (
-                (timestampRef.current >= pos.openTimestamp) &&
-                (timestampRef.current < pos.closeTimestamp)
-              ) {
-                if (!(pos.account in positionsRef.current)) {
-                  positionsRef.current[pos.account] = {};
-                }
-                if (!(pos.id in positionsRef.current[pos.account])) {
-                  messageListRef.current.push(systemMessage(pos));
-                }
-                const openedPosition: IPosition = { 
-                  id: pos.id,
-                  account: pos.account,
-                  direction: pos.direction,
-                  quantity: pos.quantity,
-                  symbol: pos.symbol,
-                  averagePrice: parseFloat(pos.averagePrice),
-                  openTimestamp: pos.openTimestamp,
-                  closeTimestamp: pos.closeTimestamp,
-                }
-                positionsRef.current[pos.account][pos.id] = openedPosition;
-
-
-              } else if (positionsRef.current[pos.account] && timestampRef.current > pos.closeTimestamp) {
-                const openPositions = {...positionsRef.current[pos.account]};
-                Reflect.deleteProperty(openPositions, pos.id);
-                positionsRef.current[pos.account] = openPositions;
-              }
-            }
-
-
-            replayBarCloseTimestamp = bars[idx].timestamp;
-            idx++;
-
-          }, 1000);
-
-          replayIntervalRef.current = mockBarWebSocket;
-
-          return () => {
-              clearInterval(mockBarWebSocket);
-          }
-
-      } else {
-          clearInterval(replayIntervalRef.current);
+      let idx = 0;
+      while (bars[idx].timestamp <= replayStartTimestamp) {
+        const currentBar = bars[idx];
+        if (bars[idx + 1].timestamp !== currentBar.timestamp) {
+          initBars.push(currentBar as IBar);
+        }
+        idx++;
       }
+      
+      setInitialBars(initBars);
+      
+      const initialComments = [];
+      const replayComments = [];
+
+      for (let comment of comments) {
+        if (comment.timestamp <= replayStartTimestamp) {
+          initialComments.push(comment);
+        } else {
+          replayComments.push(comment);
+        }
+      }
+
+      const initialPositions: IPosition[] = [];
+      const replayPositions: IPosition[] = [];
+
+      for (let pos of positions) {
+        if (pos.openTimestamp <= replayStartTimestamp) {
+          initialPositions.push(pos);
+          if (!(pos.account in positionsRef.current)) {
+            positionsRef.current[pos.account] = {};
+          }
+          positionsRef.current[pos.account][pos.id] = pos;
+        } else {
+          replayPositions.push(pos);
+        }
+      }
+
+      initialComments.push(...initialPositions.map(pos => systemMessage(pos)));
+      initialComments.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+      messageListRef.current = initialComments;
+
+      let replayBarCloseTimestamp = bars[idx].timestamp;
+      const mockBarWebSocket = setInterval(() => {
+        const now = addToDate(firstBarOpenTime, {seconds: idx + 1});
+        timestampRef.current = toRfc3339Str(now);
+        priceRef.current = parseFloat(bars[idx].close);
+
+        // replay bars
+        const mockBarMessage = replayBarCloseTimestamp !== bars[idx].timestamp ? {
+          type: 'closed_bar',
+          data: bars[idx - 1]
+        } : {
+          type: 'open_bar',
+          data: bars[idx]
+        }
+        openBarcallBackRef.current?.(mockBarMessage);
+
+        // replay comments
+        if (timestampRef.current >= replayComments[0]?.timestamp) {
+          const comment = replayComments.shift();
+          messageListRef.current.push(comment)
+        }
+        
+        // replay orders
+        for (let order of orders) {
+            const isOrderOpened = timestampRef.current >= order.openTimestamp;
+            if (isOrderOpened) {
+                if (!(order.account in ordersRef.current)) {
+                    ordersRef.current[order.account] = {};
+                }
+                ordersRef.current[order.account][order.id] = order;
+            }
+        }
+
+        // replay positions      
+        for (let pos of replayPositions) {
+          if (
+            (timestampRef.current >= pos.openTimestamp) &&
+            (timestampRef.current < pos.closeTimestamp)
+          ) {
+            if (!(pos.account in positionsRef.current)) {
+              positionsRef.current[pos.account] = {};
+            }
+            if (!(pos.id in positionsRef.current[pos.account])) {
+              messageListRef.current.push(systemMessage(pos));
+            }
+            const openedPosition: IPosition = { 
+              id: pos.id,
+              account: pos.account,
+              direction: pos.direction,
+              quantity: pos.quantity,
+              symbol: pos.symbol,
+              averagePrice: parseFloat(pos.averagePrice),
+              openTimestamp: pos.openTimestamp,
+              closeTimestamp: pos.closeTimestamp,
+            }
+            positionsRef.current[pos.account][pos.id] = openedPosition;
+
+
+          } else if (positionsRef.current[pos.account] && timestampRef.current > pos.closeTimestamp) {
+            const openPositions = {...positionsRef.current[pos.account]};
+            Reflect.deleteProperty(openPositions, pos.id);
+            positionsRef.current[pos.account] = openPositions;
+          }
+        }
+
+
+        replayBarCloseTimestamp = bars[idx].timestamp;
+        idx++;
+
+      }, 1000);
+
+      replayIntervalRef.current = mockBarWebSocket;
+
+      return () => {
+          clearInterval(mockBarWebSocket);
+      }
+
+    } else {
+        clearInterval(replayIntervalRef.current);
+    }
 
   }, [replayDate])
 
@@ -376,24 +358,29 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
       const secondsToStartReplay = 5;
       const offlineTimeout = setTimeout(() => {
         if (initialBars.length === 0) {
-          console.log('REPLAY!', isServerOnlineRef.current);
           setAssetClass('Stocks');
           setSymbol('NVDA');
-          setReplayDate('2025-08-22');
+          setReplayDate('2025-08-22T13:45:00Z');
         }
       }, secondsToStartReplay * 1000);
   
       if (initialBars.length === 0) {
-        const getclosedBars = (async () => {
+        const getclosedBars = async () => {
           console.log("Fetching closed bars");
-          const res = await fetch(`http://${serverAddress}/closed_bars/${symbol}`);
-          const closedBars = await res.json();
-          console.log(`CLOSED BARS: ${symbol}`);
-          console.log(closedBars);
+          try {
+            const res = await fetchTimeout(`http://${serverAddress}/closed_bars/${symbol}`, 5);
+            const closedBars = await res.json();
+            console.log(`closedBars: ${symbol}`);
+            console.log(closedBars);
+            setInitialBars(closedBars);
+            
+          } catch (error) {
+            console.log("Error fetching closed bars:", error);
+          }
+        };
 
-          setInitialBars(closedBars);
-    
-        })();
+        getclosedBars();
+
       }
 
       const barWs = new WebSocket(`ws://${serverAddress}/ws/bars/${symbol}`);

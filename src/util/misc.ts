@@ -139,3 +139,24 @@ export const isDST = (date = new Date()) => {
 
   return dstMap[month];
 }
+
+/**
+ * JS has no built in fetch with timeout
+ * @param url - endpoint
+ * @param timeout - timeout in seconds
+ */
+export const fetchTimeout = async (url: string, timeout: number) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => {
+    controller.abort();
+  }, timeout * 1000);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    return response;
+
+  } catch (error) {
+    throw error;
+  } finally {
+    clearTimeout(id);
+  }
+};
