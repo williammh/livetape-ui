@@ -14,7 +14,6 @@ import { Now } from './components/Now';
 import { Schedule } from './components/Schedule';
 import "./components/Shared.css";
 import { DialogContainer } from './components/DialogContainer';
-import { ServerStatus } from './components/ServerStatus';
 
 export const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -27,12 +26,6 @@ export const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const App = () => { 
-
-  const now = new Date();
-
-  now.setHours(13);
-  now.setMinutes(30);
-  now.setSeconds(0);
   
   const isPortraitMode = window.outerWidth < window.outerHeight;
   const isFixedWidthMode = false;
@@ -56,56 +49,7 @@ const App = () => {
         columns={18}
       >
         {/* app bar */}
-        <Grid
-          size={18}
-        >
-          <Item sx={{height: '100%'}}>
-            <Grid
-              container
-              columns={4}
-              alignItems='center'
-              sx={{
-                  height: '100%'
-              }}
-            >
-              <Grid
-                size={1}
-                sx={{
-                  textAlign: 'left',
-                }}
-              >
-                <Typography
-                  variant='h3'
-                  component='span'
-                  sx={{
-                    fontFamily: 'MontserratCustom',
-                    paddingLeft: 1,
-                  }}
-                >
-                  LiveTape.ai
-                </Typography>
-              </Grid>
-              <Grid
-                size={2}
-              >
-                <Typography
-                  variant='h6'
-                  noWrap={true}
-                >
-                  {/* {announcement} */}
-                </Typography>
-            
-              </Grid>
-              <Grid
-                size={1}
-              >
-                <ServerStatus />
-              </Grid>
-             
-            </Grid>
-          </Item>
-        </Grid>
-
+        {/* <AppBar /> */}
         {/* main content under app bar */}
         <Grid
           container
@@ -134,8 +78,8 @@ const App = () => {
               </Grid>
               <Grid
                 sx={{
-                  // app bar - now playing - schedule - email form - padding
-                  height: isFixedWidthMode ? 895 : window.innerHeight - 72 - 56 - 288 - 56 - 24,
+                  // now playing - schedule - email form - padding
+                  height: isFixedWidthMode ? 895 : window.innerHeight - 56 - 288 - 56 - 16,
                   paddingTop: 1,
                   paddingBottom: 1
                 }}

@@ -32,7 +32,7 @@ export const Now = () => {
       textAlign={'center'}
     >
       {/* \u00A0 */}
-      {`${symbolMap[symbol].name} (${symbolMap[symbol].exchange}: ${symbol})`}
+      {`${symbolMap[symbol].name}`}
     </Typography>
   </Box>
  )
