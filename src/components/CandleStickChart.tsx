@@ -10,8 +10,8 @@ import {
   colors,
   Typography,
 } from '@mui/material';
-import { serverAddress, useAppContext, type IBar } from '../contexts/AppContext';
-import { toLocalTimeStr, addToDate, toRfc3339Str, isDST } from '../util/misc';
+import { useAppContext, type IBar } from '../contexts/AppContext';
+import { toLocalTimeStr } from '../util/misc';
 
 const convertBars = (barData) => {
   if (!barData || !Array.isArray(barData) || barData.length === 0) {
@@ -46,7 +46,6 @@ const WebSocketDataHandler = ({ onMessage }: {onMessage: () => void }) => {
 const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxis, timezone) => {
   console.log(message.type);
   console.log(message.data);
-  console.log(rawBarDataRef.current.length);
 
   if (rawBarDataRef.current.length === 0) {
     return;
@@ -72,6 +71,16 @@ const handleWebSocketMessage = (message, chartRef, rawBarDataRef, userZoomedXAxi
   } : null;
 
   const currentBars = [...rawBarDataRef.current];
+
+  // is zoomed
+  // const firstBarTimestamp = currentBars[0].timestamp;
+  // const lastBarTimestamp = currentBars[currentBars.length - 1].timestamp;
+  
+  // const xMinTimestamp = toRfc3339Str(new Date(currentXAxisRange.min));
+  // const xMaxTimestamp = toRfc3339Str(new Date(currentXAxisRange.max));
+
+  // const isZoomed = xMinTimestamp  > firstBarTimestamp || xMaxTimestamp < lastBarTimestamp;
+  // console.log(isZoomed);
   
   switch(message.type) {
     case 'closed_bar':
@@ -181,31 +190,13 @@ const calcCleanXAxisRange = (min: number, max: number, firstBarTime?: number, la
   const cleanMax = Math.min(maxTopOfMinute, next5Min);
   const visibleMinuteBars = Math.ceil((cleanMax - min) / 60 / 1000);
   const maxTicks = Math.min(visibleMinuteBars, 12);
-  const minTicks = 6;
   const tickAmount = Math.min(visibleMinuteBars, maxTicks);
-  // const tickAmount = visibleMinuteBars < minTicks ? visibleMinuteBars : maxTicks;
-  // const tickAmount = Math.max(visibleMinuteBars, minTicks);
 
-  // console.log(new Date(firstBarTime));
-  // console.log(new Date(lastBarTime));
-
-
-  
-  // console.log('min', 'max');
-  // console.log(new Date(min));
-  // console.log(new Date(max));
-
-  // console.log('calcCleanXRange');
-  // console.log(new Date(cleanMin));
-  // console.log(new Date(cleanMax));
-  // console.log('tickAmount', tickAmount);
-  
-  // console.log('visibleMinuteBars',visibleMinuteBars);
 
   const stepSizeMin = Math.ceil((visibleMinuteBars + 1) / tickAmount);
-  // console.log("stepSizeMin", stepSizeMin);
+
   const stepSize = stepSizeMin * 60 * 1000;
-  // console.log("stepSize", stepSize);
+
 
   return { min: cleanMin, max: cleanMax, tickAmount, stepSize };
 };

@@ -180,11 +180,9 @@ export const StatusBar = () => {
             }}
           >
             <Select
-              // labelId="timezone select"
               id="timezone-select"
               value={timezone}
               color="default"
-              // label="Timezone"
               onChange={(event) => setTimezone(event.target.value)}
               renderValue={(value) => `${localTimestamp} ${getTzLabel(value)}`}
             >

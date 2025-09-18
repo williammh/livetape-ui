@@ -32,8 +32,10 @@ export const ServerStatus = () => {
         borderRadius: 1,
         display: 'flex',
         alignItems: 'center',
-        float: 'right'
+        float: 'right',
+        cursor: 'default'
       }}
+      title={isOnline ? 'Server Online' : 'Server Offline'}
     >
       <Typography
         variant='body1'
