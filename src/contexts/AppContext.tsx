@@ -194,7 +194,6 @@ export const AppProvider = ({children}: {children: React.ReactNode}) => {
         }
       } catch (error) {
         console.log(`Error fetching server status: ${error}`);
-       
         isServerOnlineRef.current = false;
       }
     };

@@ -10,7 +10,7 @@ import { Cloud, CloudOff } from '@mui/icons-material';
 export const ServerStatus = () => {
   const {isServerOnlineRef } = useAppContext();
   
-    const [isOnline, setIsOnline] = useState<boolean>(false);
+    const [isOnline, setIsOnline] = useState<boolean>(isServerOnlineRef.current);
   
     useEffect(() => {
       const updateInterval = setInterval(() => {
