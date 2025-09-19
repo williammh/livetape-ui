@@ -1,7 +1,7 @@
 export const toLocalDateTimeStr = (timestamp: string | Date, timezone: string) => {
     const options = {
         timeZone: timezone,
-        year: 'numeric',
+        year: '2-digit',
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
@@ -10,11 +10,10 @@ export const toLocalDateTimeStr = (timestamp: string | Date, timezone: string) =
         hour12: true,
     };
 
-    if (typeof timestamp === 'string') {
-      return new Date(timestamp).toLocaleString('en-US', options);
-    } else if (timestamp instanceof Date) {
-      return timestamp.toLocaleString('en-US', options);
-    }
+    const d = (timestamp instanceof Date) ? timestamp : new Date(timestamp);
+    return d.toLocaleString('en-US', options).toLowerCase();
+;
+  
 }
 
 export const toRfc3339Str = (date: Date) => {

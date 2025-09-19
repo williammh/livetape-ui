@@ -41,7 +41,6 @@ export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
           container
           flexDirection={'column'}
           size={8}
-          spacing={1}
         >
           {persona === 'moo' || persona == 'grizz' ? (
             <Grid
@@ -56,7 +55,6 @@ export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
                   height: 56,
                   width: 56,
                   bgcolor: bgColor,
-                  // margin: 'auto',
                 }}
               />
               <Typography

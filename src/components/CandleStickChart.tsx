@@ -8,6 +8,7 @@ import {
   Box,
   CircularProgress,
   colors,
+  Paper,
   Typography,
 } from '@mui/material';
 import { useAppContext, type IBar } from '../contexts/AppContext';
@@ -453,7 +454,9 @@ export const CandlestickChart = () => {
       sx={{
         marginTop: 1,
         height: height,
+        borderRadius: 1,
       }}
+      component={Paper}
     >
       <WebSocketDataHandler
         onMessage={(msg) => handleWebSocketMessage(msg, chartRef, rawBarDataRef, userZoomedXAxis, timezone)} 
@@ -555,13 +558,13 @@ export const CandlestickChart = () => {
                     userZoomedXAxis.current = true; 
                   }
 
-                  // return ;
                 }
               },
               // Prevent rendering of null/empty bars for replay bars
               sparkline: {
                 enabled: false
-              }
+              },
+           
             },
             plotOptions: {
               candlestick: {

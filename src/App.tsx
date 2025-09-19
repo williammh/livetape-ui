@@ -48,9 +48,8 @@ const App = () => {
         spacing={1}
         columns={18}
       >
-        {/* app bar */}
+        
         {/* <AppBar /> */}
-        {/* main content under app bar */}
         <Grid
           container
           direction='row'

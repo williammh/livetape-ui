@@ -68,15 +68,7 @@ export const ProfitLoss = ({persona}) => {
     },
   ]
 
-  const cellStyles = {
-    fontSize: 18,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    height: 56,
-    padding: '0px 16px'
-  }
-
+ 
   return (
     <Box
       sx={{
@@ -92,52 +84,7 @@ export const ProfitLoss = ({persona}) => {
       >
         +0.00 USD
       </Typography>
-      {/* <TableContainer
-        component={Paper}
-        sx={{
-          overflowX: 'hidden'
-        }}
-      >
-        <Table
-          aria-label="pnl table"
-          sx={{
-            tableLayout: 'fixed', 
-            width: '100%',
-          }}
-        >
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow
-                key={persona + row.name}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell
-                  component="th"
-                  scope="row"
-                  sx={{
-                    ...cellStyles,
-                    width: 'auto', 
-                  }}
-                >
-                  {row.name}
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    ...cellStyles,
-                    width: 160,
-                    minWidth: 160,
-                    paddingLeft: 0,
-                  }}
-                >
-                  {(row.value ?? beginningOfDayBalance).toFixed(2)} USD
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
-      </TableContainer> */}
+     
     </Box>
   );
 }
