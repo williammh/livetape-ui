@@ -47,6 +47,7 @@ export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
               container
               flexDirection={'row'}
               alignItems={'center'}
+              
 
             >
               <Avatar
@@ -55,12 +56,14 @@ export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
                   height: 56,
                   width: 56,
                   bgcolor: bgColor,
+
                 }}
               />
               <Typography
                 sx={{
                   fontSize: fontSize,
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  marginLeft: 1,
                 }}
               >
                 {displayName}
