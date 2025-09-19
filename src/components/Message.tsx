@@ -26,65 +26,78 @@ export const Message = ({persona, text: message, timestamp}: IMessageProps) => {
       columns={8}
       sx={{
         textAlign: 'left',
-        marginBottom: 2,
+        marginBottom: 1,
         marginRight: 1,
       }}
     >
-      <Grid
-        size={1}
+      <Card
         sx={{
-          textAlign: 'center',
+          padding: 1,
+          width: '100%'
         }}
+        
       >
-        {persona === 'moo' || persona == 'grizz' ? (
-          <>
-            <Avatar
-              src={avatar}
-              sx={{
-                height: 56,
-                width: 56,
-                bgcolor: bgColor,
-                margin: 'auto',
-              }}
-            />
+        <Grid
+          container
+          flexDirection={'column'}
+          size={8}
+          spacing={1}
+        >
+          {persona === 'moo' || persona == 'grizz' ? (
+            <Grid
+              container
+              flexDirection={'row'}
+              alignItems={'center'}
+
+            >
+              <Avatar
+                src={avatar}
+                sx={{
+                  height: 56,
+                  width: 56,
+                  bgcolor: bgColor,
+                  // margin: 'auto',
+                }}
+              />
+              <Typography
+                sx={{
+                  fontSize: fontSize,
+                  fontWeight: 'bold'
+                }}
+              >
+                {displayName}
+              </Typography>
+            </Grid>
+          ) : (
+            <>
+            </>
+          )}
+         
+          <Grid
+            padding={1}
+            paddingBottom={0}
+          >
             <Typography
               sx={{
                 fontSize: fontSize,
-                fontWeight: 'bold'
+                marginBottom: 1
               }}
-            >{displayName}</Typography>
-          </>
-        ) : (
-          <>
-          </>
-        )}
-      </Grid>
-      <Grid
-        size={7}
-      >
-        <Card
-          sx={{
-            padding: 2
-          }}
-        >
-          <Typography
-            sx={{
-              fontSize: fontSize,
-              marginBottom: 1
-            }}
-          >
-            {message}
-          </Typography>
-          <Typography
-            sx={{
-              textAlign: 'right',
-              color: 'gray'
-            }}
-          >
-            {localTimestamp}
-          </Typography>
-        </Card>
-      </Grid>
+            >
+              {message}
+            </Typography>
+            <Typography
+              sx={{
+                textAlign: 'right',
+                color: 'gray'
+              }}
+            >
+              {localTimestamp}
+            </Typography>
+          </Grid>
+          
+        </Grid>
+      
+      </Card>
     </Grid>  
   );
 }
