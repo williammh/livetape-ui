@@ -151,7 +151,7 @@ const replayPositionsMap = {
 
 const systemMessage = (pos) => ({
   persona: 'system',
-  text: `${pos.account[0].toUpperCase()}${pos.account.slice(1)} enters ${pos.direction.toUpperCase()} ${pos.quantity} ${pos.symbol} at ${pos.averagePrice}`,
+  text: `${pos.account[0].toUpperCase()}${pos.account.slice(1)} enters ${pos.direction.toUpperCase()} ${pos.quantity} ${pos.symbol} at ${pos.averagePrice} USD`,
   timestamp: pos.openTimestamp
 })
 

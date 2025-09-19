@@ -56,7 +56,44 @@ const App = () => {
           direction='row'
           size={18}
         >
-          {/* left 1/3 */}
+          
+
+
+          {/* left 2/3 */}
+          <Grid
+            container
+            direction='column'
+            columns={2}
+            size={12}
+          >
+            {/* status bar and chart */}
+            <Grid
+              columns={1}
+              size={2}
+              flexgrow={0}
+            >
+              <Item>
+                <StatusBar />
+                <CandlestickChart />
+              </Item>
+            </Grid>
+
+            <Grid
+              container
+              direction='row'
+              size={2}
+              flexGrow={1}
+            >
+              <Grid size={1}>
+                <Account persona='moo' />  
+              </Grid>
+              <Grid size={1}>
+                <Account persona='grizz' />  
+              </Grid>
+            </Grid>
+          </Grid>
+
+          {/* right 1/3 */}
           <Grid
             container
             direction='column'
@@ -98,41 +135,6 @@ const App = () => {
               </Grid>
 
             </Item>  
-          </Grid>
-
-
-          {/* right 2/3 */}
-          <Grid
-            container
-            direction='column'
-            columns={2}
-            size={12}
-          >
-            {/* status bar and chart */}
-            <Grid
-              columns={1}
-              size={2}
-              flexgrow={0}
-            >
-              <Item>
-                <StatusBar />
-                <CandlestickChart />
-              </Item>
-            </Grid>
-
-            <Grid
-              container
-              direction='row'
-              size={2}
-              flexGrow={1}
-            >
-              <Grid size={1}>
-                <Account persona='moo' />  
-              </Grid>
-              <Grid size={1}>
-                <Account persona='grizz' />  
-              </Grid>
-            </Grid>
           </Grid>
 
         </Grid>
