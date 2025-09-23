@@ -133,7 +133,7 @@ export const Orders = ({persona}) => {
             },
             fontSize: 18,
             border: 'unset',
-            height: 180,
+            height: 128,
             width: '100%',
             padding: 1,
             

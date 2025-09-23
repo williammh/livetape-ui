@@ -431,7 +431,7 @@ export const CandlestickChart = () => {
   }, [symbol]);
   
   // subtract height of StatusBar - Accounts - padding
-  const height = window.innerHeight - 64 - 446 - 30
+  const height = window.innerHeight - 64 - 344 - 30
 
   useEffect(() => {
     rawBarDataRef.current = initialBars;
