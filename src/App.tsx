@@ -115,7 +115,7 @@ const App = () => {
               <Grid
                 sx={{
                   // now playing - schedule - email form - padding
-                  height: isFixedWidthMode ? 895 : window.innerHeight - 56 - 288 - 56 - 16,
+                  height: isFixedWidthMode ? 895 : window.innerHeight - 56 - 232 - 56 - 16,
                   paddingTop: 1,
                   paddingBottom: 1
                 }}

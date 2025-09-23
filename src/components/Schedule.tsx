@@ -17,14 +17,13 @@ export const Schedule = () => {
   
   const now = new Date();
   
-  now.setHours(13);
-  now.setMinutes(30);
-  now.setSeconds(0);
-  
-  const btcTime = addToDate(now, {hours: 2, minutes: 30});
-  const tslaTime = addToDate(now, {days: 1});
-  const ethTime = addToDate(now, {days: 2});
-  const esTime = addToDate(now, {days: 3});
+  now.setUTCHours(13);
+  now.setUTCMinutes(30);
+  now.setUTCSeconds(0);
+
+  const next1 = addToDate(now, {days: 1});
+  const next2 = addToDate(now, {days: 2});
+  const next3 = addToDate(now, {days: 3});
 
 
   const dayMap = [
@@ -49,29 +48,30 @@ export const Schedule = () => {
   
   const scheduleItems = [
     {
-      'date': btcTime,
-      'assetClass': 'Crypto',
-      'symbol': 'BTCUSD',
-      'name': 'Bitcoin'
-    },
-    {
-      'date': tslaTime,
+      'date': next1,
       'assetClass': 'Stocks',
       'symbol': 'TSLA',
       'name': 'Tesla, Inc.'
     },
     {
-      'date': ethTime,
-      'assetClass': 'Crypto',
-      'symbol': 'ETHUSD',
-      'name': 'Ethereum'
+      'date': next2,
+      'assetClass': 'Stocks',
+      'symbol': 'AAPL',
+      'name': 'Apple, Inc.'
     },
     {
-      'date': esTime,
-      'assetClass': 'Futures',
-      'symbol': 'ESU25',
-      'name': 'S&P 500 E-Mini Sep 2025'
+      'date': next3,
+      'assetClass': 'Crypto',
+      'symbol': 'BTCUSD',
+      'name': 'Bitcoin'
     },
+    
+    // {
+    //   'date': esTime,
+    //   'assetClass': 'Futures',
+    //   'symbol': 'ESU25',
+    //   'name': 'S&P 500 E-Mini Sep 2025'
+    // },
   ];
 
   const rowHeight = 56
@@ -83,7 +83,6 @@ export const Schedule = () => {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     height: rowHeight,
-    // padding: 0,
     padding: '0px 16px'
   }
 
