@@ -14,8 +14,7 @@ export const Account = ({persona}: {persona: string}) => {
         <Item
             sx={{
                 height: '100%',
-                minHeight: 380,
-                // overflow: 'scroll',
+                minHeight: 350,
             }}
         >
             <Grid
