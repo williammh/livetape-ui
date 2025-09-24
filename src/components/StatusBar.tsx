@@ -175,6 +175,7 @@ export const StatusBar = () => {
             sx={{
               textAlign: 'left',
               flexGrow: 1,
+              minWidth: 312,
             }}
           >
             <Select
