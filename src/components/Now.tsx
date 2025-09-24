@@ -13,15 +13,12 @@ export const Now = () => {
       position: 'static',
       width: '100%',
       height: 56,
-      backgroundColor: '#202020',
       color: '#fff',
       display: 'flex',
       alignItems: 'center',
       padding: '16px',
       fontWeight: 'bold',
       zIndex: 1,
-      borderBottom: '1px solid #444',
-      justifyContent: 'center',
       borderRadius: 1,
     }}
   >
@@ -29,10 +26,9 @@ export const Now = () => {
       variant='h6'
       fontWeight='bold'
       noWrap={true}
-      textAlign={'center'}
     >
       {/* \u00A0 */}
-      {`${symbolMap[symbol].name}`}
+      {`${symbolMap[symbol].name} (${symbol})`}
     </Typography>
   </Box>
  )

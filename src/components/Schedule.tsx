@@ -120,7 +120,6 @@ export const Schedule = () => {
           position: 'static',
           width: '100%',
           height: rowHeight,
-          backgroundColor: '#202020',
           color: '#fff',
           display: 'flex',
           alignItems: 'center',
