@@ -13,11 +13,6 @@
   color: #212121;
 }
 
-
-.apexcharts-yaxis-annotations {
-
-}
-
 .apexcharts-yaxis-annotations rect {
   height: 28px;
   fill:#0004;
@@ -34,17 +29,22 @@
 }
 
 .green {
-  color: #4caf50
+  color: #4caf50;
 }
 
 .red {
   color: #f44336;
 }
 
-
 @font-face {
   font-family: "MontserratCustom";
   src: url("../assets/Montserrat-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
+}
+
+@media (orientation: portrait) {
+  .title {
+    display: None
+  }
 }

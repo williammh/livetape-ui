@@ -14,7 +14,6 @@ export const Now = () => {
       // ServerStatus width
       width: 'calc(100% - 74px)',
       height: 56,
-      color: '#fff',
       display: 'flex',
       alignItems: 'center',
       padding: 1,

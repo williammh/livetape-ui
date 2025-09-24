@@ -19,7 +19,7 @@ import {
 import { PlayArrow, History, CalendarMonth } from '@mui/icons-material';
 import { getTzLabel, toLocalDateTimeStr } from '../util/misc';
 import { useAppContext, symbols } from '../contexts/AppContext';
-import { ServerStatus } from './ServerStatus';
+
 
 export const StatusBar = () => {
   const [timestamp, setTimestamp] = useState<string>('');
@@ -102,13 +102,25 @@ export const StatusBar = () => {
           direction='row'
           size={1}
           flexGrow={1}
-          justifyContent='flex-start'
+          justifyContent='flex-end'
           alignItems='center'
           wrap='nowrap'
           sx={{
             height: 56,
           }}
         >
+          <Typography
+            className='title'
+            variant='h4'
+            sx={{
+              fontFamily: "MontserratCustom",
+              padding: 1,
+              flexGrow: 1,
+              textAlign: 'left'
+            }}
+          >
+            livetape.ai
+          </Typography>
           <Autocomplete 
             options={Object.keys(symbols)}
             getOptionDisabled={(option) =>
@@ -126,7 +138,6 @@ export const StatusBar = () => {
             sx={{
               ...gridStyles,
               width: 140,
-              padding: 0
             }}
             disableClearable={true}
           />
@@ -174,7 +185,7 @@ export const StatusBar = () => {
           <FormControl
             sx={{
               textAlign: 'left',
-              flexGrow: 1,
+              maxWidth: 312,
               minWidth: 312,
             }}
           >
