@@ -123,7 +123,7 @@ export const Schedule = () => {
           color: '#fff',
           display: 'flex',
           alignItems: 'center',
-          padding: '16px',
+          padding: 1,
           fontWeight: 'bold',
           zIndex: 1,
           borderBottom: '1px solid #444'

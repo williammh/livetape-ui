@@ -11,12 +11,13 @@ export const Now = () => {
   <Box
     sx={{
       position: 'static',
-      width: '100%',
+      // ServerStatus width
+      width: 'calc(100% - 74px)',
       height: 56,
       color: '#fff',
       display: 'flex',
       alignItems: 'center',
-      padding: '16px',
+      padding: 1,
       fontWeight: 'bold',
       zIndex: 1,
       borderRadius: 1,
@@ -26,6 +27,7 @@ export const Now = () => {
       variant='h6'
       fontWeight='bold'
       noWrap={true}
+      textOverflow={'ellipsis'}
     >
       {/* \u00A0 */}
       {`${symbolMap[symbol].name} (${symbol})`}

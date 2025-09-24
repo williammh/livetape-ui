@@ -1,8 +1,7 @@
 import { 
   Box,
   Grid,
-  Paper,
-  Typography,
+  Paper
 } from '@mui/material'
 import { Account } from './components//Account';
 import { CandlestickChart } from './components/CandleStickChart';
@@ -12,8 +11,9 @@ import { StatusBar } from './components/StatusBar';
 import { ButtonBar } from './components/ButtonBar';
 import { Now } from './components/Now';
 import { Schedule } from './components/Schedule';
-import "./components/Shared.css";
 import { DialogContainer } from './components/DialogContainer';
+import "./components/Shared.css";
+import { ServerStatus } from './components/ServerStatus';
 
 export const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -108,9 +108,11 @@ const App = () => {
                 container
                 direction='row'
                 alignItems='center'
-                justifyContent={'center'}
+                justifyContent={'space-between'}
+                wrap='nowrap'
               >
                 <Now />
+                <ServerStatus />
               </Grid>
               <Grid
                 sx={{

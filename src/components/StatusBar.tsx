@@ -173,10 +173,8 @@ export const StatusBar = () => {
           {/* Timezone */}
           <FormControl
             sx={{
-              marginRight: 1,
               textAlign: 'left',
               flexGrow: 1,
-              maxWidth: 340,
             }}
           >
             <Select
@@ -200,9 +198,6 @@ export const StatusBar = () => {
               <MenuItem value={'Australia/Sydney'}>Sydney</MenuItem>
             </Select>
           </FormControl>
-        </Grid>
-        <Grid>
-          <ServerStatus />
         </Grid>
       </Grid>
 
